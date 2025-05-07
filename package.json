@@ -4,6 +4,7 @@
   "module": "index.js",
   "type": "module",
   "scripts": {
+    "version": "bunx changeset",
     "build": "echo 'Add your build command here'",
     "release": "bun run build && bunx changeset publish"
   },
