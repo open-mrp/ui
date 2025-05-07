@@ -1,6 +1,6 @@
 {
   "name": "@augno/components",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "module": "index.js",
   "type": "module",
   "scripts": {
