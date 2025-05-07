@@ -1,8 +1,9 @@
 name: Release Package
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -12,7 +13,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      - run: bun install --frozen-lockfile
+      - run: bun install
       - run: bun test
 
   publish-gpr:
@@ -27,7 +28,7 @@ jobs:
         with:
           bun-version: latest
           registry-url: https://npm.pkg.github.com/
-      - run: bun install --frozen-lockfile
+      - run: bun install
       - run: bun publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
