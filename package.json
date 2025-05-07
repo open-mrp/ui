@@ -3,13 +3,18 @@
   "version": "0.0.2",
   "module": "index.js",
   "type": "module",
+  "scripts": {
+    "build": "echo 'Add your build command here'",
+    "release": "bun run build && changeset publish"
+  },
   "devDependencies": {
+    "@changesets/cli": "^2.29.3",
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "publishConfig": {
-    "registry":"https://npm.pkg.github.com/"
+    "registry": "https://npm.pkg.github.com/"
   }
 }
