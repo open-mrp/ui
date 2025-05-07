@@ -3,12 +3,7 @@
   "version": "0.0.1",
   "module": "index.js",
   "type": "module",
-  "scripts": {
-    "version": "changeset version",
-    "release": "changeset publish"
-  },
   "devDependencies": {
-    "@changesets/cli": "^2.29.3",
     "@types/bun": "latest"
   },
   "peerDependencies": {
