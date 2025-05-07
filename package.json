@@ -1,5 +1,6 @@
 {
   "name": "@augno/components",
+  "version": "0.0.1",
   "module": "index.js",
   "type": "module",
   "devDependencies": {
