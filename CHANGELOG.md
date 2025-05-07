@@ -1,5 +1,12 @@
 # @augno/components
 
+## 0.0.5
+
+### Patch Changes
+
+- 24b53b2: Removing the duplicate hello world
+- 34a9959: Trying a new approach
+
 ## 0.0.4
 
 ### Patch Changes
