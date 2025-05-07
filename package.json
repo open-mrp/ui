@@ -1,11 +1,11 @@
 {
   "name": "@augno/components",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "module": "index.js",
   "type": "module",
   "scripts": {
     "build": "echo 'Add your build command here'",
-    "release": "bun run build && changeset publish"
+    "release": "bun run build && bunx changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.3",
