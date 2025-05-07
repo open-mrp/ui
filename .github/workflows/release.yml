@@ -24,10 +24,13 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-          registry-url: https://npm.pkg.github.com/
       - run: bun install
       - run: npm adduser
       - run: npm publish
