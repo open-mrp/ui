@@ -1,5 +1,11 @@
 # @augno/components
 
+## 0.0.8
+
+### Patch Changes
+
+- cac53aa: Trying to remove PAT from the workflow
+
 ## 0.0.7
 
 ### Patch Changes
