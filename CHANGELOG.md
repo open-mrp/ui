@@ -1,5 +1,11 @@
 # @augno/components
 
+## 0.0.6
+
+### Patch Changes
+
+- d780e78: Moving publishing to npmrc
+
 ## 0.0.5
 
 ### Patch Changes
