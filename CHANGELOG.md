@@ -1,5 +1,11 @@
 # @augno/components
 
+## 0.0.9
+
+### Patch Changes
+
+- bdefccd: Updating the hello world message
+
 ## 0.0.8
 
 ### Patch Changes
