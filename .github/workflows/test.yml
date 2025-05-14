@@ -24,10 +24,11 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      - run: npm install
+      - run: bun install
+
       # This action uses the changesets created in PRs to create a new version and publish
       - name: Create Release Pull Request or Publish
-        run: npm run rollup
+        run: bun run rollup
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
