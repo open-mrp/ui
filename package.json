@@ -1,7 +1,7 @@
 {
   "name": "@augno/components",
   "description": "A collection of react components for Augno.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Augno, Inc.",
   "type": "module",
   "main": "dist/cjs/index.js",
