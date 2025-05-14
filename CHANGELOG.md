@@ -1,5 +1,11 @@
 # @augno/components
 
+## 0.1.0
+
+### Minor Changes
+
+- 88dbda0: Adding a test component
+
 ## 0.0.9
 
 ### Patch Changes
