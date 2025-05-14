@@ -13,7 +13,9 @@ const cjsConfig = {
     sourcemap: true,
   },
   plugins: [
-    resolve(),
+    resolve({
+      extensions: ['.ts', '.tsx', '.js', '.jsx']
+    }),
     commonjs(),
     typescript({ 
       tsconfig: "./tsconfig.json",
@@ -37,7 +39,9 @@ const esmConfig = {
     sourcemap: true,
   },
   plugins: [
-    resolve(),
+    resolve({
+      extensions: ['.ts', '.tsx', '.js', '.jsx']
+    }),
     commonjs(),
     typescript({ 
       tsconfig: "./tsconfig.json",
