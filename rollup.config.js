@@ -24,7 +24,8 @@ const cjsConfig = {
       declarationDir: "./dist/cjs",
       compilerOptions: {
         sourceMap: true,
-        inlineSources: true
+        inlineSources: true,
+        noEmit: false
       }
     }),
     postcss(),
@@ -50,7 +51,8 @@ const esmConfig = {
       declarationDir: "./dist/esm",
       compilerOptions: {
         sourceMap: true,
-        inlineSources: true
+        inlineSources: true,
+        noEmit: false
       }
     }),
     postcss(),
@@ -72,6 +74,7 @@ const dtsConfig = {
       compilerOptions: {
         sourceMap: true,
         inlineSources: true,
+        noEmit: false
       }
     }),
     dts()
