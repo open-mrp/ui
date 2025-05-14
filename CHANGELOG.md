@@ -1,5 +1,12 @@
 # @augno/components
 
+## 0.1.5
+
+### Patch Changes
+
+- 94d6f18: adding CI pipeline
+- 10e0d5c: fix to release pipeline
+
 ## 0.1.4
 
 ### Patch Changes
