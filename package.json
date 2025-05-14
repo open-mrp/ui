@@ -13,19 +13,26 @@
   "scripts": {
     "version": "bunx changeset",
     "rollup": "rollup -c",
-    "release": "bun run rollup && bunx changeset publish"
+    "release": "bun run rollup && bunx changeset publish",
+    "check-changes": "bunx changeset status || exit 1",
+    "test": "jest"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.3",
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
+    "@testing-library/react": "^16.3.0",
     "@types/bun": "latest",
+    "@types/jest": "^29.5.14",
     "@types/react": "^19.1.4",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "react": "^19.1.0",
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-postcss": "^4.0.2",
+    "ts-jest": "^29.3.3",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.3",
-    "react": "^19.1.0"
+    "typescript": "^5.8.3"
   }
 }
