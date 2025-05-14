@@ -1,5 +1,11 @@
 # @augno/components
 
+## 0.1.3
+
+### Patch Changes
+
+- 42ad0c8: fixing issue with rollup
+
 ## 0.1.2
 
 ### Patch Changes
