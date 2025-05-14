@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 import Button, { ButtonProps } from "./Button";
 
-interface LinkButtonProps extends ButtonProps {
+export interface LinkButtonProps extends ButtonProps {
   href: string;
 }
 
