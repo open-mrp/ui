@@ -1,5 +1,11 @@
 # @augno/components
 
+## 0.2.0
+
+### Minor Changes
+
+- fde84c3: Adding button component
+
 ## 0.1.5
 
 ### Patch Changes
