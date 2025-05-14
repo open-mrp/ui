@@ -25,7 +25,6 @@ jobs:
         with:
           bun-version: latest
       - run: bun install
-      
       # This action uses the changesets created in PRs to create a new version and publish
       - name: Create Release Pull Request or Publish
         run: bun run rollup

@@ -25,7 +25,6 @@ const cjsConfig = {
         sourceMap: true,
         inlineSources: true
       },
-      sourceMap: true,
     }),
     postcss(),
   ],
@@ -51,7 +50,6 @@ const esmConfig = {
         sourceMap: true,
         inlineSources: true
       },
-      sourceMap: true,
     }),
     postcss(),
   ],
@@ -59,7 +57,7 @@ const esmConfig = {
 
 const dtsConfig = {
   input: "src/index.ts",
-  output: [{ file: "dist/index.d.ts", format: "esm" }],
+  output: [{ file: "dist/index.d.ts", format: "esm", sourcemap: true }],
   plugins: [
     typescript({ 
       tsconfig: "./tsconfig.json",
@@ -69,7 +67,6 @@ const dtsConfig = {
         sourceMap: true,
         inlineSources: true,
       },
-      sourceMap: true,
     }),
     dts()
   ],

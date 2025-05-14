@@ -11,9 +11,11 @@
     "declarationDir": "./dist/cjs",
     "sourceMap": true,
     "outDir": "dist",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "emitDeclarationOnly": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
