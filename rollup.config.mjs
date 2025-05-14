@@ -25,10 +25,6 @@ const cjsConfig = {
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/cjs",
-      compilerOptions: {
-        sourceMap: true,
-        inlineSources: true
-      }
     }),
     postcss(),
   ],
@@ -53,10 +49,6 @@ const esmConfig = {
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/esm",
-      compilerOptions: {
-        sourceMap: true,
-        inlineSources: true
-      }
     }),
     postcss(),
   ],
@@ -76,10 +68,6 @@ const dtsConfig = {
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/types",
-      compilerOptions: {
-        sourceMap: true,
-        inlineSources: true
-      }
     }),
     dts()
   ],
