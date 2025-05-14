@@ -15,7 +15,9 @@ const cjsConfig = {
   plugins: [
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      mainFields: ['module', 'main']
+      mainFields: ['module', 'main'],
+      preserveSymlinks: true,
+      preferBuiltins: true
     }),
     commonjs(),
     typescript({ 
@@ -24,8 +26,7 @@ const cjsConfig = {
       declarationDir: "./dist/cjs",
       compilerOptions: {
         sourceMap: true,
-        inlineSources: true,
-        noEmit: false
+        inlineSources: true
       }
     }),
     postcss(),
@@ -42,7 +43,9 @@ const esmConfig = {
   plugins: [
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      mainFields: ['module', 'main']
+      mainFields: ['module', 'main'],
+      preserveSymlinks: true,
+      preferBuiltins: true
     }),
     commonjs(),
     typescript({ 
@@ -51,8 +54,7 @@ const esmConfig = {
       declarationDir: "./dist/esm",
       compilerOptions: {
         sourceMap: true,
-        inlineSources: true,
-        noEmit: false
+        inlineSources: true
       }
     }),
     postcss(),
@@ -65,7 +67,9 @@ const dtsConfig = {
   plugins: [
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      mainFields: ['module', 'main']
+      mainFields: ['module', 'main'],
+      preserveSymlinks: true,
+      preferBuiltins: true
     }),
     typescript({ 
       tsconfig: "./tsconfig.json",
@@ -73,8 +77,7 @@ const dtsConfig = {
       declarationDir: "./dist/types",
       compilerOptions: {
         sourceMap: true,
-        inlineSources: true,
-        noEmit: false
+        inlineSources: true
       }
     }),
     dts()
