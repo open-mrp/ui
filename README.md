@@ -1,5 +1,6 @@
-# components
-Shared react components for Augno
+# @augno/ui
+
+Shared react components and user interface utilities for Augno
 
 TODO: 
 - Add general linting and prettier
