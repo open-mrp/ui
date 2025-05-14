@@ -1,5 +1,11 @@
 # @augno/components
 
+## 0.1.2
+
+### Patch Changes
+
+- b7779d9: Adding rollup
+
 ## 0.1.1
 
 ### Patch Changes
