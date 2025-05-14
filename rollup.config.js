@@ -14,7 +14,8 @@ const cjsConfig = {
   },
   plugins: [
     resolve({
-      extensions: ['.ts', '.tsx', '.js', '.jsx']
+      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      mainFields: ['module', 'main']
     }),
     commonjs(),
     typescript({ 
@@ -24,7 +25,7 @@ const cjsConfig = {
       compilerOptions: {
         sourceMap: true,
         inlineSources: true
-      },
+      }
     }),
     postcss(),
   ],
@@ -39,7 +40,8 @@ const esmConfig = {
   },
   plugins: [
     resolve({
-      extensions: ['.ts', '.tsx', '.js', '.jsx']
+      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      mainFields: ['module', 'main']
     }),
     commonjs(),
     typescript({ 
@@ -49,7 +51,7 @@ const esmConfig = {
       compilerOptions: {
         sourceMap: true,
         inlineSources: true
-      },
+      }
     }),
     postcss(),
   ],
@@ -59,6 +61,10 @@ const dtsConfig = {
   input: "src/index.ts",
   output: [{ file: "dist/index.d.ts", format: "esm", sourcemap: true }],
   plugins: [
+    resolve({
+      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      mainFields: ['module', 'main']
+    }),
     typescript({ 
       tsconfig: "./tsconfig.json",
       declaration: true,
@@ -66,7 +72,7 @@ const dtsConfig = {
       compilerOptions: {
         sourceMap: true,
         inlineSources: true,
-      },
+      }
     }),
     dts()
   ],
