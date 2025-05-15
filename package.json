@@ -15,7 +15,7 @@
     "build": "rollup -c",
     "release": "bun run build && bunx changeset publish",
     "check-changes": "bunx changeset status || exit 1",
-    "test": "jest"
+    "test": "bunx jest"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.3",
