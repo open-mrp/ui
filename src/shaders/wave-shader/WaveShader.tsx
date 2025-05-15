@@ -137,10 +137,11 @@ export function WaveShader({
 
   return (
     <div
-      className={`relative max-w-full ${
-        skew === "full" ? `-skew-y-[${skewDegree}deg]` : ""
-      }`}
-      style={{ width: canvasWidth }}
+      className="relative max-w-full"
+      style={{ 
+        width: canvasWidth,
+        ...(skew === "full" ? { transform: `skewY(-${skewDegree}deg)` } : {})
+      }}
     >
       <div style={{ paddingTop: `${(canvasHeight / canvasWidth) * 100}%` }} />
       <div
