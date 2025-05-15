@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.3.1
+
+### Patch Changes
+
+- e65db6a: Making the styles their own dedicated export
+
 ## 0.3.0
 
 ### Minor Changes
