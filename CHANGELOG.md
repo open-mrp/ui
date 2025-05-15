@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.3.0
+
+### Minor Changes
+
+- cc88079: adding global css styles to export
+
 ## 0.2.4
 
 ### Patch Changes
