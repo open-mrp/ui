@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.2.3
+
+### Patch Changes
+
+- 18a72a0: attempting fix with react peer dep
+
 ## 0.2.2
 
 ### Patch Changes
