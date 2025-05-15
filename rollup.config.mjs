@@ -4,7 +4,6 @@ import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 import postcss from "rollup-plugin-postcss";
 import { string } from "rollup-plugin-string";
-
 import packageJson from './package.json' with { type: 'json' };
 
 const cjsConfig = {
@@ -14,8 +13,13 @@ const cjsConfig = {
     format: "cjs",
     sourcemap: true,
   },
-  external: ['react', 'react-dom', /\.(css|less|scss)$/],
+  external: ['react', 'react-dom'],
   plugins: [
+    postcss({
+        extract: 'styles.css', 
+        minimize: true, 
+        sourceMap: true, 
+    }),
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
       mainFields: ['module', 'main'],
@@ -27,8 +31,8 @@ const cjsConfig = {
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/cjs",
+      exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
     }),
-    postcss(),
     string({
       include: '**/*.glsl'
     }),
@@ -42,8 +46,13 @@ const esmConfig = {
     format: "esm",
     sourcemap: true,
   },
-  external: ['react', 'react-dom', /\.(css|less|scss)$/],
+  external: ['react', 'react-dom'],
   plugins: [
+    postcss({
+        extract: 'styles.css',
+        minimize: true, 
+        sourceMap: true,
+    }),
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
       mainFields: ['module', 'main'],
@@ -55,8 +64,8 @@ const esmConfig = {
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/esm",
+      exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
     }),
-    postcss(),
     string({
       include: '**/*.glsl'
     }),
@@ -78,6 +87,7 @@ const dtsConfig = {
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/types",
+      exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
     }),
     dts()
   ],
