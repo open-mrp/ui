@@ -50,6 +50,7 @@ const cjsConfig = {
       declarationDir: "./dist/cjs",
       exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
     }),
+    postcss(),
     string({
       include: '**/*.glsl'
     }),
@@ -78,6 +79,7 @@ const esmConfig = {
       declarationDir: "./dist/esm",
       exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
     }),
+    postcss(),
     string({
       include: '**/*.glsl'
     }),
