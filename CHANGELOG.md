@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.2.4
+
+### Patch Changes
+
+- 9580e20: fix for wave shader
+
 ## 0.2.3
 
 ### Patch Changes
