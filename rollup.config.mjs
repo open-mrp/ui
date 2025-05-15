@@ -3,6 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 import postcss from "rollup-plugin-postcss";
+import { string } from "rollup-plugin-string";
 
 import packageJson from './package.json' with { type: 'json' };
 
@@ -28,6 +29,9 @@ const cjsConfig = {
       declarationDir: "./dist/cjs",
     }),
     postcss(),
+    string({
+      include: '**/*.glsl'
+    }),
   ],
 };
 
@@ -53,6 +57,9 @@ const esmConfig = {
       declarationDir: "./dist/esm",
     }),
     postcss(),
+    string({
+      include: '**/*.glsl'
+    }),
   ],
 };
 
