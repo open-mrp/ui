@@ -36,3 +36,6 @@ jobs:
 
       - name: Test
         run: bun run test
+
+      - name: Check Changes
+        run: bun run check-changes
