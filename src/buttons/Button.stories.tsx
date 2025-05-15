@@ -22,7 +22,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="p-4">
+      <div className="p-4 dark:bg-background">
         <Story />
       </div>
     ),

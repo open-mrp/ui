@@ -8,23 +8,6 @@
   --border-color: #e5e7eb;
   --primary: #5048e5;
   --secondary: #10b981;
-  --gutterWidth: 16px;
-  --windowWidth: calc(100vw - var(--scrollbarWidth));
-  --layoutWidth: calc(var(--windowWidth) - var(--gutterWidth) * 2);
-  --layoutWidthMax: 1080px;
-  --scrollbarWidth: 15px;
-  --cardShadowMedium: 0 13px 27px -5px rgba(50, 50, 93, 0.25),
-    0 8px 16px -8px rgba(0, 0, 0, 0.3);
-  --cardBorderRadius: 8px;
-  --fontFamily: "sohne-var", "Helvetica Neue", "Arial", sans-serif;
-
-  /* Gradient colors */
-  --gradientColorZero: #a960ee;
-  --gradientColorOne: #ff333d;
-  --gradientColorTwo: #90e0ff;
-  --gradientColorThree: #ffcb57;
-  --angleStrong: -12deg;
-  --angleStrongSin: 0.212;
 }
 
 .dark {
@@ -33,7 +16,7 @@
   --text-secondary: #a9b3c1;
   --code-background: #161b27;
   --border-color: #1f2937;
-  --primary: #ff3961;
+  --primary: #5048e5;
   --secondary: #10b981;
 }
 
