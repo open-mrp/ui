@@ -10,6 +10,17 @@
     "dist"
   ],
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./styles.css": {
+      "import": "./dist/esm/styles.css",
+      "require": "./dist/cjs/styles.css"
+    }
+  },
   "scripts": {
     "version": "changeset",
     "build": "rollup -c",
