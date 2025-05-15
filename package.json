@@ -12,7 +12,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "version": "bunx @changesets/cli",
-    "build": "rollup -c",
+    "build": "bunx rollup -c",
     "release": "bun run build && bunx changeset publish",
     "check-changes": "bunx changeset status || exit 1",
     "test": "bunx jest"
@@ -31,14 +31,15 @@
     "class-variance-authority": "^0.7.1",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-string": "^3.0.0",
     "tailwind-merge": "^3.3.0",
     "ts-jest": "^29.3.3",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "react": "^19.0.0",

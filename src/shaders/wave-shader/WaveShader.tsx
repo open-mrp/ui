@@ -2,12 +2,13 @@ import React from "react";
 
 import { useViewportWidth } from "@/hooks/useViewportWidth";
 import { useEffect, useRef, useState } from "react";
+import { calculateShaderCanvasDimensions } from "../utils/calculateShaderCanvasDimensions";
 import { WaveShaderRenderer } from "./WaveShaderRenderer";
 import { colorConfigurations } from "./colorConfigurations";
+import fragmentShaderSource from "./shaders/main.glsl";
 import { FragmentShader } from "./shaders/types";
+import vertexShaderSource from "./shaders/vertex.glsl";
 import { WaveShaderProps } from "./types";
-import { calculateShaderCanvasDimensions } from "../utils/calculateShaderCanvasDimensions";
-import { loadShader } from "../utils/loadShader";
 
 export function WaveShader({
   animate = true,
@@ -55,12 +56,8 @@ export function WaveShader({
 
   useEffect(() => {
     async function loadShaders() {
-      const [vs, fs] = await Promise.all([
-        loadShader("wave-shader", "vertex"),
-        loadShader("wave-shader", "main"),
-      ]);
-      setVertexShader(vs);
-      setShader({ shader: fs, uniforms: {} });
+      setVertexShader(vertexShaderSource);
+      setShader({ shader: fragmentShaderSource, uniforms: {} });
     }
     loadShaders();
   }, []);
