@@ -6,6 +6,28 @@ import postcss from "rollup-plugin-postcss";
 import { string } from "rollup-plugin-string";
 import packageJson from './package.json' with { type: 'json' };
 
+const stylesConfig = {
+  input: "src/styles/index.ts",
+  output: [
+    {
+      file: "dist/cjs/styles.css",
+      format: "cjs",
+    },
+    {
+      file: "dist/esm/styles.css",
+      format: "esm",
+    }
+  ],
+  external: ['react', 'react-dom'],
+  plugins: [
+    postcss({
+      extract: true,
+      minimize: true,
+      sourceMap: true,
+    }),
+  ],
+};
+
 const cjsConfig = {
   input: "src/index.ts",
   output: {
@@ -13,13 +35,8 @@ const cjsConfig = {
     format: "cjs",
     sourcemap: true,
   },
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', /\.(css|less|scss)$/],
   plugins: [
-    postcss({
-        extract: 'styles.css', 
-        minimize: true, 
-        sourceMap: true, 
-    }),
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
       mainFields: ['module', 'main'],
@@ -46,13 +63,8 @@ const esmConfig = {
     format: "esm",
     sourcemap: true,
   },
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', /\.(css|less|scss)$/],
   plugins: [
-    postcss({
-        extract: 'styles.css',
-        minimize: true, 
-        sourceMap: true,
-    }),
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
       mainFields: ['module', 'main'],
@@ -93,4 +105,4 @@ const dtsConfig = {
   ],
 };
 
-export default [cjsConfig, esmConfig, dtsConfig];
+export default [stylesConfig, cjsConfig, esmConfig, dtsConfig];
