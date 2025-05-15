@@ -3,6 +3,7 @@ import React from "react";
 
 import { fn } from "@storybook/test";
 
+import { WaveShader } from "@/shaders/wave-shader";
 import Button from "./Button";
 
 export const ActionsData = {
@@ -33,8 +34,19 @@ type Story = StoryObj<typeof meta>;
 
 // Blur variant decorator
 const blurDecorator = (Story: any) => (
-  <div className="inline-block p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg">
-    <Story />
+  <div className="inline-block p-32 rounded-lg overflow-hidden relative">
+    <div className="absolute inset-0">
+      <WaveShader
+        colorConfiguration="default"
+        height={400}
+        // minWidth={400}
+        width={400}
+        animate={true}
+      />
+    </div>
+    <div className="relative">
+      <Story />
+    </div>
   </div>
 );
 

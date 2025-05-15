@@ -1,6 +1,6 @@
-import { clamp } from "@/utils/clamp";
 import { DEFAULT_HEIGHT } from "@/shaders/wave-shader/constants";
 import { WaveShaderProps } from "@/shaders/wave-shader/types";
+import { clamp } from "@/utils/clamp";
 
 export function calculateShaderCanvasDimensions(
   { height, minWidth, width, maintainHeight }: WaveShaderProps,
