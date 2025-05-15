@@ -5,5 +5,3 @@ export {
   ButtonSize,
   ButtonVariant,
 } from "./Button";
-
-export { default as LinkButton, LinkButtonProps } from "./LinkButton";
