@@ -1,6 +1,8 @@
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
+import tailwindcssPostcss from '@tailwindcss/postcss';
+import autoprefixer from 'autoprefixer';
 import dts from "rollup-plugin-dts";
 import postcss from "rollup-plugin-postcss";
 import { string } from "rollup-plugin-string";
@@ -24,6 +26,10 @@ const stylesConfig = {
       extract: true,
       minimize: true,
       sourceMap: true,
+      plugins: [
+        tailwindcssPostcss,
+        autoprefixer,
+      ],
     }),
   ],
 };
