@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.2.2
+
+### Patch Changes
+
+- 13ee5ee: removing nextjs dep
+
 ## 0.2.1
 
 ### Patch Changes
