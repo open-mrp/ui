@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.2.0
+
+### Minor Changes
+
+- 9e45b27: Adding icons, shaders and hooks
+
 ## 0.1.0
 
 ### Minor Changes
