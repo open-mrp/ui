@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.3.4
+
+### Patch Changes
+
+- 3d702d3: fix for styles
+
 ## 0.3.3
 
 ### Patch Changes
