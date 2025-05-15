@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.3.2
+
+### Patch Changes
+
+- 4d74bb3: Fixing issue where hooks were not exported
+
 ## 0.3.1
 
 ### Patch Changes
