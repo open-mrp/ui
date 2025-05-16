@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+"use client";
+
 import { cssVariables } from "@/utils/cssVariables";
+import { useEffect, useRef, useState } from "react";
 
 const createUseViewportWidth = (isomorphic: boolean) => () => {
   const [width, setWidth] = useState<number | null>(() => {
-    return isomorphic || typeof window === "undefined" ? null : window.innerWidth;
+    return isomorphic || typeof window === "undefined"
+      ? null
+      : window.innerWidth;
   });
   const widthRef = useRef(width);
   widthRef.current = width;

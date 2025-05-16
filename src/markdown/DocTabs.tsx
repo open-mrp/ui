@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/utils/cn";
 import React, { ReactNode, useEffect, useState } from "react";
 import { DocTabProps } from "./DocTab";

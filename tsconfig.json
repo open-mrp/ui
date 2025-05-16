@@ -10,7 +10,7 @@
     "declaration": true,
     "declarationDir": "./dist",
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "dist",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "emitDeclarationOnly": true,

@@ -1,12 +1,11 @@
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
-import tailwindcssPostcss from '@tailwindcss/postcss';
-import autoprefixer from 'autoprefixer';
-import dts from "rollup-plugin-dts";
+import tailwindcssPostcss from "@tailwindcss/postcss";
+import autoprefixer from "autoprefixer";
 import postcss from "rollup-plugin-postcss";
+import preserveDirectives from "rollup-plugin-preserve-directives";
 import { string } from "rollup-plugin-string";
-import packageJson from './package.json' with { type: 'json' };
 
 const stylesConfig = {
   input: "src/styles/index.ts",
@@ -18,18 +17,15 @@ const stylesConfig = {
     {
       file: "dist/esm/styles.css",
       format: "esm",
-    }
+    },
   ],
-  external: ['react', 'react-dom'],
+  external: ["react", "react-dom"],
   plugins: [
     postcss({
       extract: true,
       minimize: true,
       sourceMap: true,
-      plugins: [
-        tailwindcssPostcss,
-        autoprefixer,
-      ],
+      plugins: [tailwindcssPostcss, autoprefixer],
     }),
   ],
 };
@@ -37,80 +33,79 @@ const stylesConfig = {
 const cjsConfig = {
   input: "src/index.ts",
   output: {
-    file: packageJson.main,
+    dir: "dist",
     format: "cjs",
     sourcemap: true,
+    preserveModules: true,
   },
-  external: ['react', 'react-dom', '@xyflow/react', /\.(css|less|scss)$/],
+  external: ["react", "react-dom", "@xyflow/react", /\.(css|less|scss)$/],
   plugins: [
+    preserveDirectives({ include: ["**/*.tsx", "**/*.ts"] }),
     resolve({
-      extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      mainFields: ['module', 'main'],
+      extensions: [".ts", ".tsx", ".js", ".jsx"],
+      mainFields: ["module", "main"],
       preserveSymlinks: true,
-      preferBuiltins: true
+      preferBuiltins: true,
     }),
     commonjs(),
-    typescript({ 
+    typescript({
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/cjs",
-      exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
+      exclude: [
+        "**/*.stories.tsx",
+        "**/*.stories.ts",
+        "**/*.test.tsx",
+        "**/*.test.ts",
+        "**/*.spec.tsx",
+        "**/*.spec.ts",
+      ],
     }),
     postcss(),
     string({
-      include: '**/*.glsl'
+      include: "**/*.glsl",
     }),
   ],
 };
 
 const esmConfig = {
   input: "src/index.ts",
-  output: {
-    file: packageJson.module,
-    format: "esm",
-    sourcemap: true,
-  },
-  external: ['react', 'react-dom', '@xyflow/react', /\.(css|less|scss)$/],
+  output: [
+    {
+      dir: "dist",
+      format: "esm",
+      sourcemap: true,
+      preserveModules: true,
+    },
+  ],
+  external: ["react", "react-dom", "@xyflow/react", /\.(css|less|scss)$/],
   plugins: [
+    preserveDirectives({ include: ["**/*.tsx", "**/*.ts"] }),
     resolve({
-      extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      mainFields: ['module', 'main'],
+      extensions: [".ts", ".tsx", ".js", ".jsx"],
+      mainFields: ["module", "main"],
       preserveSymlinks: true,
-      preferBuiltins: true
+      preferBuiltins: true,
     }),
     commonjs(),
-    typescript({ 
+    typescript({
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "./dist/esm",
-      exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
+      exclude: [
+        "**/*.stories.tsx",
+        "**/*.stories.ts",
+        "**/*.test.tsx",
+        "**/*.test.ts",
+        "**/*.spec.tsx",
+        "**/*.spec.ts",
+      ],
     }),
     postcss(),
     string({
-      include: '**/*.glsl'
+      include: "**/*.glsl",
     }),
   ],
 };
 
-const dtsConfig = {
-  input: "src/index.ts",
-  output: [{ file: "dist/index.d.ts", format: "esm", sourcemap: true }],
-  external: ['react', 'react-dom', '@xyflow/react', /\.(css|less|scss)$/],
-  plugins: [
-    resolve({
-      extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      mainFields: ['module', 'main'],
-      preserveSymlinks: true,
-      preferBuiltins: true
-    }),
-    typescript({ 
-      tsconfig: "./tsconfig.json",
-      declaration: true,
-      declarationDir: "./dist/types",
-      exclude: ["**/*.stories.tsx", "**/*.stories.ts", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"]
-    }),
-    dts()
-  ],
-};
-
-export default [stylesConfig, cjsConfig, esmConfig, dtsConfig];
+export default [stylesConfig, cjsConfig, esmConfig];
