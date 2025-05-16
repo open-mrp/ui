@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    "target": "ES2024",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -8,10 +8,10 @@
     "jsx": "react",
     "module": "ESNext",
     "declaration": true,
-    "declarationDir": "./dist/cjs",
+    "declarationDir": "./dist",
     "sourceMap": true,
-    "outDir": "dist",
-    "moduleResolution": "node",
+    "outDir": "./dist",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "emitDeclarationOnly": true,
     "resolveJsonModule": true,

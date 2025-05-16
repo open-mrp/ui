@@ -162,7 +162,7 @@ export const SmallButton: Story = {
 
 export const DefaultButton: Story = {
   args: {
-    size: "default",
+    size: "md",
     children: "Default Button",
   },
 };

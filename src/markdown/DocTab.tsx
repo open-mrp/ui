@@ -1,24 +1,25 @@
 import { cn } from "@/utils/cn";
-import React, { ReactNode, useContext } from "react";
-import { DocTabsContext } from "./DocTabs";
+import React, { ReactNode } from "react";
 
 export interface DocTabProps {
   label: string;
   children: ReactNode;
   showContent?: boolean;
+  isActive?: boolean;
+  onSelect?: (label: string) => void;
 }
 
-export default function DocTab({ label, children, showContent = true }: DocTabProps) {
-  const context = useContext(DocTabsContext);
-  if (!context) throw new Error("DocTab must be used within DocTabs");
-
-  const { activeTab, setActiveTab } = context;
-  const isActive = activeTab === label;
-
+export default function DocTab({
+  label,
+  children,
+  showContent = true,
+  isActive = false,
+  onSelect,
+}: DocTabProps) {
   if (!showContent) {
     return (
       <button
-        onClick={() => setActiveTab(label)}
+        onClick={() => onSelect?.(label)}
         className={cn(
           "py-4 px-4 border-b-2 font-medium text-sm transition-colors cursor-pointer",
           isActive

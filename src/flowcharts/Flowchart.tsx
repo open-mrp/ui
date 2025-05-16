@@ -1,12 +1,14 @@
+"use client";
+
 import { cn } from "@/utils/cn";
 import {
-    Background,
-    BackgroundVariant,
-    Edge,
-    Node,
-    NodeProps,
-    ReactFlow,
-    ReactFlowInstance,
+  Background,
+  BackgroundVariant,
+  Edge,
+  Node,
+  NodeProps,
+  ReactFlow,
+  ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import React, { useCallback, useState } from "react";

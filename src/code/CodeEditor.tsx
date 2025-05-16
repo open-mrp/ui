@@ -1,3 +1,5 @@
+"use client";
+
 import copy from "copy-to-clipboard";
 import React, { useEffect, useRef, useState } from "react";
 import { highlightCode } from "../utils/highlight";
