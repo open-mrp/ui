@@ -27,6 +27,7 @@ export interface FlowchartProps {
   className?: string;
   additionalNodeTypes?: Record<string, React.ComponentType<NodeProps>>;
   defaultViewport?: { x: number; y: number; zoom: number };
+  isPro?: boolean;
 }
 
 /**
@@ -39,6 +40,7 @@ export default function Flowchart({
   className = "",
   additionalNodeTypes = {},
   defaultViewport = { x: 0, y: 0, zoom: 0.5 },
+  isPro = false,
 }: FlowchartProps) {
   // Store the ReactFlow instance
   const [reactFlowInstance, setReactFlowInstance] =
@@ -64,7 +66,10 @@ export default function Flowchart({
       }}
     >
       <ReactFlow
-        proOptions={{ account: "paid-pro", hideAttribution: true }}
+        proOptions={{
+          account: isPro ? "paid-pro" : "free",
+          hideAttribution: isPro,
+        }}
         nodes={nodes}
         edges={edges}
         onInit={onInit}

@@ -41,7 +41,7 @@ const cjsConfig = {
     format: "cjs",
     sourcemap: true,
   },
-  external: ['react', 'react-dom', /\.(css|less|scss)$/],
+  external: ['react', 'react-dom', '@xyflow/react', /\.(css|less|scss)$/],
   plugins: [
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -70,7 +70,7 @@ const esmConfig = {
     format: "esm",
     sourcemap: true,
   },
-  external: ['react', 'react-dom', /\.(css|less|scss)$/],
+  external: ['react', 'react-dom', '@xyflow/react', /\.(css|less|scss)$/],
   plugins: [
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -95,7 +95,7 @@ const esmConfig = {
 const dtsConfig = {
   input: "src/index.ts",
   output: [{ file: "dist/index.d.ts", format: "esm", sourcemap: true }],
-  external: ['react', 'react-dom', /\.(css|less|scss)$/],
+  external: ['react', 'react-dom', '@xyflow/react', /\.(css|less|scss)$/],
   plugins: [
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],

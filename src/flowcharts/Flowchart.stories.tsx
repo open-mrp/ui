@@ -84,6 +84,7 @@ export const SimpleApiFlow: Story = {
     height: 500,
     nodes: simpleApiFlow.nodes,
     edges: simpleApiFlow.edges,
+    isPro: true,
   },
 };
 const complexFlow = createSequenceDiagram({
@@ -160,6 +161,7 @@ export const ComplexFlow: Story = {
     height: 600,
     nodes: complexFlow.nodes,
     edges: complexFlow.edges,
+    isPro: true,
   },
 };
 
@@ -198,5 +200,6 @@ export const CustomViewport: Story = {
     defaultViewport: { x: 100, y: 100, zoom: 0.8 },
     nodes: customViewport.nodes,
     edges: customViewport.edges,
+    isPro: true,
   },
 };

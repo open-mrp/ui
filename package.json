@@ -76,10 +76,10 @@
   },
   "peerDependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@xyflow/react": "^12.6.4"
   },
   "dependencies": {
-    "@xyflow/react": "^12.6.4",
     "copy-to-clipboard": "^3.3.3"
   }
 }
