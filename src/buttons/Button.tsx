@@ -1,10 +1,10 @@
+import { ComponentSize } from "@/types/ComponentSize";
 import { cn } from "@/utils/cn";
 import { cva } from "class-variance-authority";
 import React from "react";
 
 export type ButtonColor = "primary" | "secondary" | "gray" | "blur";
 export type ButtonVariant = "contained" | "outlined" | "text";
-export type ButtonSize = "sm" | "default" | "lg" | "icon";
 
 // Base styles
 const BASE_STYLES =
@@ -26,7 +26,7 @@ const buttonVariants = cva(BASE_STYLES, {
     size: {
       icon: "p-2",
       sm: "px-4 py-2 text-xs",
-      default: "px-4 py-2",
+      md: "px-4 py-2",
       lg: "px-6 py-2 text-base",
     },
     disabled: {
@@ -138,7 +138,7 @@ const buttonVariants = cva(BASE_STYLES, {
   defaultVariants: {
     variant: "contained",
     color: "primary",
-    size: "default",
+    size: "md",
     disabled: false,
   },
 });
@@ -147,7 +147,7 @@ export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
   children: React.ReactNode;
   variant?: ButtonVariant;
-  size?: ButtonSize;
+  size?: ComponentSize | "icon";
   color?: ButtonColor;
   disabled?: boolean;
 }
@@ -155,7 +155,7 @@ export interface ButtonProps
 export default function Button({
   children,
   variant = "contained",
-  size = "default",
+  size = "md",
   color = "primary",
   disabled = false,
   className,

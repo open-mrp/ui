@@ -1,4 +1,5 @@
-import { CheckIcon, CopyIcon } from "@/icons";
+import CheckIcon from "@/icons/CheckIcon";
+import CopyIcon from "@/icons/CopyIcon";
 import React from "react";
 
 export interface CodeCopyButtonProps {

@@ -1,4 +1,4 @@
-import { EventIcon } from "@/icons";
+import EventIcon from "@/icons/EventIcon";
 import { cn } from "@/utils/cn";
 import React from "react";
 

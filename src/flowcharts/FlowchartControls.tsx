@@ -1,5 +1,7 @@
 import { Button } from "@/buttons";
-import { FitViewIcon, ZoomInIcon, ZoomOutIcon } from "@/icons";
+import FitViewIcon from "@/icons/FitViewIcon";
+import ZoomInIcon from "@/icons/ZoomInIcon";
+import ZoomOutIcon from "@/icons/ZoomOutIcon";
 import { ReactFlowInstance } from "@xyflow/react";
 import React from "react";
 
