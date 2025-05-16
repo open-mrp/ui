@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.4.0
+
+### Minor Changes
+
+- 275e70e: Adding markdown components
+
 ## 0.3.4
 
 ### Patch Changes
