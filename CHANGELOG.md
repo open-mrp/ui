@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.4.1
+
+### Patch Changes
+
+- bab4822: fix for build process
+
 ## 0.4.0
 
 ### Minor Changes
