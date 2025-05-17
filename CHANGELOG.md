@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.4.3
+
+### Patch Changes
+
+- a168504: final fix for tailwind styling
+
 ## 0.4.2
 
 ### Patch Changes
