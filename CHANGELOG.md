@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.4.2
+
+### Patch Changes
+
+- af6352d: fix for types export
+
 ## 0.4.1
 
 ### Patch Changes
