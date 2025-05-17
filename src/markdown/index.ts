@@ -16,9 +16,4 @@ export {
   type DocPageHeaderProps,
 } from "./DocPageHeader";
 export { default as DocTab, type DocTabProps } from "./DocTab";
-export {
-  default as DocTabs,
-  default as DocTabsContext,
-  type DocTabsContextType,
-  type DocTabsProps,
-} from "./DocTabs";
+export { default as DocTabs, type DocTabsProps } from "./DocTabs";

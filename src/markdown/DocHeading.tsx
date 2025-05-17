@@ -1,3 +1,5 @@
+"use client";
+
 import CheckIcon from "@/icons/CheckIcon";
 import CopyIcon from "@/icons/CopyIcon";
 import React, { createElement, useState } from "react";

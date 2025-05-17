@@ -1,3 +1,5 @@
+"use client";
+
 import ChevronDownIcon from "@/icons/ChevronDownIcon";
 import ChevronUpIcon from "@/icons/ChevronUpIcon";
 import { cn } from "@/utils/cn";

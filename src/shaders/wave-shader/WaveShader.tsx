@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import { useViewportWidth } from "@/hooks/useViewportWidth";
@@ -138,9 +140,9 @@ export function WaveShader({
   return (
     <div
       className="relative max-w-full"
-      style={{ 
+      style={{
         width: canvasWidth,
-        ...(skew === "full" ? { transform: `skewY(-${skewDegree}deg)` } : {})
+        ...(skew === "full" ? { transform: `skewY(-${skewDegree}deg)` } : {}),
       }}
     >
       <div style={{ paddingTop: `${(canvasHeight / canvasWidth) * 100}%` }} />
