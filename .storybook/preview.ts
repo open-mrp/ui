@@ -1,5 +1,6 @@
 import type { Preview } from "@storybook/react";
-import "../src/styles/styles.css";
+import "../src/styles/atom-one-dark.css";
+import "../src/styles/theme.css";
 
 import { withThemeByClassName } from "@storybook/addon-themes";
 
