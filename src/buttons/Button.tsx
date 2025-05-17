@@ -1,4 +1,4 @@
-import { ComponentSize } from "@/types/ComponentSize";
+import type { ComponentSize } from "@/types/ComponentSize";
 import { cn } from "@/utils/cn";
 import { cva } from "class-variance-authority";
 import React from "react";

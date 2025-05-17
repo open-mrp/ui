@@ -10,11 +10,15 @@ const config: StorybookConfig = {
     "@storybook/addon-essentials",
     "@storybook/addon-onboarding",
     "@storybook/addon-interactions",
-    "@storybook/addon-themes"
+    "@storybook/addon-themes",
   ],
   framework: {
     name: "@storybook/react-vite",
     options: {},
+  },
+  typescript: {
+    check: false,
+    reactDocgen: false,
   },
   viteFinal: async (config) => {
     if (config.resolve) {
