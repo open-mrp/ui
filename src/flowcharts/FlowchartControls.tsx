@@ -3,7 +3,6 @@ import FitViewIcon from "@/icons/FitViewIcon";
 import ZoomInIcon from "@/icons/ZoomInIcon";
 import ZoomOutIcon from "@/icons/ZoomOutIcon";
 import { ReactFlowInstance } from "@xyflow/react";
-import React from "react";
 
 export interface FlowchartControlsProps {
   reactFlowInstance: ReactFlowInstance | null;
@@ -22,8 +21,7 @@ export default function FlowchartControls({
       }}
     >
       <Button
-        variant="text"
-        size="icon"
+        variant="icon"
         color="gray"
         onClick={() => reactFlowInstance?.fitView()}
         title="Fit View"
@@ -37,8 +35,7 @@ export default function FlowchartControls({
         }}
       />
       <Button
-        variant="text"
-        size="icon"
+        variant="icon"
         color="gray"
         onClick={() => reactFlowInstance?.zoomOut({ duration: 200 })}
         title="Zoom Out"
@@ -46,8 +43,7 @@ export default function FlowchartControls({
         <ZoomOutIcon size={16} />
       </Button>
       <Button
-        variant="text"
-        size="icon"
+        variant="icon"
         color="gray"
         onClick={() => reactFlowInstance?.zoomIn({ duration: 200 })}
         title="Zoom In"
