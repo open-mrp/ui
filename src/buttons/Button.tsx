@@ -3,7 +3,6 @@ import { cn } from "@/utils/cn";
 import { cva } from "class-variance-authority";
 import React from "react";
 
-export type ButtonColor = "primary" | "secondary" | "gray" | string;
 export type ButtonVariant = "contained" | "outlined" | "text" | "icon";
 
 // Base styles
@@ -198,65 +197,12 @@ const buttonVariants = cva(BASE_STYLES, {
   },
 });
 
-const getCustomColorClasses = (
-  color: string,
-  variant: ButtonVariant,
-  blur: boolean
-) => {
-  const colorMap = {
-    blue: {
-      contained: blur
-        ? "bg-blue-600/10 text-blue-600 hover:bg-blue-600/20 dark:bg-blue-600/5 dark:hover:bg-blue-600/10"
-        : "bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-700",
-      outlined: blur
-        ? "border-blue-600/20 text-blue-600 hover:bg-blue-600/10 hover:border-blue-600/30 dark:hover:bg-blue-600/5"
-        : "border-blue-600 text-blue-600 hover:bg-blue-600/5 hover:border-blue-600",
-      text: blur
-        ? "text-blue-600 hover:bg-blue-600/10 dark:hover:bg-blue-600/5"
-        : "text-blue-600 hover:bg-blue-600/5",
-      icon: blur
-        ? "text-blue-600 hover:bg-blue-600/10 dark:hover:bg-blue-600/5"
-        : "text-blue-600 hover:bg-blue-600/5",
-    },
-    green: {
-      contained: blur
-        ? "bg-green-600/10 text-green-600 hover:bg-green-600/20 dark:bg-green-600/5 dark:hover:bg-green-600/10"
-        : "bg-green-600 text-white hover:bg-green-700 dark:hover:bg-green-700",
-      outlined: blur
-        ? "border-green-600/20 text-green-600 hover:bg-green-600/10 hover:border-green-600/30 dark:hover:bg-green-600/5"
-        : "border-green-600 text-green-600 hover:bg-green-600/5 hover:border-green-600",
-      text: blur
-        ? "text-green-600 hover:bg-green-600/10 dark:hover:bg-green-600/5"
-        : "text-green-600 hover:bg-green-600/5",
-      icon: blur
-        ? "text-green-600 hover:bg-green-600/10 dark:hover:bg-green-600/5"
-        : "text-green-600 hover:bg-green-600/5",
-    },
-    purple: {
-      contained: blur
-        ? "bg-purple-600/10 text-purple-600 hover:bg-purple-600/20 dark:bg-purple-600/5 dark:hover:bg-purple-600/10"
-        : "bg-purple-600 text-white hover:bg-purple-700 dark:hover:bg-purple-700",
-      outlined: blur
-        ? "border-purple-600/20 text-purple-600 hover:bg-purple-600/10 hover:border-purple-600/30 dark:hover:bg-purple-600/5"
-        : "border-purple-600 text-purple-600 hover:bg-purple-600/5 hover:border-purple-600",
-      text: blur
-        ? "text-purple-600 hover:bg-purple-600/10 dark:hover:bg-purple-600/5"
-        : "text-purple-600 hover:bg-purple-600/5",
-      icon: blur
-        ? "text-purple-600 hover:bg-purple-600/10 dark:hover:bg-purple-600/5"
-        : "text-purple-600 hover:bg-purple-600/5",
-    },
-  };
-
-  return colorMap[color as keyof typeof colorMap]?.[variant] || "";
-};
-
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
   children: React.ReactNode;
   variant?: ButtonVariant;
   size?: ComponentSize;
-  color?: ButtonColor;
+  color?: string;
   disabled?: boolean;
   blur?: boolean;
 }
@@ -271,16 +217,11 @@ export default function Button({
   className,
   ...props
 }: ButtonProps) {
-  const customColorClass = !["primary", "secondary", "gray"].includes(color)
-    ? getCustomColorClasses(color, variant, blur)
-    : "";
-
   return (
     <button
       disabled={disabled}
       className={cn(
         buttonVariants({ variant, color, size, disabled, blur }),
-        customColorClass,
         className
       )}
       {...props}
