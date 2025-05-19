@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.6.1
+
+### Patch Changes
+
+- e0fb077: fix missing export of Breadcrumb
+
 ## 0.6.0
 
 ### Minor Changes
