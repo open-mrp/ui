@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import React from "react";
-
 import { fn } from "@storybook/test";
-
-import { WaveShader } from "@/shaders/wave-shader";
+import React from "react";
+import { WaveShader } from "../shaders/wave-shader";
 import Button from "./Button";
 
 export const ActionsData = {
@@ -39,7 +37,6 @@ const blurDecorator = (Story: any) => (
       <WaveShader
         colorConfiguration="default"
         height={400}
-        // minWidth={400}
         width={400}
         animate={true}
       />
@@ -78,10 +75,35 @@ export const ContainedGray: Story = {
 export const ContainedBlur: Story = {
   args: {
     variant: "contained",
-    color: "blur",
+    blur: true,
     children: "Contained Blur",
   },
   decorators: [blurDecorator],
+};
+
+// Custom Color Stories
+export const ContainedBlue: Story = {
+  args: {
+    variant: "contained",
+    color: "blue",
+    children: "Contained Blue",
+  },
+};
+
+export const ContainedGreen: Story = {
+  args: {
+    variant: "contained",
+    color: "green",
+    children: "Contained Green",
+  },
+};
+
+export const ContainedPurple: Story = {
+  args: {
+    variant: "contained",
+    color: "purple",
+    children: "Contained Purple",
+  },
 };
 
 // Outlined Variant Stories
@@ -112,7 +134,7 @@ export const OutlinedGray: Story = {
 export const OutlinedBlur: Story = {
   args: {
     variant: "outlined",
-    color: "blur",
+    blur: true,
     children: "Outlined Blur",
   },
   decorators: [blurDecorator],
@@ -146,7 +168,7 @@ export const TextGray: Story = {
 export const TextBlur: Story = {
   args: {
     variant: "text",
-    color: "blur",
+    blur: true,
     children: "Text Blur",
   },
   decorators: [blurDecorator],
@@ -174,11 +196,21 @@ export const LargeButton: Story = {
   },
 };
 
+// Icon Variant Stories
 export const IconButton: Story = {
   args: {
-    size: "icon",
+    variant: "icon",
     children: "🔍",
   },
+};
+
+export const IconButtonBlur: Story = {
+  args: {
+    variant: "icon",
+    blur: true,
+    children: "🔍",
+  },
+  decorators: [blurDecorator],
 };
 
 // Disabled State
@@ -187,4 +219,25 @@ export const DisabledButton: Story = {
     disabled: true,
     children: "Disabled Button",
   },
+};
+
+// Combined Examples
+export const BlurredBlueButton: Story = {
+  args: {
+    variant: "contained",
+    color: "blue",
+    blur: true,
+    children: "Blurred Blue Button",
+  },
+  decorators: [blurDecorator],
+};
+
+export const BlurredGreenButton: Story = {
+  args: {
+    variant: "outlined",
+    color: "green",
+    blur: true,
+    children: "Blurred Green Button",
+  },
+  decorators: [blurDecorator],
 };
