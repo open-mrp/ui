@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.5.0
+
+### Minor Changes
+
+- 826bd38: Update to button API
+
 ## 0.4.3
 
 ### Patch Changes
