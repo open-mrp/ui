@@ -26,14 +26,18 @@ export { default as ChevronRightIcon } from "./ChevronRightIcon";
 export { default as ChevronUpIcon } from "./ChevronUpIcon";
 export { default as CloseIcon } from "./CloseIcon";
 export { default as CopyIcon } from "./CopyIcon";
+export { default as DiscordIcon } from "./DiscordIcon";
 export { default as EventIcon } from "./EventIcon";
 export { default as FitViewIcon } from "./FitViewIcon";
+export { default as GithubIcon } from "./GithubIcon";
 export { default as HelpIcon } from "./HelpIcon";
+export { default as HomeIcon } from "./HomeIcon";
 export { default as Icon } from "./Icon";
 export { default as MenuIcon } from "./MenuIcon";
 export { default as MoonIcon } from "./MoonIcon";
 export { default as QuestionMarkIcon } from "./QuestionMarkIcon";
 export { default as SunIcon } from "./SunIcon";
+export { default as TwitterIcon } from "./TwitterIcon";
 export { default as ZoomInIcon } from "./ZoomInIcon";
 export { default as ZoomOutIcon } from "./ZoomOutIcon";
 
