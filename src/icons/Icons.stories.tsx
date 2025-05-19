@@ -2,23 +2,27 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import {
-    ArrowRightIcon,
-    AugnoLogo,
-    CheckIcon,
-    ChevronDownIcon,
-    ChevronRightIcon,
-    ChevronUpIcon,
-    CloseIcon,
-    CopyIcon,
-    EventIcon,
-    FitViewIcon,
-    HelpIcon,
-    MenuIcon,
-    MoonIcon,
-    QuestionMarkIcon,
-    SunIcon,
-    ZoomInIcon,
-    ZoomOutIcon,
+  ArrowRightIcon,
+  AugnoLogo,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+  CloseIcon,
+  CopyIcon,
+  DiscordIcon,
+  EventIcon,
+  FitViewIcon,
+  GithubIcon,
+  HelpIcon,
+  HomeIcon,
+  MenuIcon,
+  MoonIcon,
+  QuestionMarkIcon,
+  SunIcon,
+  TwitterIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
 } from "./index";
 
 const meta = {
@@ -123,6 +127,26 @@ export const Menu: Story = {
   render: () => <MenuIcon />,
 };
 
+// DiscordIcon
+export const Discord: Story = {
+  render: () => <DiscordIcon />,
+};
+
+// GithubIcon
+export const Github: Story = {
+  render: () => <GithubIcon />,
+};
+
+// HomeIcon
+export const Home: Story = {
+  render: () => <HomeIcon />,
+};
+
+// TwitterIcon
+export const Twitter: Story = {
+  render: () => <TwitterIcon />,
+};
+
 // Display all icons together
 export const AllIcons: Story = {
   render: () => (
@@ -160,6 +184,10 @@ export const AllIcons: Story = {
         <span className="text-sm mt-2">CopyIcon</span>
       </div>
       <div className="flex flex-col items-center">
+        <DiscordIcon />
+        <span className="text-sm mt-2">DiscordIcon</span>
+      </div>
+      <div className="flex flex-col items-center">
         <EventIcon />
         <span className="text-sm mt-2">EventIcon</span>
       </div>
@@ -168,8 +196,24 @@ export const AllIcons: Story = {
         <span className="text-sm mt-2">FitViewIcon</span>
       </div>
       <div className="flex flex-col items-center">
+        <GithubIcon />
+        <span className="text-sm mt-2">GithubIcon</span>
+      </div>
+      <div className="flex flex-col items-center">
         <HelpIcon />
         <span className="text-sm mt-2">HelpIcon</span>
+      </div>
+      <div className="flex flex-col items-center">
+        <HomeIcon />
+        <span className="text-sm mt-2">HomeIcon</span>
+      </div>
+      <div className="flex flex-col items-center">
+        <MenuIcon />
+        <span className="text-sm mt-2">MenuIcon</span>
+      </div>
+      <div className="flex flex-col items-center">
+        <MoonIcon />
+        <span className="text-sm mt-2">MoonIcon</span>
       </div>
       <div className="flex flex-col items-center">
         <QuestionMarkIcon />
@@ -180,20 +224,16 @@ export const AllIcons: Story = {
         <span className="text-sm mt-2">SunIcon</span>
       </div>
       <div className="flex flex-col items-center">
+        <TwitterIcon />
+        <span className="text-sm mt-2">TwitterIcon</span>
+      </div>
+      <div className="flex flex-col items-center">
         <ZoomInIcon />
         <span className="text-sm mt-2">ZoomInIcon</span>
       </div>
       <div className="flex flex-col items-center">
         <ZoomOutIcon />
         <span className="text-sm mt-2">ZoomOutIcon</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <MoonIcon />
-        <span className="text-sm mt-2">MoonIcon</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <MenuIcon />
-        <span className="text-sm mt-2">MenuIcon</span>
       </div>
     </div>
   ),
@@ -245,4 +285,4 @@ export const SizeVariants: Story = {
       </div>
     </div>
   ),
-}; 
+};
