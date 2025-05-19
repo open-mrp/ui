@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.6.0
+
+### Minor Changes
+
+- 2a0c2de: Adding more components
+
 ## 0.5.0
 
 ### Minor Changes
