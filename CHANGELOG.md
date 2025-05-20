@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.7.0
+
+### Minor Changes
+
+- fe01376: Adding sidenav components
+
 ## 0.6.4
 
 ### Patch Changes
