@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavLink, NavSubSectionData } from "./types";
 
 export interface NavSubSectionProps {
@@ -30,12 +30,6 @@ export default function NavSubSection({
   });
 
   const [isOpen, setIsOpen] = useState(hasActiveItem);
-
-  useEffect(() => {
-    if (hasActiveItem) {
-      setIsOpen(true);
-    }
-  }, [hasActiveItem]);
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -85,10 +79,11 @@ export default function NavSubSection({
         {/* Animated Active Indicator */}
         {isOpen && activeIndex !== -1 && (
           <div
-            className="absolute w-3 h-3 rounded-full bg-secondary-500 z-20 transition-all duration-500"
+            className="absolute w-3 h-3 rounded-full bg-secondary-500 z-20 transition-transform duration-500 ease-in-out"
             style={{
               left: "-4px",
-              top: `calc(12px + ${activeIndex * 32}px)`,
+              top: "12px",
+              transform: `translateY(${activeIndex * 32}px)`,
             }}
           />
         )}
