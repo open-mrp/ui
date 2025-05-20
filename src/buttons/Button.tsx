@@ -7,7 +7,7 @@ export type ButtonVariant = "contained" | "outlined" | "text" | "icon";
 
 // Base styles
 const BASE_STYLES =
-  "inline-flex items-center justify-center rounded-md text-sm font-semibold transition-all duration-250 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
+  "ui-button inline-flex items-center justify-center rounded-md text-sm font-semibold transition-all duration-250 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
 
 const colorVariants = {
   primary: {
@@ -18,11 +18,12 @@ const colorVariants = {
     icon: "text-primary-500 hover:bg-primary-500/5",
   },
   secondary: {
-    contained: "bg-secondary-500 text-white hover:bg-secondary-600",
+    contained:
+      "bg-secondary-500 text-white hover:bg-secondary-600 disabled:bg-gray-700/50 disabled:text-gray-600 disabled:hover:bg-gray-700/50 disabled:hover:cursor-auto",
     outlined:
-      "border-secondary-500 text-secondary-500 hover:bg-secondary-500/5 hover:border-secondary-500",
-    text: "text-secondary-500 hover:bg-secondary-500/5",
-    icon: "text-secondary-500 hover:bg-secondary-500/5",
+      "border-secondary-500 text-secondary-500 hover:bg-secondary-500/5 hover:border-secondary-500 disabled:border-gray-700/50 disabled:text-gray-600 disabled:hover:bg-transparent disabled:hover:border-gray-700/50 disabled:hover:cursor-auto",
+    text: "text-secondary-500 hover:bg-secondary-500/5 disabled:text-gray-600 disabled:hover:bg-transparent disabled:hover:cursor-auto",
+    icon: "text-secondary-500 hover:bg-secondary-500/5 disabled:text-gray-600 disabled:hover:bg-transparent disabled:hover:cursor-auto",
   },
   blue: {
     contained: "bg-blue-500 text-white hover:bg-blue-600",
@@ -178,7 +179,7 @@ const buttonVariants = cva(BASE_STYLES, {
       lg: "px-6 py-2 text-base",
     },
     disabled: {
-      true: "hover:cursor-auto",
+      true: "opacity-50 cursor-auto pointer-events-none",
       false: "hover:cursor-pointer",
     },
     blur: {
@@ -190,8 +191,23 @@ const buttonVariants = cva(BASE_STYLES, {
     {
       variant: "contained",
       disabled: true,
-      blur: false,
-      class: "bg-gray-700/50 text-gray-600",
+      class: "!bg-gray-700/50 !text-gray-600 !hover:bg-gray-700/50",
+    },
+    {
+      variant: "outlined",
+      disabled: true,
+      class:
+        "!border-gray-700/50 !text-gray-600 !hover:bg-transparent !hover:border-gray-700/50",
+    },
+    {
+      variant: "text",
+      disabled: true,
+      class: "!text-gray-600 !hover:bg-transparent",
+    },
+    {
+      variant: "icon",
+      disabled: true,
+      class: "!text-gray-600 !hover:bg-transparent",
     },
     {
       variant: "contained",
@@ -202,12 +218,6 @@ const buttonVariants = cva(BASE_STYLES, {
     },
     {
       variant: "outlined",
-      disabled: true,
-      blur: false,
-      class: "border-gray-700/50 text-gray-600",
-    },
-    {
-      variant: "outlined",
       blur: true,
       disabled: false,
       class:
@@ -215,21 +225,9 @@ const buttonVariants = cva(BASE_STYLES, {
     },
     {
       variant: "text",
-      disabled: true,
-      blur: false,
-      class: "text-gray-600",
-    },
-    {
-      variant: "text",
       blur: true,
       disabled: false,
       class: "text-white hover:bg-white/20 dark:hover:bg-white/15",
-    },
-    {
-      variant: "icon",
-      disabled: true,
-      blur: false,
-      class: "text-gray-600",
     },
     {
       variant: "icon",
