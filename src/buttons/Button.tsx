@@ -260,7 +260,7 @@ export default function Button({
   children,
   variant = "contained",
   size = "md",
-  color = "white",
+  color = variant === "icon" ? "gray" : "white",
   disabled = false,
   blur = false,
   className,
