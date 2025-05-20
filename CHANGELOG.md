@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.6.4
+
+### Patch Changes
+
+- 9590215: Tweak to button icon rendering
+
 ## 0.6.3
 
 ### Patch Changes
