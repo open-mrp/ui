@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.7.2
+
+### Patch Changes
+
+- 58bb53e: Button fix
+
 ## 0.7.1
 
 ### Patch Changes
