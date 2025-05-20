@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.7.1
+
+### Patch Changes
+
+- bb0c540: Fix for sidenav
+
 ## 0.7.0
 
 ### Minor Changes
