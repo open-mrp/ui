@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.6.3
+
+### Patch Changes
+
+- b2f2a0e: adding missing colors to button
+
 ## 0.6.2
 
 ### Patch Changes
