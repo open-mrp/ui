@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.6.2
+
+### Patch Changes
+
+- 9725dce: fix for build issue with react
+
 ## 0.6.1
 
 ### Patch Changes
