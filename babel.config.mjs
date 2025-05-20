@@ -6,7 +6,7 @@ export default function (api) {
   return {
     presets: [
       ["@babel/preset-env", { modules: isCJS ? "commonjs" : false }],
-      "@babel/preset-react",
+      ["@babel/preset-react", { runtime: "automatic" }],
       ["@babel/preset-typescript", { onlyRemoveTypeImports: true }],
     ],
     plugins: [

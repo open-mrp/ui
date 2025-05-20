@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function EventIcon({
   size = "h-3 w-3",
   color = "#6b7280",

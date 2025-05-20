@@ -1,5 +1,3 @@
-import React from "react";
-
 interface AugnoLogoProps {
   size?: string | number;
   color?: string;
