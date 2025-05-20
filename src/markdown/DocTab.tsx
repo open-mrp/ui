@@ -1,5 +1,5 @@
 import { cn } from "@/utils/cn";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 export interface DocTabProps {
   label: string;

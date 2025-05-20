@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import React from "react";
 
 export interface SupportLink {
-  icon: ReactNode;
+  icon: React.ReactNode;
   text: string;
   link: {
     text: string;
@@ -11,11 +11,14 @@ export interface SupportLink {
 
 export interface FooterProps {
   home: {
-    icon: ReactNode;
+    icon: React.ReactNode;
     href: string;
   };
   supportLinks: SupportLink[];
-  renderLink?: (props: { href: string; children: ReactNode }) => ReactNode;
+  renderLink?: (props: {
+    href: string;
+    children: React.ReactNode;
+  }) => React.ReactNode;
 }
 
 export default function Footer({

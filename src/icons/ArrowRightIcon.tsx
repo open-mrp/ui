@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "@/utils/cn";
 
 export default function ArrowRightIcon({ className }: { className?: string }) {
@@ -6,7 +5,7 @@ export default function ArrowRightIcon({ className }: { className?: string }) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       className={cn("h-4 w-4", className)}
-      style={{ verticalAlign: '-0.125em' }}
+      style={{ verticalAlign: "-0.125em" }}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

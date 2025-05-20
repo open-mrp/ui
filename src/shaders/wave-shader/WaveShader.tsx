@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 import { useViewportWidth } from "@/hooks/useViewportWidth";
 import { useEffect, useRef, useState } from "react";
 import { calculateShaderCanvasDimensions } from "../utils/calculateShaderCanvasDimensions";
