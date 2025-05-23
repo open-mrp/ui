@@ -26,10 +26,6 @@ function getTextContent(node: React.ReactNode): string {
         props: { children?: React.ReactNode; tableName?: string };
       };
 
-      // If it's a string type (like a span), use the children
-      if (typeof element.type === "string") {
-        return getTextContent(element.props.children);
-      }
       // If it's a component, try to get text from its children
       return getTextContent(element.props.children);
     }
