@@ -12,7 +12,7 @@ export interface DocHeadingProps {
 }
 
 // Utility function to extract a string identifier from props
-const extractTableName = (
+const extractTableIdentifier = (
   props: Record<string, unknown>
 ): string | undefined => {
   // Check all props that are strings
@@ -49,8 +49,10 @@ function getTextContent(node: React.ReactNode): string {
 
       // Handle any component that might have a string for table identification eg. tableName, prefixId in TableHeadingTooltip in Internal Docs
       if (isFunctionComponent(element)) {
-        const tableName = extractTableName(element.props);
-        return tableName || getTextContent(element.props.children);
+        return (
+          extractTableIdentifier(element.props) ||
+          getTextContent(element.props.children)
+        );
       }
 
       // If it's a component, try to get text from its children
