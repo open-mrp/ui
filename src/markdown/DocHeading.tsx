@@ -11,57 +11,88 @@ export interface DocHeadingProps {
   number?: number;
 }
 
-// Utility function to extract a string identifier from props
-const extractTableIdentifier = (
-  props: Record<string, unknown>
-): string | undefined => {
-  // Check all props that are strings
-  return Object.values(props).find(
-    (value): value is string => typeof value === "string"
-  );
-};
+function isReactElement(node: unknown): node is React.ReactElement {
+  return React.isValidElement(node);
+}
 
-// Add type guard at the top of the file after imports
-const isObject = (value: unknown): value is object => {
-  return value !== null && typeof value === "object";
-};
-
-const isFunctionComponent = (element: {
-  type: unknown;
-}): element is { type: React.ComponentType<unknown> } => {
-  return typeof element.type === "function";
-};
-
+// Extract text content iteratively without recursion
 function getTextContent(node: React.ReactNode): string {
-  if (typeof node === "string") return node;
-  if (typeof node === "number") return node.toString();
-  if (node === null || node === undefined) return "";
-  if (Array.isArray(node)) return node.map(getTextContent).join("");
+  const parts: string[] = [];
+  const stack: React.ReactNode[] = [node];
+  let depth = 0;
+  const MAX_DEPTH = 5;
 
-  // Handle React elements
-  if (isObject(node)) {
-    // Check if it's a React element
-    if (React.isValidElement(node)) {
-      const element = node as {
-        type: string | React.ComponentType<unknown>;
-        props: { children?: React.ReactNode };
-      };
+  while (stack.length > 0) {
+    depth++;
+    // Prevent infinite recursion and set reasonable limit to depth
+    if (depth > MAX_DEPTH) {
+      throw new Error(
+        `Maximum stack depth of ${MAX_DEPTH} exceeded in getTextContent. This might indicate a circular reference in your React components.`
+      );
+    }
 
-      // Handle any component that might have a string for table identification eg. tableName, prefixId in TableHeadingTooltip in Internal Docs
-      if (isFunctionComponent(element)) {
-        return (
-          extractTableIdentifier(element.props) ||
-          getTextContent(element.props.children)
-        );
+    const current = stack.pop();
+
+    if (current === null || current === undefined) {
+      continue;
+    }
+
+    if (typeof current === "string") {
+      parts.push(current);
+      continue;
+    }
+
+    if (typeof current === "number") {
+      parts.push(current.toString());
+      continue;
+    }
+
+    if (Array.isArray(current)) {
+      // Push in reverse order to maintain left-to-right processing
+      for (let i = current.length - 1; i >= 0; i--) {
+        stack.push(current[i]);
+      }
+      continue;
+    }
+
+    if (isReactElement(current)) {
+      const { props } = current;
+
+      // Check if component has identifier props (like tableName, prefixId)
+      if (typeof current.type === "function" && props) {
+        // Look for string properties that might be identifiers
+        const stringProps = Object.entries(props)
+          .filter(
+            ([key, value]) => typeof value === "string" && key !== "className"
+          )
+          .map(([_, value]) => value as string);
+
+        if (stringProps.length > 0) {
+          parts.push(stringProps[0]);
+          continue;
+        }
       }
 
-      // If it's a component, try to get text from its children
-      return getTextContent(element.props.children);
+      // Process children if present
+      if (props && typeof props === "object" && "children" in props) {
+        stack.push((props as { children: React.ReactNode }).children);
+      }
+      continue;
     }
-    // Fallback for other objects
-    return String(node);
+
+    // For any other type, convert to string
+    parts.push(String(current));
   }
-  return "";
+
+  return parts.join("");
+}
+
+// Create a slug from text content
+function createSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 export default function DocHeading({
@@ -70,14 +101,7 @@ export default function DocHeading({
   className = "",
   number,
 }: DocHeadingProps) {
-  const id = useMemo(
-    () =>
-      getTextContent(children)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, ""),
-    [children]
-  );
+  const id = useMemo(() => createSlug(getTextContent(children)), [children]);
 
   const [copied, setCopied] = useState(false);
 
