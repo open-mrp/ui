@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.7.4
+
+### Patch Changes
+
+- c28bdc6: fixed the functionality for copy button on DocHeading when passing a react element by type checking and processing different types seperately
+
 ## 0.7.3
 
 ### Patch Changes
