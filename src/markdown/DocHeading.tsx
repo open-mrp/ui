@@ -26,15 +26,6 @@ function getTextContent(node: React.ReactNode): string {
         props: { children?: React.ReactNode; tableName?: string };
       };
 
-      // Special handling for TableHeadingTooltip
-      if (
-        typeof element.type === "function" &&
-        element.type.name === "TableHeadingTooltip" &&
-        element.props.tableName
-      ) {
-        return element.props.tableName;
-      }
-
       // If it's a string type (like a span), use the children
       if (typeof element.type === "string") {
         return getTextContent(element.props.children);
