@@ -2,7 +2,7 @@
 
 import CheckIcon from "@/icons/CheckIcon";
 import CopyIcon from "@/icons/CopyIcon";
-import React, { createElement, useState } from "react";
+import React, { createElement, useMemo, useState } from "react";
 
 export interface DocHeadingProps {
   children: React.ReactNode;
@@ -11,13 +11,45 @@ export interface DocHeadingProps {
   number?: number;
 }
 
+function getTextContent(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return node.toString();
+  if (node === null || node === undefined) return "";
+  if (Array.isArray(node)) return node.map(getTextContent).join("");
+
+  // Handle React elements
+  if (typeof node === "object" && node !== null) {
+    // Check if it's a React element
+    if (React.isValidElement(node)) {
+      const element = node as {
+        type: string | React.ComponentType<unknown>;
+        props: { children?: React.ReactNode; tableName?: string };
+      };
+
+      // If it's a component, try to get text from its children
+      return getTextContent(element.props.children);
+    }
+    // Fallback for other objects
+    return String(node);
+  }
+  return "";
+}
+
 export default function DocHeading({
   children,
   level = 2,
   className = "",
   number,
 }: DocHeadingProps) {
-  const id = children?.toString().toLowerCase().replace(/ /g, "-");
+  const id = useMemo(
+    () =>
+      getTextContent(children)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, ""),
+    [children]
+  );
+
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (e: React.MouseEvent) => {
