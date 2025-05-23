@@ -20,7 +20,7 @@ function getTextContent(node: React.ReactNode): string {
   // Handle React elements
   if (typeof node === "object" && node !== null) {
     // Check if it's a React element
-    if ("type" in node && "props" in node) {
+    if (React.isValidElement(node)) {
       const element = node as {
         type: string | React.ComponentType<unknown>;
         props: { children?: React.ReactNode; tableName?: string };
