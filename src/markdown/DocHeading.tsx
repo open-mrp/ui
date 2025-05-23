@@ -11,6 +11,27 @@ export interface DocHeadingProps {
   number?: number;
 }
 
+// Utility function to extract a string identifier from props
+const extractTableName = (
+  props: Record<string, unknown>
+): string | undefined => {
+  // Check all props that are strings
+  return Object.values(props).find(
+    (value): value is string => typeof value === "string"
+  );
+};
+
+// Add type guard at the top of the file after imports
+const isObject = (value: unknown): value is object => {
+  return value !== null && typeof value === "object";
+};
+
+const isFunctionComponent = (element: {
+  type: unknown;
+}): element is { type: React.ComponentType<unknown> } => {
+  return typeof element.type === "function";
+};
+
 function getTextContent(node: React.ReactNode): string {
   if (typeof node === "string") return node;
   if (typeof node === "number") return node.toString();
@@ -18,13 +39,19 @@ function getTextContent(node: React.ReactNode): string {
   if (Array.isArray(node)) return node.map(getTextContent).join("");
 
   // Handle React elements
-  if (typeof node === "object" && node !== null) {
+  if (isObject(node)) {
     // Check if it's a React element
     if (React.isValidElement(node)) {
       const element = node as {
         type: string | React.ComponentType<unknown>;
-        props: { children?: React.ReactNode; tableName?: string };
+        props: { children?: React.ReactNode };
       };
+
+      // Handle any component that might have a string for table identification eg. tableName, prefixId in TableHeadingTooltip in Internal Docs
+      if (isFunctionComponent(element)) {
+        const tableName = extractTableName(element.props);
+        return tableName || getTextContent(element.props.children);
+      }
 
       // If it's a component, try to get text from its children
       return getTextContent(element.props.children);
