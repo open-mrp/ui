@@ -17,8 +17,8 @@
       "require": "./dist/cjs/index.js"
     },
     "./styles.css": {
-      "import": "./dist/esm/styles.css",
-      "require": "./dist/cjs/styles.css"
+      "import": "./dist/styles.css",
+      "require": "./dist/styles.css"
     }
   },
   "scripts": {
@@ -34,7 +34,7 @@
     "test": "jest",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "local-ui": "bun run build && yalc publish"
+    "yalc-publish": "bun run build && yalc publish"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.2",
