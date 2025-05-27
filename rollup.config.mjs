@@ -1,4 +1,3 @@
-import tailwindcssPostcss from "@tailwindcss/postcss";
 import autoprefixer from "autoprefixer";
 import postcss from "rollup-plugin-postcss";
 
@@ -14,7 +13,7 @@ const stylesConfig = {
       extract: true,
       minimize: true,
       sourceMap: true,
-      plugins: [tailwindcssPostcss, autoprefixer],
+      plugins: [autoprefixer],
       inject: false,
     }),
   ],
