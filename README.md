@@ -23,7 +23,7 @@ The process to publish a new vesrion:
 
 ### Using a local UI repo in other repos
 
-First, install yalc globally with `npm install -j yalc`.
+First, install yalc globally with `npm install -g yalc`.
 
 Now, after any change you just run `bun run local-ui` to build and publish the changes for you other local repo to use.
 
