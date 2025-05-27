@@ -1,5 +1,12 @@
 # @augno/ui
 
+## 0.7.5
+
+### Patch Changes
+
+- e1e2892: Fix for missing styles
+- 2de8585: fix for styling issues
+
 ## 0.7.4
 
 ### Patch Changes
