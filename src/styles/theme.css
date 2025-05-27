@@ -23,6 +23,174 @@ body {
   color: var(--foreground);
 }
 
+/* Custom text selection/highlight styling */
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--primary);
+  color: white;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+/* Custom scrollbar styling */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.overflow-x-auto:hover::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.overflow-y-auto:hover::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 1rem 0px 0px;
+}
+
+h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 1rem 0px 0px;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 450;
+  letter-spacing: 0.01em;
+  padding: 1rem 0px 0px;
+}
+
+h4 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  padding: 1rem 0px 0px;
+}
+
+h5 {
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  padding: 1rem 0px 0px;
+}
+
+h6 {
+  font-size: 1rem;
+  font-weight: 350;
+  letter-spacing: 0.01em;
+  padding: 1rem 0px 0px;
+}
+
+p {
+  font-size: 1rem;
+  font-weight: 350;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  padding: 0.5rem 0px 0px;
+}
+
+li {
+  @apply my-1;
+}
+
+ul {
+  @apply pl-5 mt-4;
+  list-style-type: disc;
+  color: var(--text-secondary);
+}
+
+ul li {
+  padding-left: 10px;
+}
+
+ul li::marker {
+  color: rgba(156, 163, 175, 0.8);
+}
+
+ol {
+  @apply list-decimal pl-5 mb-4;
+  color: var(--text-secondary);
+}
+
+ol li::marker {
+  color: rgba(156, 163, 175, 0.8);
+}
+
+table {
+  @apply w-full border-collapse;
+  margin-bottom: 1rem;
+}
+
+tr {
+  @apply border-b border-gray-200;
+}
+
+th {
+  @apply text-sm font-bold;
+  padding: 0.5rem;
+}
+
+td {
+  @apply text-sm;
+  padding: 0.5rem;
+}
+
+a {
+  @apply text-primary-500 hover:text-primary-700;
+}
+
+blockquote {
+  @apply border-l-4 border-gray-300 pl-4 mt-6 mb-4;
+  padding-bottom: 8px;
+}
+
+blockquote p {
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+blockquote h4 {
+  padding-top: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
 @theme {
   --color-black: #000;
   --color-white: #fff;
@@ -103,5 +271,4 @@ body {
 
   --font-primary: "Inter", Arial, Helvetica, sans-serif;
 }
-
 @source "../../dist";
