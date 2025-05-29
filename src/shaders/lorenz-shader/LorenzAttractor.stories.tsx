@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { LorenzAttractor } from "./LorenzAttractor";
 
 const meta: Meta<typeof LorenzAttractor> = {
-  title: "Components/LorenzAttractor",
+  title: "shaders/LorenzAttractor",
   component: LorenzAttractor,
   parameters: {
     layout: "fullscreen",
