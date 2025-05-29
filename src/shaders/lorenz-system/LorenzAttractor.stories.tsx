@@ -1,10 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { LorenzAttractor } from "./LorenzAttractor";
-import {
-  COLOR_PALETTES,
-  createDisplayParams,
-  createLorenzParams,
-} from "./utils";
 
 const meta: Meta<typeof LorenzAttractor> = {
   title: "Components/LorenzAttractor",
@@ -101,28 +96,6 @@ export const Default: Story = {
   },
 };
 
-export const CustomParameters: Story = {
-  args: {
-    width: 800,
-    height: 600,
-    initialParams: {
-      sigma: 15,
-      beta: 2.5,
-      rho: 35,
-      step_size: 0.001,
-      steps_per_frame: 5,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Lorenz attractor with custom parameters that create different chaotic behavior patterns.",
-      },
-    },
-  },
-};
-
 export const SlowMotion: Story = {
   args: {
     width: 800,
@@ -162,60 +135,6 @@ export const HighSpeed: Story = {
       description: {
         story:
           "Faster animation with larger step size and more steps per frame for rapid pattern formation.",
-      },
-    },
-  },
-};
-
-export const CustomDisplay: Story = {
-  args: {
-    width: 800,
-    height: 600,
-    initialDisplay: {
-      scale: 1 / 25,
-      rotation: [0.1, 0, 0],
-      rotationd: [0, 0, 0.01],
-      translation: [0, 0, 2],
-      _length: 10240,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Custom display settings with automatic rotation and longer trails.",
-      },
-    },
-  },
-};
-
-export const CustomParticleCount: Story = {
-  args: {
-    width: 800,
-    height: 600,
-    particleCount: 6,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Lorenz attractor with a custom number of particles (6 instead of the default 12).",
-      },
-    },
-  },
-};
-
-export const ManyParticles: Story = {
-  args: {
-    width: 800,
-    height: 600,
-    particleCount: 24,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Lorenz attractor with many particles (24) creating a denser visualization.",
       },
     },
   },
@@ -261,50 +180,6 @@ export const DistanceBasedColoring: Story = {
       description: {
         story:
           "Distance-based coloring where particle colors interpolate between Rosolanc purple and Helvetia blue based on their distance to the oscillation centers.",
-      },
-    },
-  },
-};
-
-export const ResponsiveCanvas: Story = {
-  args: {
-    width: 1000,
-    height: 600,
-    minWidth: 400,
-    maintainHeight: 0.3,
-    particleCount: 8,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Responsive canvas that adjusts to viewport width while maintaining aspect ratio. Resize the browser window to see the effect. Uses calculateShaderCanvasDimensions utility for consistent sizing behavior.",
-      },
-    },
-  },
-};
-
-export const UtilityFunctionsDemo: Story = {
-  args: {
-    width: 800,
-    height: 600,
-    particleCount: 12,
-    initialParams: createLorenzParams({
-      sigma: 12,
-      rho: 30,
-      step_size: 0.003,
-    }),
-    initialDisplay: createDisplayParams({
-      scale: 1 / 30,
-      rotationd: [0.0002, 0.0002, 0.0002],
-    }),
-    customColors: COLOR_PALETTES.plasma,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Demonstrates the use of utility functions: createLorenzParams(), createDisplayParams(), and COLOR_PALETTES.plasma. These utilities follow DRY principles and provide consistent defaults.",
       },
     },
   },
