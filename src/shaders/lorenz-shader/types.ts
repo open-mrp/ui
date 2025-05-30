@@ -1,3 +1,5 @@
+import { ColorConfiguration } from "../colorConfigurations";
+
 export interface LorenzParams {
   sigma: number;
   beta: number;
@@ -57,8 +59,8 @@ export interface DisplayParams {
 
 export interface LorenzWebGLProgram {
   program: WebGLProgram;
-  attrib: Record<string, number>;
-  uniform: Record<string, WebGLUniformLocation>;
+  attrib: { [key: string]: number };
+  uniform: { [key: string]: WebGLUniformLocation };
 }
 
 export interface ThreeBodyWebGLProgram {
@@ -67,11 +69,7 @@ export interface ThreeBodyWebGLProgram {
   uniform: Record<string, WebGLUniformLocation>;
 }
 
-export interface LorenzSolution extends Array<number> {
-  0: number; // x
-  1: number; // y
-  2: number; // z
-}
+export type LorenzSolution = [number, number, number];
 
 export interface ThreeBodySolution extends Array<number> {
   // Body 1: position and velocity
@@ -108,7 +106,7 @@ export interface LorenzProps {
   initialParams?: Partial<LorenzParams>;
   initialDisplay?: Partial<DisplayParams>;
   particleCount?: number; // Number of particles to generate
-  customColors?: [number, number, number][]; // Array of RGB colors (0-1 range)
+  colorScheme?: ColorConfiguration;
   useDistanceBasedColoring?: boolean; // Enable distance-based coloring
   distanceColorA?: [number, number, number]; // Color A for distance interpolation
   distanceColorB?: [number, number, number]; // Color B for distance interpolation

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { colorConfigurations } from "../colorConfigurations";
 import { calculateShaderCanvasDimensions } from "../utils/calculateShaderCanvasDimensions";
+import { HSLAtoRGB } from "./colorManager";
 import { Lorenz } from "./Lorenz";
 import { LorenzProps } from "./types";
 
@@ -14,10 +16,8 @@ export function LorenzAttractor({
   initialParams,
   initialDisplay,
   particleCount = 12,
-  customColors,
+  colorScheme = "default",
   useDistanceBasedColoring = false,
-  distanceColorA = [0.658, 0.376, 0.718], // Rosolanc purple
-  distanceColorB = [0.11, 0.42, 0.627], // Helvetia blue
   oscillationCenters,
 }: LorenzProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,6 +28,14 @@ export function LorenzAttractor({
   const [viewportWidth, setViewportWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 800
   );
+
+  // Convert color scheme to RGB colors
+  const getRGBColors = (scheme: string) => {
+    const config =
+      colorConfigurations[scheme as keyof typeof colorConfigurations];
+    if (!config) return undefined;
+    return config.gradient.map((hsla) => HSLAtoRGB(hsla));
+  };
 
   // Handle viewport width changes for responsive behavior
   useEffect(() => {
@@ -52,9 +60,12 @@ export function LorenzAttractor({
     if (!canvasRef.current || isInitialized) return;
 
     try {
+      const colors = useDistanceBasedColoring
+        ? undefined
+        : getRGBColors(colorScheme);
       const lorenz = new Lorenz(
         canvasRef.current,
-        useDistanceBasedColoring ? undefined : customColors,
+        colors,
         useDistanceBasedColoring
       );
 
@@ -69,7 +80,11 @@ export function LorenzAttractor({
 
       // Configure distance-based coloring if enabled
       if (useDistanceBasedColoring) {
-        lorenz.enableDistanceBasedColoring(distanceColorA, distanceColorB);
+        const rosolaneToHelvetia =
+          colorConfigurations.rosolane_to_helvetia.gradient;
+        const colorA = HSLAtoRGB(rosolaneToHelvetia[1]); // Rosolane purple
+        const colorB = HSLAtoRGB(rosolaneToHelvetia[0]); // Helvetia blue
+        lorenz.enableDistanceBasedColoring(colorA, colorB);
         lorenz.setOscillationCenters(
           oscillationCenters || [
             [-8, -8, 27],
@@ -97,10 +112,8 @@ export function LorenzAttractor({
     initialDisplay,
     onSolutionCountChange,
     particleCount,
-    customColors,
+    colorScheme,
     useDistanceBasedColoring,
-    distanceColorA,
-    distanceColorB,
     oscillationCenters,
   ]);
 
@@ -109,28 +122,29 @@ export function LorenzAttractor({
     if (!isInitialized || !lorenzRef.current) return;
 
     if (useDistanceBasedColoring) {
-      lorenzRef.current.enableDistanceBasedColoring(
-        distanceColorA,
-        distanceColorB
-      );
+      const rosolaneToHelvetia =
+        colorConfigurations.rosolane_to_helvetia.gradient;
+      const colorA = HSLAtoRGB(rosolaneToHelvetia[1]); // Rosolane purple
+      const colorB = HSLAtoRGB(rosolaneToHelvetia[0]); // Helvetia blue
+      lorenzRef.current.enableDistanceBasedColoring(colorA, colorB);
       lorenzRef.current.setOscillationCenters(
         oscillationCenters || [
           [-8, -8, 27],
           [8, 8, 27],
         ]
       );
-    } else if (customColors) {
-      lorenzRef.current.disableDistanceBasedColoring();
-      lorenzRef.current.setCustomColors(customColors);
     } else {
+      const colors = getRGBColors(colorScheme);
       lorenzRef.current.disableDistanceBasedColoring();
-      lorenzRef.current.clearCustomColors();
+      if (colors) {
+        lorenzRef.current.setCustomColors(colors);
+      } else {
+        lorenzRef.current.clearCustomColors();
+      }
     }
   }, [
-    customColors,
+    colorScheme,
     useDistanceBasedColoring,
-    distanceColorA,
-    distanceColorB,
     oscillationCenters,
     isInitialized,
   ]);

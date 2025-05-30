@@ -1,5 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import {
+  ColorConfiguration,
+  colorConfigurations,
+} from "../colorConfigurations";
 import { LorenzAttractor } from "./LorenzAttractor";
+
+// Get available color schemes from colorConfigurations
+const colorSchemeOptions = Object.keys(
+  colorConfigurations
+) as ColorConfiguration[];
 
 const meta: Meta<typeof LorenzAttractor> = {
   title: "shaders/LorenzAttractor",
@@ -54,22 +63,14 @@ const meta: Meta<typeof LorenzAttractor> = {
       control: { type: "range", min: 1, max: 50, step: 1 },
       description: "Number of particles (default: 12)",
     },
-    customColors: {
-      control: "object",
-      description:
-        "Array of RGB colors in 0-1 range, e.g., [[1, 0, 0], [0, 1, 0], [0, 0, 1]]",
+    colorScheme: {
+      control: "select",
+      options: colorSchemeOptions,
+      description: "Color scheme to use for particles",
     },
     useDistanceBasedColoring: {
       control: "boolean",
       description: "Enable distance-based color interpolation",
-    },
-    distanceColorA: {
-      control: "object",
-      description: "Color A for distance interpolation (RGB 0-1 range)",
-    },
-    distanceColorB: {
-      control: "object",
-      description: "Color B for distance interpolation (RGB 0-1 range)",
     },
     oscillationCenters: {
       control: "object",
@@ -145,18 +146,13 @@ export const ArtisticPigments: Story = {
     width: 800,
     height: 600,
     particleCount: 8,
-    customColors: [
-      [0.537, 0.357, 0.482], // Dusky madder violet (#895B7B)
-      [0.478, 0.537, 0.722], // Deep lyons blue (#7A89B8)
-      [1.0, 0.369, 0.769], // Eosine pink (#FF5EC4)
-      [0.502, 0.275, 0.106], // Hay's russet (#80461B)
-    ],
+    colorScheme: "dusk",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Classic artistic pigment colors: Dusky madder violet, Deep lyons blue, Eosine pink, and Hay's russet.",
+          "Classic artistic pigment colors using the 'dusk' color scheme with dusky madder violet, deep lyons blue, eosine pink, and hay's russet.",
       },
     },
   },
@@ -168,8 +164,6 @@ export const DistanceBasedColoring: Story = {
     height: 600,
     particleCount: 10,
     useDistanceBasedColoring: true,
-    distanceColorA: [0.658, 0.376, 0.718], // Rosolanc purple
-    distanceColorB: [0.11, 0.42, 0.627], // Helvetia blue
     oscillationCenters: [
       [-8, -8, 27],
       [8, 8, 27],
@@ -179,7 +173,7 @@ export const DistanceBasedColoring: Story = {
     docs: {
       description: {
         story:
-          "Distance-based coloring where particle colors interpolate between Rosolanc purple and Helvetia blue based on their distance to the oscillation centers.",
+          "Distance-based coloring where particle colors interpolate between Rosolane purple and Helvetia blue based on their distance to the oscillation centers.",
       },
     },
   },

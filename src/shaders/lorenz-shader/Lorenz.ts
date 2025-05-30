@@ -10,6 +10,14 @@ import projectVert from "./shaders/project.vert.glsl";
 import tailFrag from "./shaders/tail.frag.glsl";
 import tailVert from "./shaders/tail.vert.glsl";
 
+// Import color management utilities
+import {
+  RGBColor,
+  generateColor,
+  getRandomColor,
+  setColorScheme,
+} from "./colorManager";
+
 export class Lorenz {
   public gl: WebGLRenderingContext;
   public params: LorenzParams;
@@ -30,10 +38,10 @@ export class Lorenz {
   public second = Math.floor(Date.now() / 1000);
   public ready = false;
   private startTime = Date.now(); // For oscillation timing
-  private customColors?: [number, number, number][]; // Custom color palette
+  private customColors?: RGBColor[]; // Updated type to RGBColor
   private useDistanceBasedColoring = false;
-  private distanceColorA: [number, number, number] = [0.658, 0.376, 0.718]; // Rosolanc purple
-  private distanceColorB: [number, number, number] = [0.11, 0.42, 0.627]; // Helvetia blue
+  private distanceColorA: RGBColor = { r: 0.658, g: 0.376, b: 0.718 }; // Rosolanc purple
+  private distanceColorB: RGBColor = { r: 0.11, g: 0.42, b: 0.627 }; // Helvetia blue
   private oscillationCenters: [number, number, number][] = [
     [-8, -8, 27], // Left attractor center
     [8, 8, 27], // Right attractor center
@@ -41,7 +49,7 @@ export class Lorenz {
 
   constructor(
     canvas: HTMLCanvasElement,
-    customColors?: [number, number, number][],
+    customColors?: RGBColor[],
     useDistanceColoring = false
   ) {
     const context =
@@ -64,21 +72,22 @@ export class Lorenz {
       step_size: 0.002,
       steps_per_frame: 3,
       oscillation: {
+        // parameter oscillation
         enabled: true,
         sigma: {
           base: 10,
           amplitude: 2,
-          frequency: 0.001, // Very slow oscillation
+          frequency: 0.005,
         },
         beta: {
           base: 8 / 3,
-          amplitude: 0.5,
-          frequency: 0.0008,
+          amplitude: 0.0,
+          frequency: 0.0,
         },
         rho: {
           base: 28,
-          amplitude: 5,
-          frequency: 0.0012,
+          amplitude: 0,
+          frequency: 0.0,
         },
       },
     };
@@ -215,19 +224,9 @@ export class Lorenz {
     ] as LorenzSolution;
   }
 
-  static color(i: number): [number, number, number] {
-    const colors = [
-      0x8d, 0xd3, 0xc7, 0xff, 0xff, 0xb3, 0xbe, 0xba, 0xda, 0xfb, 0x80, 0x72,
-      0x80, 0xb1, 0xd3, 0xfd, 0xb4, 0x62, 0xb3, 0xde, 0x69, 0xfc, 0xcd, 0xe5,
-      0xd9, 0xd9, 0xd9, 0xbc, 0x80, 0xbd, 0xcc, 0xeb, 0xc5, 0xff, 0xed, 0x6f,
-      0xff, 0xff, 0xff,
-    ];
-    const base = (i * 3) % colors.length;
-    return colors.slice(base, base + 3).map((x) => x / 255) as [
-      number,
-      number,
-      number
-    ];
+  static color(i: number): RGBColor {
+    // Use the colorManager's getRandomColor or generateColor
+    return generateColor();
   }
 
   static lorenz(
@@ -332,16 +331,16 @@ export class Lorenz {
   }
 
   private interpolateColor(
-    colorA: [number, number, number],
-    colorB: [number, number, number],
+    colorA: RGBColor,
+    colorB: RGBColor,
     t: number
-  ): [number, number, number] {
+  ): RGBColor {
     const clampedT = Math.max(0, Math.min(1, t));
-    return [
-      colorA[0] + (colorB[0] - colorA[0]) * clampedT,
-      colorA[1] + (colorB[1] - colorA[1]) * clampedT,
-      colorA[2] + (colorB[2] - colorA[2]) * clampedT,
-    ];
+    return {
+      r: colorA.r + (colorB.r - colorA.r) * clampedT,
+      g: colorA.g + (colorB.g - colorA.g) * clampedT,
+      b: colorA.b + (colorB.b - colorA.b) * clampedT,
+    };
   }
 
   private updateDistanceBasedColors(): void {
@@ -373,9 +372,9 @@ export class Lorenz {
         normalizedDistance
       );
 
-      this.tail_colors[i * 3 + 0] = color[0];
-      this.tail_colors[i * 3 + 1] = color[1];
-      this.tail_colors[i * 3 + 2] = color[2];
+      this.tail_colors[i * 3 + 0] = color.r;
+      this.tail_colors[i * 3 + 1] = color.g;
+      this.tail_colors[i * 3 + 2] = color.b;
     }
 
     // Update GPU buffer
@@ -499,14 +498,23 @@ export class Lorenz {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.tail_element_buffer);
 
       for (let i = 0; i < count; i++) {
-        const r = this.tail_colors[i * 3 + 0];
-        const g = this.tail_colors[i * 3 + 1];
-        const b = this.tail_colors[i * 3 + 2];
-        const offset = i * length * 4 * 3;
+        // Create a temporary RGBColor object from the color components
+        const color: RGBColor = {
+          r: this.tail_colors[i * 3 + 0],
+          g: this.tail_colors[i * 3 + 1],
+          b: this.tail_colors[i * 3 + 2],
+        };
 
-        gl.uniform3f(uniform.color, r, g, b);
+        gl.uniform3f(uniform.color, color.r, color.g, color.b);
         gl.uniform1f(uniform.tail_length, this.tail_length[i]);
-        gl.vertexAttribPointer(attrib.point, 3, gl.FLOAT, false, 0, offset);
+        gl.vertexAttribPointer(
+          attrib.point,
+          3,
+          gl.FLOAT,
+          false,
+          0,
+          i * length * 4 * 3
+        );
         gl.drawElements(
           gl.LINE_STRIP,
           length,
@@ -546,16 +554,18 @@ export class Lorenz {
       if (this.customColors) {
         for (let i = 0; i < count; i++) {
           const color = this.customColors[i % this.customColors.length];
-          this.tail_colors[i * 3 + 0] = color[0];
-          this.tail_colors[i * 3 + 1] = color[1];
-          this.tail_colors[i * 3 + 2] = color[2];
+          this.tail_colors[i * 3 + 0] = color.r;
+          this.tail_colors[i * 3 + 1] = color.g;
+          this.tail_colors[i * 3 + 2] = color.b;
         }
       } else {
+        // Use the new color management system
+        setColorScheme("default"); // Set default color scheme
         for (let i = 0; i < count; i++) {
-          const color = Lorenz.color(i);
-          this.tail_colors[i * 3 + 0] = color[0];
-          this.tail_colors[i * 3 + 1] = color[1];
-          this.tail_colors[i * 3 + 2] = color[2];
+          const color = getRandomColor();
+          this.tail_colors[i * 3 + 0] = color.r;
+          this.tail_colors[i * 3 + 1] = color.g;
+          this.tail_colors[i * 3 + 2] = color.b;
         }
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, this.tail_colors_buffer);
@@ -610,16 +620,16 @@ export class Lorenz {
     this.trim(v);
   }
 
-  setCustomColors(colors: [number, number, number][]): this {
+  setCustomColors(colors: RGBColor[]): this {
     this.customColors = colors;
     // Regenerate color buffer with new colors
     const count = this.solutions.length;
     if (count > 0) {
       for (let i = 0; i < count; i++) {
         const color = this.customColors[i % this.customColors.length];
-        this.tail_colors[i * 3 + 0] = color[0];
-        this.tail_colors[i * 3 + 1] = color[1];
-        this.tail_colors[i * 3 + 2] = color[2];
+        this.tail_colors[i * 3 + 0] = color.r;
+        this.tail_colors[i * 3 + 1] = color.g;
+        this.tail_colors[i * 3 + 2] = color.b;
       }
       // Update GPU buffer
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.tail_colors_buffer);
@@ -633,11 +643,12 @@ export class Lorenz {
     // Regenerate color buffer with default colors
     const count = this.solutions.length;
     if (count > 0) {
+      setColorScheme("default"); // Set default color scheme
       for (let i = 0; i < count; i++) {
-        const color = Lorenz.color(i);
-        this.tail_colors[i * 3 + 0] = color[0];
-        this.tail_colors[i * 3 + 1] = color[1];
-        this.tail_colors[i * 3 + 2] = color[2];
+        const color = getRandomColor();
+        this.tail_colors[i * 3 + 0] = color.r;
+        this.tail_colors[i * 3 + 1] = color.g;
+        this.tail_colors[i * 3 + 2] = color.b;
       }
       // Update GPU buffer
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.tail_colors_buffer);
@@ -646,10 +657,7 @@ export class Lorenz {
     return this;
   }
 
-  enableDistanceBasedColoring(
-    colorA: [number, number, number],
-    colorB: [number, number, number]
-  ): this {
+  enableDistanceBasedColoring(colorA: RGBColor, colorB: RGBColor): this {
     this.useDistanceBasedColoring = true;
     this.distanceColorA = colorA;
     this.distanceColorB = colorB;
