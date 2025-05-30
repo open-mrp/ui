@@ -75,19 +75,19 @@ export class Lorenz {
         // parameter oscillation
         enabled: true,
         sigma: {
-          base: 10,
-          amplitude: 2,
-          frequency: 0.005,
+          base: 15,
+          amplitude: 1,
+          frequency: 0.001,
         },
         beta: {
-          base: 8 / 3,
-          amplitude: 0.0,
-          frequency: 0.0,
+          base: 2.5,
+          amplitude: 0.1,
+          frequency: 0.0001,
         },
         rho: {
-          base: 28,
-          amplitude: 0,
-          frequency: 0.0,
+          base: 38,
+          amplitude: 2,
+          frequency: 0.00001,
         },
       },
     };
@@ -95,7 +95,7 @@ export class Lorenz {
     this.display = {
       scale: 1 / 25,
       rotation: [1.65, 3.08, -0.93],
-      rotationd: [0.0001, 0.0001, 0.0001], // Much more subtle rotation speeds
+      rotationd: [0.0002, 0.0002, 0.0001], // rotation speeds
       translation: [0, 0.075, 1.81],
       _length: 512,
     };
@@ -302,18 +302,18 @@ export class Lorenz {
     // Update sigma with oscillation
     this.params.sigma =
       oscillation.sigma.base +
-      Math.sin(time * oscillation.sigma.frequency) *
+      Math.cos(time * oscillation.sigma.frequency) *
         oscillation.sigma.amplitude;
 
     // Update beta with oscillation
     this.params.beta =
       oscillation.beta.base +
-      Math.sin(time * oscillation.beta.frequency) * oscillation.beta.amplitude;
+      Math.cos(time * oscillation.beta.frequency) * oscillation.beta.amplitude;
 
     // Update rho with oscillation
     this.params.rho =
       oscillation.rho.base +
-      Math.sin(time * oscillation.rho.frequency) * oscillation.rho.amplitude;
+      Math.cos(time * oscillation.rho.frequency) * oscillation.rho.amplitude;
   }
 
   private calculateDistanceToNearestCenter(point: LorenzSolution): number {
