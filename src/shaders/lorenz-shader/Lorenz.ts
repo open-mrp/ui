@@ -95,8 +95,8 @@ export class Lorenz {
     this.display = {
       scale: 1 / 25,
       rotation: [1.65, 3.08, -0.93],
-      rotationd: [0.0002, 0.0002, 0.0001], // rotation speeds
-      translation: [0, 0.075, 1.81],
+      rotationd: [-0.00025, 0.0002, 0.0001], // rotation speeds
+      translation: [-0.5, -0.05, 2.81],
       _length: 512,
     };
 
