@@ -2,13 +2,13 @@
 
 import { useViewportWidth } from "@/hooks/useViewportWidth";
 import { useEffect, useRef, useState } from "react";
+import { colorConfigurations } from "../colorConfigurations";
 import { calculateShaderCanvasDimensions } from "../utils/calculateShaderCanvasDimensions";
-import { WaveShaderRenderer } from "./WaveShaderRenderer";
-import { colorConfigurations } from "./colorConfigurations";
 import fragmentShaderSource from "./shaders/main.glsl";
 import { FragmentShader } from "./shaders/types";
 import vertexShaderSource from "./shaders/vertex.glsl";
 import { WaveShaderProps } from "./types";
+import { WaveShaderRenderer } from "./WaveShaderRenderer";
 
 export function WaveShader({
   animate = true,

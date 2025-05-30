@@ -1,4 +1,4 @@
-import { ColorConfiguration } from "./colorConfigurations";
+import { ColorConfiguration } from "../colorConfigurations";
 
 export interface WaveShaderProps {
   skew?: "full" | "bottom";
