@@ -16,14 +16,14 @@ export const colorConfigurations = {
       "hsl(40deg 100% 50%)", // Amber
       "hsl(48deg 100% 50%)", // Yellow
       "hsl(55deg 100% 50%)", // Lime
-    ],
+    ]
   },
   fire: {
     gradient: [
       "hsla(31, 100%, 50%, 1)",
       "hsla(356, 100%, 50%, 1)",
       "hsla(42, 100%, 56%, 1)",
-    ],
+    ]
   },
   red_to_purple: {
     gradient: [
@@ -37,7 +37,7 @@ export const colorConfigurations = {
       "hsla(229, 83%, 60%, 1)", // Neon Blue
       "hsla(212, 84%, 61%, 1)", // Chefchaouen Blue
       "hsla(194, 85%, 62%, 1)", // Vivid Sky Blue
-    ],
+    ]
   },
   blue_to_yellow: {
     gradient: [
@@ -48,7 +48,7 @@ export const colorConfigurations = {
       "hsl(154deg 100% 39%)", // Emerald
       "hsl(89deg 70% 56%)", // Lime
       "hsl(55deg 100% 50%)", // Bright yellow
-    ],
+    ]
   },
   red_to_blue: {
     gradient: [
@@ -57,7 +57,7 @@ export const colorConfigurations = {
       "hsl(300deg 100% 50%)", // Purple
       "hsl(270deg 100% 50%)", // Violet
       "hsl(240deg 100% 50%)", // Blue
-    ],
+    ]
   },
   sunset: {
     gradient: [
@@ -66,7 +66,7 @@ export const colorConfigurations = {
       "hsl(340deg 100% 40%)", // Deep rose
       "hsl(20deg 100% 50%)", // Bright orange
       "hsl(45deg 100% 60%)", // Golden yellow
-    ],
+    ]
   },
   blue_to_purple: {
     gradient: [
@@ -75,7 +75,7 @@ export const colorConfigurations = {
       "hsl(258deg 86% 34%)", // Zaffre
       "hsl(229deg 83% 60%)", // Neon blue
       "hsl(194deg 85% 62%)", // Vivid sky blue
-    ],
+    ]
   },
   blue_to_pink: {
     gradient: [
@@ -84,7 +84,7 @@ export const colorConfigurations = {
       "hsla(334, 100%, 50%, 1)", // Rose
       "hsla(265, 83%, 57%, 1)", // Blue violet
       "hsla(217, 100%, 61%, 1)", // Azure
-    ],
+    ]
   },
   crazy: {
     gradient: [
@@ -92,7 +92,7 @@ export const colorConfigurations = {
       "hsla(355, 98%, 60%, 1)", // Red
       "hsla(281, 78%, 61%, 1)", // Purple
       "hsla(198, 99%, 78%, 1)", // Light blue
-    ],
+    ]
   },
   dusk: {
     gradient: [
@@ -100,12 +100,20 @@ export const colorConfigurations = {
       "hsla(228, 31%, 60%, 1)", // Deep lyons blue
       "hsla(320, 100%, 68%, 1)", // Eosine pink
       "hsla(25, 65%, 30%, 1)", // Hay's russe
-    ],
+    ]
   },
   rosolane_to_helvetia: {
     gradient: [
       "hsla(207, 70%, 37%, 1)", // Helvetia blue
       "hsla(288, 37%, 55%, 1)", // Rosolane purple
-    ],
+    ]
   },
-};
+  organic: {
+    gradient: [
+      "hsl(147, 30%, 30%)", // Deep slate green
+      "hsl(48, 40%, 85%)", // Cream yellow
+      "hsl(270, 15%, 75%)", // Grayish lavender
+      "hsl(282, 60%, 40%)", // Cotinga purple
+    ]
+  }
+}; 
