@@ -3,16 +3,16 @@ import {
   ColorConfiguration,
   colorConfigurations,
 } from "../colorConfigurations";
-import { LorenzAttractor } from "./LorenzAttractor";
+import { LorenzShader } from "./LorenzShader";
 
 // Get available color schemes from colorConfigurations
 const colorSchemeOptions = Object.keys(
   colorConfigurations
 ) as ColorConfiguration[];
 
-const meta: Meta<typeof LorenzAttractor> = {
+const meta: Meta<typeof LorenzShader> = {
   title: "shaders/LorenzAttractor",
-  component: LorenzAttractor,
+  component: LorenzShader,
   parameters: {
     layout: "fullscreen",
     docs: {
@@ -80,7 +80,7 @@ const meta: Meta<typeof LorenzAttractor> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof LorenzAttractor>;
+type Story = StoryObj<typeof LorenzShader>;
 
 export const Default: Story = {
   args: {

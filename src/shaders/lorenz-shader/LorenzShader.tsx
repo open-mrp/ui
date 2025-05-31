@@ -5,7 +5,7 @@ import { HSLAtoRGB } from "./colorManager";
 import { Lorenz } from "./Lorenz";
 import { LorenzProps } from "./types";
 
-export function LorenzAttractor({
+export function LorenzShader({
   width = 800,
   height = 600,
   minWidth,

@@ -1,5 +1,4 @@
-export { Lorenz } from "./Lorenz";
-export { LorenzAttractor } from "./LorenzAttractor";
+export { LorenzShader } from "./LorenzShader";
 export type {
   DisplayParams,
   LorenzParams,
@@ -7,12 +6,3 @@ export type {
   LorenzSolution,
   LorenzWebGLProgram,
 } from "./types";
-export {
-  COLOR_PALETTES,
-  createColorPalette,
-  createDisplayParams,
-  createLorenzParams,
-  generateInitialConditions,
-  getLorenzCanvasDimensions,
-  normalizeColor,
-} from "./utils";
