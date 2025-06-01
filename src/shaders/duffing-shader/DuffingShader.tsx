@@ -1,10 +1,11 @@
+import { useViewportWidth } from "@/hooks/useViewportWidth";
 import React, { useEffect, useMemo, useRef } from "react";
 import { FluidRenderer } from "./FluidRenderer";
 import type { DuffingShaderProps } from "./types";
 
 export function DuffingShader({
   width = 600,
-  height = 275,
+  height = 400,
   className = "",
   config,
   skew,
@@ -15,15 +16,17 @@ export function DuffingShader({
 }: DuffingShaderProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<FluidRenderer | null>(null);
+  const viewportWidth = useViewportWidth();
 
-  // Calculate dimensions based on minWidth and maintainHeight
+  // Calculate dimensions based on container size
   const dimensions = useMemo(() => {
-    const finalWidth = Math.max(width, minWidth);
+    const containerWidth = viewportWidth ?? width;
+    const finalWidth = Math.max(containerWidth, minWidth);
     const finalHeight = maintainHeight
       ? Math.round(finalWidth * maintainHeight)
       : height;
     return { width: finalWidth, height: finalHeight };
-  }, [width, minWidth, maintainHeight, height]);
+  }, [width, minWidth, maintainHeight, height, viewportWidth]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -68,17 +71,30 @@ export function DuffingShader({
   }, [skew, skewDegree]);
 
   return (
-    <div className={`fluid-simulation-container ${className}`}>
-      <canvas
-        ref={canvasRef}
-        width={dimensions.width}
-        height={dimensions.height}
+    <div
+      className="relative w-full h-full"
+      style={{
+        minWidth,
+        ...(skew === "full" ? { transform: `skewY(-${skewDegree}deg)` } : {}),
+      }}
+    >
+      <div
+        className="absolute top-0 left-0 w-full h-full"
         style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
+          clipPath:
+            skew === "bottom"
+              ? `polygon(0 0, 100% 0, 100% ${50 + skewDegree / 2}%, 0 100%)`
+              : "none",
         }}
-      />
+      >
+        <canvas
+          ref={canvasRef}
+          className={`absolute top-0 left-0 w-full h-full ${className}`}
+          style={{
+            transformOrigin: "0 0",
+          }}
+        />
+      </div>
     </div>
   );
 }
