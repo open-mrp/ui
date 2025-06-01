@@ -1,3 +1,5 @@
+import type { ColorConfiguration } from "../colorConfigurations";
+
 // WebGL Types
 export interface WebGLContext {
   gl: WebGL2RenderingContext | WebGLRenderingContext;
@@ -197,21 +199,6 @@ export interface SunraysPrograms {
     };
   };
 }
-
-// Main Config Type
-export type ColorConfiguration =
-  | "dusk"
-  | "default"
-  | "fire"
-  | "red_to_purple"
-  | "blue_to_yellow"
-  | "red_to_blue"
-  | "sunset"
-  | "blue_to_purple"
-  | "blue_to_pink"
-  | "crazy"
-  | "rosolane_to_helvetia"
-  | "organic";
 
 export interface Config {
   SIM_RESOLUTION: number;
@@ -430,6 +417,9 @@ export interface DuffingShaderProps {
   config?: Partial<Config>;
   skew?: "full" | "bottom";
   skewDegree?: number;
+  minWidth?: number;
+  maintainHeight?: number;
+  colorConfiguration?: ColorConfiguration;
 }
 
 export interface Boundaries {

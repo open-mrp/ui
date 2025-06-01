@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { FluidRenderer } from "./FluidRenderer";
 import type { DuffingShaderProps } from "./types";
 
@@ -9,9 +9,21 @@ export function DuffingShader({
   config,
   skew,
   skewDegree = 6,
+  minWidth = 600,
+  maintainHeight = 0.3,
+  colorConfiguration = "dusk",
 }: DuffingShaderProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<FluidRenderer | null>(null);
+
+  // Calculate dimensions based on minWidth and maintainHeight
+  const dimensions = useMemo(() => {
+    const finalWidth = Math.max(width, minWidth);
+    const finalHeight = maintainHeight
+      ? Math.round(finalWidth * maintainHeight)
+      : height;
+    return { width: finalWidth, height: finalHeight };
+  }, [width, minWidth, maintainHeight, height]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -19,7 +31,10 @@ export function DuffingShader({
     try {
       const renderer = new FluidRenderer(
         canvasRef.current,
-        config,
+        {
+          ...config,
+          COLOR_SCHEME: colorConfiguration,
+        },
         skew,
         skewDegree
       );
@@ -31,16 +46,19 @@ export function DuffingShader({
     } catch (error) {
       console.error("Failed to initialize Fluid Simulation:", error);
     }
-  }, [config, skew, skewDegree]);
+  }, [config, skew, skewDegree, colorConfiguration]);
 
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
     if (config) {
-      renderer.updateConfig(config);
+      renderer.updateConfig({
+        ...config,
+        COLOR_SCHEME: colorConfiguration,
+      });
     }
-  }, [config]);
+  }, [config, colorConfiguration]);
 
   useEffect(() => {
     const renderer = rendererRef.current;
@@ -53,8 +71,8 @@ export function DuffingShader({
     <div className={`fluid-simulation-container ${className}`}>
       <canvas
         ref={canvasRef}
-        width={width}
-        height={height}
+        width={dimensions.width}
+        height={dimensions.height}
         style={{
           width: "100%",
           height: "100%",
