@@ -40,6 +40,7 @@ import {
   AdvectionProgram,
   BloomPrograms,
   BlurProgram,
+  Boundaries,
   ColorProgram,
   Config,
   CurlFBO,
@@ -108,6 +109,7 @@ export class FluidRenderer {
   private colorProgram!: Program<ColorProgram["uniforms"]>;
   private copyProgram!: Program;
   private clearProgram!: Program;
+  private boundaries!: Boundaries;
 
   private ditheringTexture: {
     texture: WebGLTexture | null;
@@ -152,16 +154,18 @@ export class FluidRenderer {
     this.gl = gl;
     this.ext = ext;
 
-    // Initialize vertex buffer and element array buffer
+    this.boundaries = {
+      botLeft: [-1, -1],
+      botRight: [1, -1],
+      topLeft: [-1, 1],
+      topRight: [1, 1],
+    };
+
     const vertices = new Float32Array([
-      -1,
-      -1, // bottom left
-      1,
-      -1, // bottom right
-      -1,
-      1, // top left
-      1,
-      1, // top right
+      ...this.boundaries.botLeft, // bottom left
+      ...this.boundaries.botRight, // bottom right
+      ...this.boundaries.topLeft, // top left
+      ...this.boundaries.topRight, // top right
     ]);
 
     const indices = new Uint16Array([

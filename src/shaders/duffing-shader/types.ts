@@ -411,3 +411,10 @@ export interface DuffingShaderProps {
   className?: string;
   config?: Partial<Config>;
 }
+
+export interface Boundaries {
+  botLeft: [number, number];
+  botRight: [number, number];
+  topLeft: [number, number];
+  topRight: [number, number];
+}

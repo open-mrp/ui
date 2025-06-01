@@ -76,3 +76,30 @@ ArtisticEffects.args = {
     SUNRAYS_WEIGHT: 0.2,
   },
 };
+
+export const BigBois = Template.bind({});
+BigBois.args = {
+  width: 800,
+  height: 600,
+  config: {
+    SIM_RESOLUTION: 512,
+    DYE_RESOLUTION: 1024,
+    DENSITY_DISSIPATION: 1.5,
+    VELOCITY_DISSIPATION: 0.95,
+    PRESSURE_ITERATIONS: 25,
+    CURL: 0.2,
+    SPLAT_RADIUS: 0.02,
+    SPLAT_FORCE: 700,
+    BLOOM_ITERATIONS: 12,
+    BLOOM_RESOLUTION: 512,
+    BLOOM_INTENSITY: 0.05,
+    BLOOM_THRESHOLD: 6.9,
+    BLOOM_SOFT_KNEE: 0.7,
+    SUNRAYS_RESOLUTION: 256,
+    SUNRAYS_WEIGHT: 0.15,
+    DUFFING: {
+      NUM_OSCILLATORS: 3,
+    },
+    COLOR_SCHEME: "rosolane_to_helvetia",
+  },
+};
