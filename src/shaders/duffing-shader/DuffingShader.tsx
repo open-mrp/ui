@@ -3,10 +3,12 @@ import { FluidRenderer } from "./FluidRenderer";
 import type { DuffingShaderProps } from "./types";
 
 export function DuffingShader({
-  width = 800,
-  height = 600,
+  width = 600,
+  height = 275,
   className = "",
   config,
+  skew,
+  skewDegree = 6,
 }: DuffingShaderProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<FluidRenderer | null>(null);
@@ -15,7 +17,12 @@ export function DuffingShader({
     if (!canvasRef.current) return;
 
     try {
-      const renderer = new FluidRenderer(canvasRef.current, config);
+      const renderer = new FluidRenderer(
+        canvasRef.current,
+        config,
+        skew,
+        skewDegree
+      );
       rendererRef.current = renderer;
 
       return () => {
@@ -24,7 +31,7 @@ export function DuffingShader({
     } catch (error) {
       console.error("Failed to initialize Fluid Simulation:", error);
     }
-  }, [config]);
+  }, [config, skew, skewDegree]);
 
   useEffect(() => {
     const renderer = rendererRef.current;
@@ -35,6 +42,13 @@ export function DuffingShader({
     }
   }, [config]);
 
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+
+    renderer.updateSkew(skew, skewDegree);
+  }, [skew, skewDegree]);
+
   return (
     <div className={`fluid-simulation-container ${className}`}>
       <canvas
@@ -42,8 +56,8 @@ export function DuffingShader({
         width={width}
         height={height}
         style={{
-          width: `${width}px`,
-          height: `${height}px`,
+          width: "100%",
+          height: "100%",
           display: "block",
         }}
       />

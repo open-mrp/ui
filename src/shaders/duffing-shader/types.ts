@@ -410,6 +410,8 @@ export interface DuffingShaderProps {
   height?: number;
   className?: string;
   config?: Partial<Config>;
+  skew?: "full" | "bottom";
+  skewDegree?: number;
 }
 
 export interface Boundaries {

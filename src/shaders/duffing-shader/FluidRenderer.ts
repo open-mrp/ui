@@ -71,6 +71,8 @@ export class FluidRenderer {
   private pointerManager: PointerManager;
   private lastUpdateTime: number;
   private animationFrameId: number | null = null;
+  private skewType?: "full" | "bottom";
+  private skewDegree: number = 6;
 
   // FBOs
   private dye!: DyeFBO;
@@ -118,8 +120,15 @@ export class FluidRenderer {
     attach: (id: number) => number;
   };
 
-  constructor(canvas: HTMLCanvasElement, config?: Partial<Config>) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    config?: Partial<Config>,
+    skewType?: "full" | "bottom",
+    skewDegree: number = 6
+  ) {
     this.canvas = canvas;
+    this.skewType = skewType;
+    this.skewDegree = skewDegree;
     this.config = {
       SIM_RESOLUTION: 512,
       DYE_RESOLUTION: 1024,
@@ -154,12 +163,37 @@ export class FluidRenderer {
     this.gl = gl;
     this.ext = ext;
 
-    this.boundaries = {
-      botLeft: [-1, -1],
-      botRight: [1, -1],
-      topLeft: [-1, 1],
-      topRight: [1, 1],
-    };
+    // Calculate skew based on skewType and skewDegree
+    const skewRadians = (this.skewDegree * Math.PI) / 180;
+    const skewAmount = Math.tan(skewRadians);
+
+    if (this.skewType === "full") {
+      this.boundaries = {
+        botLeft: [-1, -1 - skewAmount],
+        botRight: [1, -1 + skewAmount],
+        topLeft: [-1, 1 - skewAmount],
+        topRight: [1, 1 + skewAmount],
+      };
+    } else if (this.skewType === "bottom") {
+      // Convert from percentage space to NDC space (-1 to 1)
+      // In WaveShader: right edge goes to (50 + skewDegree/2)% of height
+      // Convert from [0,100] to [-1,1] space: (x/50 - 1)
+      const rightEdgeY = (50 + skewDegree / 2) / 50 - 1;
+
+      this.boundaries = {
+        botLeft: [-1, -1], // (0%, 100%) -> (-1, -1)
+        botRight: [1, rightEdgeY], // (100%, 50+skewDegree/2%) -> (1, rightEdgeY)
+        topLeft: [-1, 1], // (0%, 0%) -> (-1, 1)
+        topRight: [1, 1], // (100%, 0%) -> (1, 1)
+      };
+    } else {
+      this.boundaries = {
+        botLeft: [-1, -1],
+        botRight: [1, -1],
+        topLeft: [-1, 1],
+        topRight: [1, 1],
+      };
+    }
 
     const vertices = new Float32Array([
       ...this.boundaries.botLeft, // bottom left
@@ -1204,6 +1238,53 @@ export class FluidRenderer {
     target.texelSizeX = 1.0 / w;
     target.texelSizeY = 1.0 / h;
     return target;
+  }
+
+  public updateSkew(skewType?: "full" | "bottom", skewDegree: number = 6) {
+    this.skewType = skewType;
+    this.skewDegree = skewDegree;
+
+    const skewRadians = (this.skewDegree * Math.PI) / 180;
+    const skewAmount = Math.tan(skewRadians);
+
+    if (this.skewType === "full") {
+      this.boundaries = {
+        botLeft: [-1, -1 - skewAmount],
+        botRight: [1, -1 + skewAmount],
+        topLeft: [-1, 1 - skewAmount],
+        topRight: [1, 1 + skewAmount],
+      };
+    } else if (this.skewType === "bottom") {
+      // Use same calculation as constructor
+      const rightEdgeY = (50 + skewDegree / 2) / 50 - 1;
+
+      this.boundaries = {
+        botLeft: [-1, -1], // (0%, 100%) -> (-1, -1)
+        botRight: [1, rightEdgeY], // (100%, 50+skewDegree/2%) -> (1, rightEdgeY)
+        topLeft: [-1, 1], // (0%, 0%) -> (-1, 1)
+        topRight: [1, 1], // (100%, 0%) -> (1, 1)
+      };
+    } else {
+      this.boundaries = {
+        botLeft: [-1, -1],
+        botRight: [1, -1],
+        topLeft: [-1, 1],
+        topRight: [1, 1],
+      };
+    }
+
+    // Update vertex buffer with new boundaries
+    const vertices = new Float32Array([
+      ...this.boundaries.botLeft,
+      ...this.boundaries.botRight,
+      ...this.boundaries.topLeft,
+      ...this.boundaries.topRight,
+    ]);
+
+    const vertexBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+    this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
   }
 }
 
