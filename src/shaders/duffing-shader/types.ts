@@ -1,5 +1,3 @@
-import { ColorConfiguration } from "../colorConfigurations";
-
 // WebGL Types
 export interface WebGLContext {
   gl: WebGL2RenderingContext | WebGLRenderingContext;
@@ -201,6 +199,20 @@ export interface SunraysPrograms {
 }
 
 // Main Config Type
+export type ColorConfiguration =
+  | "dusk"
+  | "default"
+  | "fire"
+  | "red_to_purple"
+  | "blue_to_yellow"
+  | "red_to_blue"
+  | "sunset"
+  | "blue_to_purple"
+  | "blue_to_pink"
+  | "crazy"
+  | "rosolane_to_helvetia"
+  | "organic";
+
 export interface Config {
   SIM_RESOLUTION: number;
   DYE_RESOLUTION: number;
@@ -211,7 +223,7 @@ export interface Config {
   CURL: number;
   SPLAT_RADIUS: number;
   SPLAT_FORCE: number;
-  BACK_COLOR: RGBColor;
+  BACK_COLOR: { r: number; g: number; b: number };
   BLOOM_ITERATIONS: number;
   BLOOM_RESOLUTION: number;
   BLOOM_INTENSITY: number;
@@ -222,11 +234,17 @@ export interface Config {
   COLOR_SCHEME: ColorConfiguration;
   DUFFING: {
     NUM_OSCILLATORS: number;
-    DELTA: number; // damping coefficient
-    BETA: number; // linear stiffness
-    ALPHA: number; // cubic stiffness
-    GAMMA: number; // forcing amplitude
-    OMEGA: number; // forcing frequency
+    DELTA: number;
+    BETA: number;
+    ALPHA: number;
+    GAMMA: number;
+    OMEGA: number;
+  };
+  boundaries?: {
+    botLeft: [number, number];
+    botRight: [number, number];
+    topLeft: [number, number];
+    topRight: [number, number];
   };
 }
 

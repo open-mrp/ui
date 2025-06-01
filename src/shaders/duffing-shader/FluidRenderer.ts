@@ -137,7 +137,7 @@ export class FluidRenderer {
       PRESSURE: 0.8,
       PRESSURE_ITERATIONS: 20,
       CURL: 0.1,
-      SPLAT_RADIUS: 0.0003,
+      SPLAT_RADIUS: 0.005,
       SPLAT_FORCE: 8000,
       BACK_COLOR: { r: 0, g: 0, b: 0 },
       BLOOM_ITERATIONS: 10,
@@ -263,7 +263,10 @@ export class FluidRenderer {
       canvas,
       () => getRandomColor(),
       (splatData: SplatData) => this.handleSplat(splatData),
-      this.config
+      {
+        ...this.config,
+        boundaries: this.boundaries,
+      }
     );
 
     this.lastUpdateTime = Date.now();
@@ -1255,7 +1258,9 @@ export class FluidRenderer {
         topRight: [1, 1 + skewAmount],
       };
     } else if (this.skewType === "bottom") {
-      // Use same calculation as constructor
+      // Convert from percentage space to NDC space (-1 to 1)
+      // In WaveShader: right edge goes to (50 + skewDegree/2)% of height
+      // Convert from [0,100] to [-1,1] space: (x/50 - 1)
       const rightEdgeY = (50 + skewDegree / 2) / 50 - 1;
 
       this.boundaries = {
@@ -1285,6 +1290,9 @@ export class FluidRenderer {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
     this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
+
+    // Update boundaries in pointer manager
+    this.pointerManager.updateBoundaries(this.boundaries);
   }
 }
 
