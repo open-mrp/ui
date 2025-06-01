@@ -1,20 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { FluidRenderer } from "./FluidRenderer";
-import type { Config } from "./types";
+import type { DuffingShaderProps } from "./types";
 
-export interface FluidSimulationProps {
-  width?: number;
-  height?: number;
-  className?: string;
-  config?: Partial<Config>;
-}
-
-export function FluidSimulation({
+export function DuffingShader({
   width = 800,
   height = 600,
   className = "",
   config,
-}: FluidSimulationProps): React.ReactElement {
+}: DuffingShaderProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<FluidRenderer | null>(null);
 

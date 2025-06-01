@@ -1,19 +1,19 @@
 import type { Meta, StoryFn } from "@storybook/react";
 import React from "react";
-import { FluidSimulation } from "./FluidSimulation";
+import { DuffingShader } from "./DuffingShader";
 
 const meta = {
-  title: "shaders/FluidSimulation",
-  component: FluidSimulation,
+  title: "shaders/DuffingShader",
+  component: DuffingShader,
   parameters: {
     layout: "fullscreen",
   },
-} satisfies Meta<typeof FluidSimulation>;
+} satisfies Meta<typeof DuffingShader>;
 
 export default meta;
 
-const Template: StoryFn<typeof FluidSimulation> = (args) => (
-  <FluidSimulation {...args} />
+const Template: StoryFn<typeof DuffingShader> = (args) => (
+  <DuffingShader {...args} />
 );
 
 export const Default = Template.bind({});

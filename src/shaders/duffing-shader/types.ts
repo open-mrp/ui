@@ -405,3 +405,9 @@ export interface PointerData {
   moved: boolean;
   color: RGBColor;
 }
+export interface DuffingShaderProps {
+  width?: number;
+  height?: number;
+  className?: string;
+  config?: Partial<Config>;
+}
