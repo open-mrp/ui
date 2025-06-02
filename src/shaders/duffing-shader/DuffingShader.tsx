@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { colorConfigurations } from "../colorConfigurations";
 import { calculateShaderCanvasDimensions } from "../utils/calculateShaderCanvasDimensions";
 import { FluidRenderer } from "./FluidRenderer";
-import { Config, DuffingShaderProps } from "./types";
+import { getShaders } from "./shaders";
+import { Config, DuffingShaderProps, FragmentShader } from "./types";
 
 const DEFAULT_CONFIG: Config = {
   SIM_RESOLUTION: 512,
@@ -47,6 +48,9 @@ export function DuffingShader({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<FluidRenderer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [shaders, setShaders] = useState<Record<string, FragmentShader> | null>(
+    null
+  );
 
   const viewportWidth = useViewportWidth();
   const [dimensions, setDimensions] = useState(() => {
@@ -66,9 +70,18 @@ export function DuffingShader({
 
   const [canvasWidth, canvasHeight] = dimensions;
 
+  // Load shaders
+  useEffect(() => {
+    async function loadShaders() {
+      const loadedShaders = await getShaders();
+      setShaders(loadedShaders);
+    }
+    loadShaders();
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !shaders) return;
 
     if (!colorConfigurations[colorConfiguration]) {
       console.warn(`Color configuration "${colorConfiguration}" not found`);
@@ -111,17 +124,20 @@ export function DuffingShader({
     }
 
     // Initialize the FluidRenderer with the canvas and configuration
-    rendererRef.current = new FluidRenderer(canvas, {
-      ...mergedConfig,
-      boundaries,
-    });
+    rendererRef.current = new FluidRenderer(
+      canvas,
+      mergedConfig,
+      skew,
+      skewDegree,
+      shaders
+    );
 
     // Clean up the renderer on unmount
     return () => {
       rendererRef.current?.destroy();
       rendererRef.current = null;
     };
-  }, [colorConfiguration, userConfig, skew, skewDegree]);
+  }, [colorConfiguration, userConfig, skew, skewDegree, shaders]);
 
   // Update renderer configuration when props change
   useEffect(() => {

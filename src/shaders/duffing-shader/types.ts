@@ -428,3 +428,8 @@ export interface Boundaries {
   topLeft: [number, number];
   topRight: [number, number];
 }
+
+export interface FragmentShader {
+  shader: string;
+  uniforms: Record<string, { value: number }>;
+}

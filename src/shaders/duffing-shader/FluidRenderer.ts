@@ -1,6 +1,6 @@
 "use strict";
 import { ColorConfiguration } from "../colorConfigurations";
-import { clearShader, displayShaderSource } from "./shaders";
+import { FragmentShader } from "./types";
 
 // Import managers for their functionality
 import {
@@ -23,8 +23,6 @@ import {
   initPhysicsShaders,
 } from "./physicsManager";
 import { PointerManager } from "./pointerManager";
-import baseVertexShaderSource from "./shaders/baseVertexShader.glsl";
-import copyShaderSource from "./shaders/copyShader.glsl";
 import {
   applyAdvection,
   handlePointerSplat,
@@ -56,6 +54,14 @@ import {
   VelocityFBO,
   WebGLContext,
 } from "./types";
+
+// Import shader sources
+import {
+  baseVertexShader,
+  clearShader,
+  copyShader,
+  displayShader,
+} from "./shaders";
 
 export class FluidRenderer {
   private gl: WebGLRenderingContext;
@@ -124,7 +130,8 @@ export class FluidRenderer {
     canvas: HTMLCanvasElement,
     config?: Partial<Config>,
     skewType?: "full" | "bottom",
-    skewDegree: number = 6
+    skewDegree: number = 6,
+    shaders?: Record<string, FragmentShader>
   ) {
     this.canvas = canvas;
     this.skewType = skewType;
@@ -230,27 +237,36 @@ export class FluidRenderer {
     this.initColorScheme();
 
     // Compile base shaders
-    const baseVertexShader = this.compileShader(
+    const baseVertexShaderCompiled = this.compileShader(
       gl.VERTEX_SHADER,
-      baseVertexShaderSource
-    );
-    const copyShader = this.compileShader(gl.FRAGMENT_SHADER, copyShaderSource);
-    const clearShaderCompiled = this.compileShader(
-      gl.FRAGMENT_SHADER,
-      clearShader
-    );
-    const displayShader = this.compileShader(
-      gl.FRAGMENT_SHADER,
-      displayShaderSource
+      baseVertexShader
     );
 
-    // Initialize all programs
-    this.initPrograms(
-      baseVertexShader,
-      copyShader,
-      clearShaderCompiled,
-      displayShader
-    );
+    if (shaders) {
+      // If shaders are provided, use them
+      this.initProgramsWithShaders(baseVertexShaderCompiled, shaders);
+    } else {
+      // Otherwise use the default initialization
+      const copyShaderCompiled = this.compileShader(
+        gl.FRAGMENT_SHADER,
+        copyShader
+      );
+      const clearShaderCompiled = this.compileShader(
+        gl.FRAGMENT_SHADER,
+        clearShader
+      );
+      const displayShaderCompiled = this.compileShader(
+        gl.FRAGMENT_SHADER,
+        displayShader
+      );
+
+      this.initPrograms(
+        baseVertexShaderCompiled,
+        copyShaderCompiled,
+        clearShaderCompiled,
+        displayShaderCompiled
+      );
+    }
 
     // Initialize framebuffers
     this.initFramebuffers();
@@ -274,6 +290,101 @@ export class FluidRenderer {
 
     // Start the animation loop
     this.update();
+  }
+
+  private initProgramsWithShaders(
+    baseVertexShader: WebGLShader,
+    shaders: Record<string, FragmentShader>
+  ) {
+    const gl = this.gl;
+
+    // Compile all fragment shaders
+    const compiledShaders = Object.entries(shaders).reduce(
+      (acc, [key, value]) => {
+        acc[key] = this.compileShader(gl.FRAGMENT_SHADER, value.shader);
+        return acc;
+      },
+      {} as Record<string, WebGLShader>
+    );
+
+    // Initialize programs with compiled shaders
+    this.pressureProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.pressure
+    );
+    this.divergenceProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.divergence
+    );
+    this.curlProgram = new Program(gl, baseVertexShader, compiledShaders.curl);
+    this.vorticityProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.vorticity
+    );
+    this.gradienSubtractProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.gradientSubtract
+    );
+    this.sunraysMaskProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.sunraysMask
+    );
+    this.sunraysProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.sunrays
+    );
+    this.blurProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.bloomBlur
+    );
+    this.bloomPrefilterProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.bloomPrefilter
+    );
+    this.bloomBlurProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.bloomBlur
+    );
+    this.bloomFinalProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.bloomFinal
+    );
+    this.splatProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.splat
+    );
+    this.advectionProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.advection
+    );
+    this.colorProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.color
+    );
+    this.copyProgram = new Program(gl, baseVertexShader, compiledShaders.copy);
+    this.clearProgram = new Program(
+      gl,
+      baseVertexShader,
+      compiledShaders.clear
+    );
+    this.displayMaterial = new Material(
+      gl,
+      baseVertexShader,
+      compiledShaders.display
+    );
   }
 
   private initPrograms(
