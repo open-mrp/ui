@@ -17,7 +17,7 @@ const meta = {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <div className="w-full h-[400px] overflow-hidden">
+      <div className="w-full min-h-[400px] overflow-hidden">
         <Story />
       </div>
     ),
@@ -53,9 +53,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    width: 600,
+    colorConfiguration: "default",
     height: 400,
-    minWidth: 300,
+    minWidth: 600,
   },
 };
 
@@ -65,6 +65,14 @@ export const CustomColors: Story = {
     config: {
       BACK_COLOR: { r: 0.1, g: 0.1, b: 0.15 },
       COLOR_SCHEME: "sunset",
+      DUFFING: {
+        NUM_OSCILLATORS: 8,
+        DELTA: 0.2,
+        BETA: 0.08,
+        ALPHA: 0.9,
+        GAMMA: 0.8,
+        OMEGA: 0.4,
+      },
     },
   },
 };
@@ -87,11 +95,19 @@ export const HighPerformance: Story = {
       BLOOM_SOFT_KNEE: 0.7,
       SUNRAYS_RESOLUTION: 196,
       SUNRAYS_WEIGHT: 0.1,
+      DUFFING: {
+        NUM_OSCILLATORS: 8,
+        DELTA: 0.2,
+        BETA: 0.08,
+        ALPHA: 0.9,
+        GAMMA: 0.8,
+        OMEGA: 0.4,
+      },
     },
   },
 };
 
-export const BigBois: Story = {
+export const ChaoticOscillators: Story = {
   args: {
     ...Default.args,
     config: {
@@ -121,8 +137,17 @@ export const WithFullSkew: Story = {
     ...Default.args,
     skew: "full",
     skewDegree: 6,
+    height: 300,
     config: {
       COLOR_SCHEME: "rosolane_to_helvetia",
+      DUFFING: {
+        NUM_OSCILLATORS: 5,
+        DELTA: 0.2,
+        BETA: 0.08,
+        ALPHA: 0.9,
+        GAMMA: 0.8,
+        OMEGA: 0.4,
+      },
     },
   },
 };
@@ -132,6 +157,7 @@ export const WithBottomSkew: Story = {
     ...Default.args,
     skew: "bottom",
     skewDegree: 6,
+    height: 300,
     config: {
       DENSITY_DISSIPATION: 1.5,
       VELOCITY_DISSIPATION: 0.95,
