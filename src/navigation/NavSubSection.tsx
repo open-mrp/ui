@@ -31,7 +31,7 @@ interface AnimationConstants {
 
 const ANIMATION_CONSTANTS: AnimationConstants = {
   SCALE_DELAY: 50,
-  PING_DELAY: 300,
+  PING_DELAY: 100,
   PING_DURATION: 900,
   OPEN_TIME: 300,
   ITEM_TIME: 75,
