@@ -61,20 +61,54 @@ export const Basic: Story = {
   args: {
     sections: [
       {
-        title: "Getting Started",
+        title: "Getting Started with Our Comprehensive Documentation Suite",
         links: [
-          { href: "/docs", children: "Documentation" },
-          { href: "/tutorials", children: "Tutorials" },
-          { href: "/active", children: "Active Link" },
+          { href: "/docs", children: "Documentation & Getting Started Guide" },
+          {
+            href: "/tutorials",
+            children: "Step-by-Step Interactive Tutorials",
+          },
+          { href: "/active", children: "Currently Active Link Example" },
+          { href: "/quickstart", children: "5-Minute Quickstart Guide" },
         ],
       },
       {
-        title: "Components",
+        title: "Components Library",
         links: [
-          { href: "/buttons", children: "Buttons" },
-          { href: "/forms", children: "Forms" },
-          { href: "/cards", children: "Cards" },
+          { href: "/buttons", children: "Buttons & Interactive Elements" },
+          { href: "/forms", children: "Forms & Input Components" },
+          { href: "/cards", children: "Cards & Container Components" },
+          { href: "/layout", children: "Layout & Grid Systems" },
         ],
+      },
+      {
+        title: "Design System Guidelines & Best Practices for Implementation",
+        links: [
+          { href: "/typography", children: "Typography & Font Guidelines" },
+          { href: "/colors", children: "Color Palette & Usage" },
+          { href: "/spacing", children: "Spacing & Layout Rules" },
+        ],
+      },
+      {
+        title: "Advanced Topics",
+        links: [
+          {
+            href: "/performance",
+            children: "Performance Optimization Techniques & Best Practices",
+          },
+          {
+            href: "/accessibility",
+            children: "Accessibility Guidelines & WCAG 2.1 Compliance",
+          },
+          {
+            href: "/internationalization",
+            children: "Internationalization & Localization Support",
+          },
+        ],
+      },
+      {
+        title: "Empty Section Test",
+        links: [],
       },
     ],
   },
@@ -86,29 +120,103 @@ export const WithSubsections: Story = {
   args: {
     sections: [
       {
-        title: "Getting Started",
+        title: "Getting Started with Development",
         links: [
-          { href: "/docs", children: "Documentation" },
-          { href: "/tutorials", children: "Tutorials" },
+          { href: "/docs", children: "Comprehensive Documentation" },
+          { href: "/tutorials", children: "Interactive Learning Path" },
           {
-            title: "Advanced Topics",
+            title: "Advanced Implementation Topics & Best Practices",
             items: [
-              { href: "/advanced/performance", children: "Performance" },
-              { href: "/advanced/security", children: "Security" },
-              { href: "/active", children: "Active Link" },
+              {
+                href: "/advanced/performance",
+                children: "Performance Optimization Strategies & Techniques",
+              },
+              {
+                href: "/advanced/security",
+                children: "Security Best Practices & Implementation Guidelines",
+              },
+              { href: "/active", children: "Active Link Example" },
+              {
+                title: "Deep Dive Topics",
+                items: [
+                  {
+                    href: "/advanced/architecture",
+                    children: "Architecture Patterns & Anti-patterns",
+                  },
+                  {
+                    href: "/advanced/state-management",
+                    children: "Complex State Management Solutions",
+                  },
+                ],
+              },
             ],
           },
         ],
       },
       {
-        title: "Components",
+        title: "Component Library & Usage Guidelines",
         links: [
-          { href: "/buttons", children: "Buttons" },
+          { href: "/buttons", children: "Button Components & Variants" },
           {
-            title: "Form Elements",
+            title: "Form Elements & Input Components",
             items: [
-              { href: "/forms/inputs", children: "Inputs" },
-              { href: "/forms/selects", children: "Selects" },
+              { href: "/forms/inputs", children: "Input Fields & Text Areas" },
+              {
+                href: "/forms/selects",
+                children: "Select Components & Dropdowns",
+              },
+              {
+                href: "/forms/validation",
+                children: "Form Validation & Error Handling",
+              },
+              {
+                title: "Advanced Form Patterns",
+                items: [
+                  {
+                    href: "/forms/advanced/multi-step",
+                    children: "Multi-step Form Implementation",
+                  },
+                  {
+                    href: "/forms/advanced/dynamic",
+                    children: "Dynamic Form Generation & Handling",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            title: "Layout Components & Systems",
+            items: [
+              {
+                href: "/layout/grid",
+                children: "Grid System & Responsive Layouts",
+              },
+              {
+                href: "/layout/containers",
+                children: "Container Components & Usage",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Testing Edge Cases",
+        links: [
+          { href: "/empty-subsection", children: "Empty Subsection Below" },
+          {
+            title: "Empty Subsection",
+            items: [],
+          },
+          {
+            title:
+              "Very Long Title That Might Need Special Handling in the Navigation Component Structure",
+            items: [
+              { href: "/edge/case1", children: "Edge Case Test 1" },
+              {
+                href: "/edge/case2",
+                children:
+                  "Edge Case with a Very Long Title That Might Need Truncation or Special Styling in the Navigation",
+              },
             ],
           },
         ],
