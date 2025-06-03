@@ -25,6 +25,9 @@ const ANIMATION_CONSTANTS = {
   SCALE_DELAY: 50,
   PING_DELAY: 400,
   PING_DURATION: 900,
+  OPEN_TIME: 300,
+  ITEM_TIME: 75,
+  INDICATOR_TIME: 500,
 } as const;
 
 // Types for indicator position
@@ -136,7 +139,7 @@ const ActiveIndicator: React.FC<{
 }> = React.memo(({ position, showPing }) => (
   <div className="relative">
     <div
-      className="absolute transition-all duration-500 cubic-bezier(0.2, 0, 0, 1)"
+      className={`absolute transition-all duration-${ANIMATION_CONSTANTS.INDICATOR_TIME} cubic-bezier(0.2, 0, 0, 1)`}
       style={
         {
           left: "-4px",
@@ -153,7 +156,7 @@ const ActiveIndicator: React.FC<{
         />
       )}
       <div
-        className="relative w-3 h-3 rounded-full bg-secondary-500 z-20 transition-all duration-500 ease-in-out"
+        className={`relative w-3 h-3 rounded-full bg-secondary-500 z-20 transition-all duration-${ANIMATION_CONSTANTS.INDICATOR_TIME} ease-in-out`}
         style={{
           opacity: position.scale,
           transform: `scale(${position.scale})`,
@@ -187,19 +190,29 @@ export default function NavSubSection({
     prevActiveIndex
   );
 
-  const toggleOpen = useCallback(() => setIsOpen((prev) => !prev), []);
+  const toggleOpen = useCallback(() => {
+    if (!isOpen) {
+      setIsOpen(true);
+      // Delay the animation reset until after the opening transition (300ms)
+      setTimeout(() => {
+        setPrevActiveIndex(-1);
+      }, ANIMATION_CONSTANTS.OPEN_TIME);
+    } else {
+      setIsOpen(false);
+    }
+  }, [isOpen]);
 
   // Update previous active index when active index changes
   useEffect(() => {
     setPrevActiveIndex(activeIndex);
   }, [activeIndex]);
 
-  // Auto-open section when it contains the active item
+  // Auto-open section when it becomes active
   useEffect(() => {
-    if (hasActive && !isOpen) {
+    if (hasActive && !isOpen && prevActiveIndex === -1) {
       setIsOpen(true);
     }
-  }, [hasActive, isOpen]);
+  }, [hasActive, isOpen, prevActiveIndex]);
 
   return (
     <div className={className}>
@@ -221,7 +234,9 @@ export default function NavSubSection({
       <div className="ml-2 relative">
         {/* Border line */}
         <div
-          className={`absolute top-0 bottom-0 w-0 border-l-3 border-gray-700 transition-all duration-300 origin-top
+          className={`absolute top-0 bottom-0 w-0 border-l-3 border-gray-700 transition-all duration-${
+            ANIMATION_CONSTANTS.OPEN_TIME
+          } origin-top
             ${isOpen ? "scale-y-100" : "scale-y-0"}`}
           aria-hidden="true"
         />
@@ -235,7 +250,9 @@ export default function NavSubSection({
         <div
           id={`subsection-${subSection.title}`}
           ref={itemsContainerRef}
-          className={`pl-3 overflow-hidden transition-all duration-300 ease-in-out
+          className={`pl-3 overflow-hidden transition-all duration-${
+            ANIMATION_CONSTANTS.OPEN_TIME
+          } ease-in-out
             ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
           role="region"
           aria-hidden={!isOpen}
@@ -243,14 +260,18 @@ export default function NavSubSection({
           {subSection.items.map((item, itemIndex) => (
             <div
               key={itemIndex}
-              className={`text-sm py-1 transition-all duration-300 ease-in-out motion-safe:transition-transform motion-safe:transition-opacity
+              className={`text-sm py-1 transition-all duration-${
+                ANIMATION_CONSTANTS.OPEN_TIME
+              } ease-in-out motion-safe:transition-transform motion-safe:transition-opacity
                 ${
                   isOpen
                     ? "translate-y-0 opacity-100"
                     : "-translate-y-2 opacity-0"
                 }`}
               style={{
-                transitionDelay: `${itemIndex * 75}ms`,
+                transitionDelay: `${
+                  itemIndex * ANIMATION_CONSTANTS.ITEM_TIME
+                }ms`,
               }}
             >
               {renderNavItem(item)}
