@@ -125,7 +125,7 @@ export const WithSubsections: Story = {
           { href: "/docs", children: "Comprehensive Documentation" },
           { href: "/tutorials", children: "Interactive Learning Path" },
           {
-            title: "Advanced Implementation Topics & Best Practices",
+            title: "Advanced Implementation Topics",
             items: [
               {
                 href: "/advanced/performance",
@@ -137,17 +137,12 @@ export const WithSubsections: Story = {
               },
               { href: "/active", children: "Active Link Example" },
               {
-                title: "Deep Dive Topics",
-                items: [
-                  {
-                    href: "/advanced/architecture",
-                    children: "Architecture Patterns & Anti-patterns",
-                  },
-                  {
-                    href: "/advanced/state-management",
-                    children: "Complex State Management Solutions",
-                  },
-                ],
+                href: "/advanced/architecture",
+                children: "Architecture Patterns & Anti-patterns",
+              },
+              {
+                href: "/advanced/state-management",
+                children: "Complex State Management Solutions",
               },
             ],
           },
@@ -170,17 +165,12 @@ export const WithSubsections: Story = {
                 children: "Form Validation & Error Handling",
               },
               {
-                title: "Advanced Form Patterns",
-                items: [
-                  {
-                    href: "/forms/advanced/multi-step",
-                    children: "Multi-step Form Implementation",
-                  },
-                  {
-                    href: "/forms/advanced/dynamic",
-                    children: "Dynamic Form Generation & Handling",
-                  },
-                ],
+                href: "/forms/advanced/multi-step",
+                children: "Multi-step Form Implementation",
+              },
+              {
+                href: "/forms/advanced/dynamic",
+                children: "Dynamic Form Generation & Handling",
               },
             ],
           },
@@ -208,14 +198,13 @@ export const WithSubsections: Story = {
             items: [],
           },
           {
-            title:
-              "Very Long Title That Might Need Special Handling in the Navigation Component Structure",
+            title: "Very Long Title That Might Need Special Handling",
             items: [
               { href: "/edge/case1", children: "Edge Case Test 1" },
               {
                 href: "/edge/case2",
                 children:
-                  "Edge Case with a Very Long Title That Might Need Truncation or Special Styling in the Navigation",
+                  "Edge Case with a Very Long Title That Might Need Truncation",
               },
             ],
           },
