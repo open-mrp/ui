@@ -20,23 +20,29 @@ const isNavLink = (item: NavLink | NavSubSectionData): item is NavLink => {
   return "href" in item;
 };
 
-// Constants for animation timings
-const ANIMATION_CONSTANTS = {
+interface AnimationConstants {
+  readonly SCALE_DELAY: number;
+  readonly PING_DELAY: number;
+  readonly PING_DURATION: number;
+  readonly OPEN_TIME: number;
+  readonly ITEM_TIME: number;
+  readonly INDICATOR_TIME: number;
+}
+
+const ANIMATION_CONSTANTS: AnimationConstants = {
   SCALE_DELAY: 50,
-  PING_DELAY: 400,
+  PING_DELAY: 300,
   PING_DURATION: 900,
   OPEN_TIME: 300,
   ITEM_TIME: 75,
   INDICATOR_TIME: 500,
 } as const;
 
-// Types for indicator position
 interface IndicatorPosition {
-  top: number;
-  scale: number;
+  readonly top: number;
+  readonly scale: number;
 }
 
-// Extracted hook for handling active item detection
 const useActiveItem = (
   items: (NavLink | NavSubSectionData)[],
   isPathActive: (path: string) => boolean
@@ -58,13 +64,12 @@ const useActiveItem = (
   }, [items, isPathActive]);
 };
 
-// Extracted hook for handling indicator position
 const useIndicatorPosition = (
-  itemsRef: React.RefObject<HTMLDivElement>,
+  itemsRef: React.MutableRefObject<HTMLDivElement | null>,
   activeIndex: number,
   isOpen: boolean,
   prevActiveIndex: number
-): [IndicatorPosition | null, boolean, (show: boolean) => void] => {
+): readonly [IndicatorPosition | null, boolean, (show: boolean) => void] => {
   const [position, setPosition] = useState<IndicatorPosition | null>(null);
   const [showPing, setShowPing] = useState(false);
 
@@ -111,7 +116,7 @@ const useIndicatorPosition = (
   return [position, showPing, setShowPing];
 };
 
-// Extracted component for the chevron icon
+// Improved ChevronIcon with better accessibility
 const ChevronIcon: React.FC<{ isOpen: boolean }> = React.memo(({ isOpen }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -120,6 +125,8 @@ const ChevronIcon: React.FC<{ isOpen: boolean }> = React.memo(({ isOpen }) => (
     viewBox="0 0 24 24"
     stroke="currentColor"
     aria-hidden="true"
+    role="img"
+    aria-label={isOpen ? "Collapse section" : "Expand section"}
   >
     <path
       strokeLinecap="round"
@@ -130,16 +137,14 @@ const ChevronIcon: React.FC<{ isOpen: boolean }> = React.memo(({ isOpen }) => (
   </svg>
 ));
 
-ChevronIcon.displayName = "ChevronIcon";
-
-// Extracted component for the active indicator
+// Improved ActiveIndicator with better accessibility and performance
 const ActiveIndicator: React.FC<{
   position: IndicatorPosition;
   showPing: boolean;
 }> = React.memo(({ position, showPing }) => (
   <div className="relative">
     <div
-      className={`absolute transition-all duration-${ANIMATION_CONSTANTS.INDICATOR_TIME} cubic-bezier(0.2, 0, 0, 1)`}
+      className={`absolute transition-all duration-${ANIMATION_CONSTANTS.INDICATOR_TIME} ease-in-out`}
       style={
         {
           left: "-4px",
@@ -156,7 +161,7 @@ const ActiveIndicator: React.FC<{
         />
       )}
       <div
-        className={`relative w-3 h-3 rounded-full bg-secondary-500 z-20 transition-all duration-${ANIMATION_CONSTANTS.INDICATOR_TIME} ease-in-out`}
+        className={`relative w-3 h-3 rounded-full bg-secondary-500 z-20 transition-transform duration-${ANIMATION_CONSTANTS.INDICATOR_TIME} ease-in-out`}
         style={{
           opacity: position.scale,
           transform: `scale(${position.scale})`,
@@ -167,40 +172,38 @@ const ActiveIndicator: React.FC<{
   </div>
 ));
 
-ActiveIndicator.displayName = "ActiveIndicator";
-
 export default function NavSubSection({
   subSection,
   isPathActive,
   renderNavItem,
   className = "",
-}: NavSubSectionProps) {
+}: NavSubSectionProps): React.ReactElement {
   const itemsContainerRef = useRef<HTMLDivElement>(null);
-  const [prevActiveIndex, setPrevActiveIndex] = useState(-1);
+  const [prevActiveIndex, setPrevActiveIndex] = useState<number>(-1);
 
   const { hasActive, activeIdx: activeIndex } = useActiveItem(
     subSection.items,
     isPathActive
   );
-  const [isOpen, setIsOpen] = useState(hasActive);
+  const [isOpen, setIsOpen] = useState<boolean>(hasActive);
   const [position, showPing, setShowPing] = useIndicatorPosition(
-    itemsContainerRef as React.RefObject<HTMLDivElement>,
+    itemsContainerRef,
     activeIndex,
     isOpen,
     prevActiveIndex
   );
 
   const toggleOpen = useCallback(() => {
-    if (!isOpen) {
-      setIsOpen(true);
-      // Delay the animation reset until after the opening transition (300ms)
-      setTimeout(() => {
-        setPrevActiveIndex(-1);
-      }, ANIMATION_CONSTANTS.OPEN_TIME);
-    } else {
-      setIsOpen(false);
-    }
-  }, [isOpen]);
+    setIsOpen((prev) => {
+      if (!prev) {
+        // Delay the animation reset until after the opening transition
+        setTimeout(() => {
+          setPrevActiveIndex(-1);
+        }, ANIMATION_CONSTANTS.OPEN_TIME);
+      }
+      return !prev;
+    });
+  }, []);
 
   // Update previous active index when active index changes
   useEffect(() => {
@@ -218,7 +221,7 @@ export default function NavSubSection({
     <div className={className}>
       <button
         onClick={toggleOpen}
-        className={`flex w-full items-center justify-between rounded-md px-2 py-1 text-sm cursor-pointer text-left
+        className={`flex w-full items-center justify-between rounded-md px-2 py-1 text-sm cursor-pointer text-left transition-colors
           ${
             hasActive
               ? "font-medium hover:bg-gray-800 text-gray-200"
@@ -234,7 +237,7 @@ export default function NavSubSection({
       <div className="ml-2 relative">
         {/* Border line */}
         <div
-          className={`absolute top-0 bottom-0 w-0 border-l-3 border-gray-700 transition-all duration-${
+          className={`absolute top-0 bottom-0 w-0 border-l-3 border-gray-700 transition-transform duration-${
             ANIMATION_CONSTANTS.OPEN_TIME
           } origin-top
             ${isOpen ? "scale-y-100" : "scale-y-0"}`}
@@ -262,12 +265,11 @@ export default function NavSubSection({
               key={itemIndex}
               className={`text-sm py-1 transition-all duration-${
                 ANIMATION_CONSTANTS.OPEN_TIME
-              } ease-in-out motion-safe:transition-transform motion-safe:transition-opacity
-                ${
-                  isOpen
-                    ? "translate-y-0 opacity-100"
-                    : "-translate-y-2 opacity-0"
-                }`}
+              } ease-in-out motion-safe:transition-transform ${
+                isOpen
+                  ? "translate-y-0 opacity-100"
+                  : "-translate-y-2 opacity-0"
+              }`}
               style={{
                 transitionDelay: `${
                   itemIndex * ANIMATION_CONSTANTS.ITEM_TIME
