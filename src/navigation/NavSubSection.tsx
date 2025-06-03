@@ -221,9 +221,8 @@ export default function NavSubSection({
       <div className="ml-2 relative">
         {/* Border line */}
         <div
-          className={`absolute top-0 bottom-0 w-0 border-l-3 border-gray-700 ${
-            isOpen ? "" : "hidden"
-          }`}
+          className={`absolute top-0 bottom-0 w-0 border-l-3 border-gray-700 transition-all duration-300 origin-top
+            ${isOpen ? "scale-y-100" : "scale-y-0"}`}
           aria-hidden="true"
         />
 
@@ -236,14 +235,24 @@ export default function NavSubSection({
         <div
           id={`subsection-${subSection.title}`}
           ref={itemsContainerRef}
-          className={`pl-3 overflow-hidden transition-all duration-300 ${
-            isOpen ? "pt-0.5" : "max-h-0"
-          }`}
+          className={`pl-3 overflow-hidden transition-all duration-300 ease-in-out
+            ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
           role="region"
           aria-hidden={!isOpen}
         >
           {subSection.items.map((item, itemIndex) => (
-            <div key={itemIndex} className="text-sm py-1">
+            <div
+              key={itemIndex}
+              className={`text-sm py-1 transition-all duration-300 ease-in-out motion-safe:transition-transform motion-safe:transition-opacity
+                ${
+                  isOpen
+                    ? "translate-y-0 opacity-100"
+                    : "-translate-y-2 opacity-0"
+                }`}
+              style={{
+                transitionDelay: `${itemIndex * 75}ms`,
+              }}
+            >
               {renderNavItem(item)}
             </div>
           ))}
