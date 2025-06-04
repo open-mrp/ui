@@ -11,7 +11,7 @@ TODO:
 
 To run the tests, run `bun run test`.
 
-The process to publish a new vesrion:
+The process to publish a new version:
 
 - Make the changes in a new branch that you want for the lib and run `bun run version`
 - Make and merge a PR to `main` with those changes
