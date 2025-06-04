@@ -1,5 +1,15 @@
 # @augno/ui
 
+## 0.8.0
+
+### Minor Changes
+
+- 74b7649: Added more polish to the sidenav for better user experiece. cleaned up animations added some animations etc.
+
+### Patch Changes
+
+- 827db09: adding some tests
+
 ## 0.7.5
 
 ### Patch Changes
