@@ -1,19 +1,29 @@
 export class DuffingOscillator {
-  private x: number = 0;
-  private y: number = 0;
-  private dx: number = 0;
-  private dy: number = 0;
-  private delta: number; // damping coefficient (δ)
-  private alpha: number; // linear stiffness (α)
-  private beta: number; // cubic stiffness (β)
-  private gamma: number; // forcing amplitude (γ)
-  private omega: number; // forcing frequency (ω)
-  private time: number = 0;
-  private phaseOffset: number;
-  private baseX: number;
-  private baseY: number;
-  private index: number;
-  private totalOscillators: number;
+  // Position and velocity in local oscillator space
+  private x: number = 0; // Displacement from base position (X)
+  private y: number = 0; // Displacement from base position (Y)
+  private dx: number = 0; // Velocity X component
+  private dy: number = 0; // Velocity Y component
+
+  // Classical Duffing equation parameters
+  // ẍ + δẋ + αx + βx³ = γcos(ωt)
+  private delta: number; // Damping coefficient (δ) - energy loss
+  private alpha: number; // Linear stiffness (α) - restoring force
+  private beta: number; // Cubic stiffness (β) - non-linear term
+  private gamma: number; // Forcing amplitude (γ) - external drive
+  private omega: number; // Forcing frequency (ω) - oscillation rate
+
+  // Simulation state
+  private time: number = 0; // Current simulation time
+  private phaseOffset: number; // Unique phase for this oscillator
+
+  // Multi-oscillator system
+  private baseX: number; // Fixed position in circle formation
+  private baseY: number; // Fixed position in circle formation
+  private index: number; // Oscillator index (0, 1, 2, ...)
+  private totalOscillators: number; // Total count for phase calculation
+
+  // Spatial constraints Geometric boundary definition
   private boundaries: {
     botLeft: [number, number];
     botRight: [number, number];
@@ -124,31 +134,30 @@ export class DuffingOscillator {
     return [v[0] - 2 * dot * normal[0], v[1] - 2 * dot * normal[1]];
   }
 
+  // Convert from our simulation space to NDC space
   private toNDC(x: number, y: number): [number, number] {
-    // Convert from our simulation space to NDC space
     return [x * 2.0, y * 2.0];
   }
 
+  // Convert from NDC space back to simulation space
   private fromNDC(x: number, y: number): [number, number] {
-    // Convert from NDC space back to simulation space
     return [x / 2.0, y / 2.0];
   }
 
   public update(dt: number): { x: number; y: number; dx: number; dy: number } {
-    // Classical Duffing equation implementation
-    // ẍ + δẋ + αx + βx³ = γcos(ωt)
-    const forcing =
-      this.gamma * Math.cos(this.omega * this.time + this.phaseOffset);
+    // modified Duffing equation
 
     // X component
+    // ẍ + δẋ + αx + βx³ = γcos(ωt)
     const ddx =
       -this.delta * this.dx -
       this.alpha * this.x -
       this.beta * Math.pow(this.x, 3) +
-      forcing;
+      this.gamma * Math.cos(this.omega * this.time + this.phaseOffset);
     this.dx += ddx * dt;
 
-    // Y component (similar to X but with sin for phase difference)
+    // Y component
+    // ẍ + δẋ + αx + βx³ = γsin(ωt)
     const ddy =
       -this.delta * this.dy -
       this.alpha * this.y -
@@ -157,7 +166,7 @@ export class DuffingOscillator {
     this.dy += ddy * dt;
 
     // Add progressive containment force
-    const maxDist = 0.4;
+    const maxDist = 0.4; // max dist from base position
     const dist = Math.sqrt(this.x * this.x + this.y * this.y); // Distance from base position
 
     if (dist > maxDist) {
@@ -172,11 +181,10 @@ export class DuffingOscillator {
     let nextX = this.x + this.dx * dt;
     let nextY = this.y + this.dy * dt;
 
+    // Boundary checking and reflection (keeping existing implementation)
     // Convert to NDC space for boundary checking
-    const currentPos = this.toNDC(this.x + this.baseX, this.y + this.baseY);
     const nextPos = this.toNDC(nextX + this.baseX, nextY + this.baseY);
 
-    // Boundary checking and reflection (keeping existing implementation)
     if (!this.isInBoundaries(nextPos)) {
       const lines = [
         [this.boundaries.botLeft, this.boundaries.botRight],
@@ -185,6 +193,7 @@ export class DuffingOscillator {
         [this.boundaries.topLeft, this.boundaries.botLeft],
       ];
 
+      const currentPos = this.toNDC(this.x + this.baseX, this.y + this.baseY);
       for (const [a, b] of lines) {
         if (this.sideOfLine(nextPos, a, b) < 0) {
           const ndcVel = this.toNDC(this.dx, this.dy);
@@ -235,5 +244,58 @@ export class DuffingOscillator {
     topRight: [number, number];
   }): void {
     this.boundaries = boundaries;
+  }
+
+  /**
+   * Combined update and splat data generation method
+   */
+  public updateAndGetSplat(
+    dt: number,
+    canvas: HTMLCanvasElement,
+    color: { r: number; g: number; b: number },
+    prevTexcoord: { x: number; y: number }
+  ): {
+    splatData: {
+      texcoordX: number;
+      texcoordY: number;
+      prevTexcoordX: number;
+      prevTexcoordY: number;
+      deltaX: number;
+      deltaY: number;
+      color: { r: number; g: number; b: number };
+    };
+    newTexcoord: { x: number; y: number };
+  } {
+    // Update physics using existing method
+    const { x, y, dx, dy } = this.update(dt);
+
+    // Convert oscillator space [-0.5, 0.5] to texture space [0, 1]
+    const texcoordX = Math.min(Math.max(x + 0.5, 0), 1);
+    const texcoordY = Math.min(Math.max(y + 0.5, 0), 1);
+
+    // Apply aspect ratio correction to velocities
+    const aspectRatio = canvas.width / canvas.height;
+    let correctedDx = dx * 0.5; // Scale down velocity
+    let correctedDy = dy * 0.5;
+
+    // Correct for aspect ratio
+    if (aspectRatio < 1) {
+      correctedDx *= aspectRatio; // Portrait: compress X movement
+    } else if (aspectRatio > 1) {
+      correctedDy /= aspectRatio; // Landscape: compress Y movement
+    }
+
+    return {
+      splatData: {
+        texcoordX,
+        texcoordY,
+        prevTexcoordX: prevTexcoord.x,
+        prevTexcoordY: prevTexcoord.y,
+        deltaX: correctedDx,
+        deltaY: correctedDy,
+        color,
+      },
+      newTexcoord: { x: texcoordX, y: texcoordY },
+    };
   }
 }

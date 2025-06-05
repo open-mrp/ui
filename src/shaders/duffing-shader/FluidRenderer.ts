@@ -22,10 +22,9 @@ import {
   applyVorticity,
   initPhysicsShaders,
 } from "./physicsManager";
-import { PointerManager } from "./pointerManager";
 import {
   applyAdvection,
-  handlePointerSplat,
+  handlePointerSplatOptimized,
   initSplatShaders,
 } from "./splatManager";
 import {
@@ -56,6 +55,7 @@ import {
 } from "./types";
 
 // Import shader sources
+import { DuffingOscillator } from "./DuffingOscillator";
 import {
   baseVertexShader,
   clearShader,
@@ -74,7 +74,9 @@ export class FluidRenderer {
   };
   private config: Config;
   private canvas: HTMLCanvasElement;
-  private pointerManager: PointerManager;
+  private oscillators: DuffingOscillator[];
+  private oscillatorColors: { r: number; g: number; b: number }[];
+  private oscillatorPrevPositions: { x: number; y: number }[];
   private lastUpdateTime: number;
   private animationFrameId: number | null = null;
   private skewType?: "full" | "bottom";
@@ -136,6 +138,7 @@ export class FluidRenderer {
     this.canvas = canvas;
     this.skewType = skewType;
     this.skewDegree = skewDegree;
+
     this.config = {
       SIM_RESOLUTION: 512,
       DYE_RESOLUTION: 1024,
@@ -274,15 +277,32 @@ export class FluidRenderer {
     // Initialize display keywords
     this.updateKeywords();
 
-    // Initialize pointer manager
-    this.pointerManager = new PointerManager(
-      canvas,
-      () => getRandomColor(),
-      (splatData: SplatData) => this.handleSplat(splatData),
-      {
-        ...this.config,
-        boundaries: this.boundaries,
-      }
+    // Pre-generate fixed colors for each oscillator
+    this.oscillatorColors = Array.from(
+      { length: this.config.DUFFING.NUM_OSCILLATORS },
+      () => getRandomColor()
+    );
+
+    // Initialize oscillators
+    this.oscillators = Array.from(
+      { length: this.config.DUFFING.NUM_OSCILLATORS },
+      (_, i) =>
+        new DuffingOscillator({
+          delta: this.config.DUFFING.DELTA,
+          beta: this.config.DUFFING.BETA,
+          alpha: this.config.DUFFING.ALPHA,
+          gamma: this.config.DUFFING.GAMMA,
+          omega: this.config.DUFFING.OMEGA,
+          index: i,
+          total: this.config.DUFFING.NUM_OSCILLATORS,
+          boundaries: this.boundaries,
+        })
+    );
+
+    // Initialize previous positions for each oscillator
+    this.oscillatorPrevPositions = Array.from(
+      { length: this.config.DUFFING.NUM_OSCILLATORS },
+      () => ({ x: 0.5, y: 0.5 })
     );
 
     this.lastUpdateTime = Date.now();
@@ -512,7 +532,7 @@ export class FluidRenderer {
   private update = () => {
     const dt = this.calcDeltaTime();
     if (this.resizeCanvas()) this.initFramebuffers();
-    this.applyInputs();
+    this.applyInputs(dt);
     this.step(dt);
     this.render(null);
     this.animationFrameId = requestAnimationFrame(this.update);
@@ -536,8 +556,22 @@ export class FluidRenderer {
     return false;
   }
 
-  private applyInputs() {
-    this.pointerManager.applyInputs();
+  private applyInputs(dt: number) {
+    // Update oscillators and generate splats
+    this.oscillators.forEach((oscillator, index) => {
+      const { splatData, newTexcoord } = oscillator.updateAndGetSplat(
+        dt,
+        this.canvas,
+        this.oscillatorColors[index],
+        this.oscillatorPrevPositions[index]
+      );
+
+      // Update stored position for next frame
+      this.oscillatorPrevPositions[index] = newTexcoord;
+
+      // Generate splat
+      this.handleSplat(splatData);
+    });
   }
 
   private step(dt: number) {
@@ -713,7 +747,7 @@ export class FluidRenderer {
   }
 
   private handleSplat(splatData: SplatData) {
-    handlePointerSplat(
+    handlePointerSplatOptimized(
       splatData,
       {
         SPLAT_FORCE: this.config.SPLAT_FORCE,
@@ -730,9 +764,13 @@ export class FluidRenderer {
 
   public updateConfig(newConfig: Partial<Config>) {
     this.config = { ...this.config, ...newConfig };
-    if (newConfig.COLOR_SCHEME) {
-      this.initColorScheme(newConfig.COLOR_SCHEME);
-    }
+
+    // Update color scheme and regenerate colors
+    this.initColorScheme(this.config.COLOR_SCHEME);
+    this.oscillatorColors = Array.from(
+      { length: this.config.DUFFING.NUM_OSCILLATORS },
+      () => getRandomColor()
+    );
   }
 
   public destroy() {
@@ -1402,8 +1440,10 @@ export class FluidRenderer {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
     this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
 
-    // Update boundaries in pointer manager
-    this.pointerManager.updateBoundaries(this.boundaries);
+    // Update boundaries in oscillators
+    this.oscillators.forEach((oscillator) => {
+      oscillator.setBoundaries(this.boundaries);
+    });
   }
 }
 

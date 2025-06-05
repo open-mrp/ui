@@ -94,7 +94,7 @@ export const HighPerformance: Story = {
       BLOOM_THRESHOLD: 0.0,
       BLOOM_SOFT_KNEE: 0.7,
       SUNRAYS_RESOLUTION: 196,
-      SUNRAYS_WEIGHT: 0.1,
+      SUNRAYS_WEIGHT: 5.0,
       DUFFING: {
         NUM_OSCILLATORS: 8,
         DELTA: 0.2,
@@ -111,16 +111,14 @@ export const ChaoticOscillators: Story = {
   args: {
     ...Default.args,
     config: {
-      DENSITY_DISSIPATION: 1.5,
-      VELOCITY_DISSIPATION: 0.95,
-      CURL: 0.2,
-      SPLAT_RADIUS: 0.02,
+      CURL: 0.9,
+      SPLAT_RADIUS: 0.2,
       SPLAT_FORCE: 700,
-      BLOOM_INTENSITY: 0.05,
-      BLOOM_THRESHOLD: 6.9,
-      SUNRAYS_WEIGHT: 0.15,
+      BLOOM_INTENSITY: 0.01,
+      // BLOOM_THRESHOLD: 0.9,
+      // SUNRAYS_WEIGHT: 0.95,
       DUFFING: {
-        NUM_OSCILLATORS: 3,
+        NUM_OSCILLATORS: 4,
         DELTA: 0.2,
         BETA: 0.08,
         ALPHA: 0.9,
@@ -128,26 +126,6 @@ export const ChaoticOscillators: Story = {
         OMEGA: 0.4,
       },
       COLOR_SCHEME: "rosolane_to_helvetia",
-    },
-  },
-};
-
-export const WithFullSkew: Story = {
-  args: {
-    ...Default.args,
-    skew: "full",
-    skewDegree: 6,
-    height: 300,
-    config: {
-      COLOR_SCHEME: "rosolane_to_helvetia",
-      DUFFING: {
-        NUM_OSCILLATORS: 5,
-        DELTA: 0.2,
-        BETA: 0.08,
-        ALPHA: 0.9,
-        GAMMA: 0.8,
-        OMEGA: 0.4,
-      },
     },
   },
 };

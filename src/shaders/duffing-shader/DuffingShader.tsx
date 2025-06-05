@@ -38,7 +38,7 @@ const DEFAULT_CONFIG: Config = {
 };
 
 export function DuffingShader({
-  colorConfiguration = "default",
+  colorConfiguration = DEFAULT_CONFIG.COLOR_SCHEME,
   skew,
   skewDegree = 6,
   minWidth = 600,
@@ -91,7 +91,6 @@ export function DuffingShader({
     const mergedConfig: Config = {
       ...DEFAULT_CONFIG,
       ...userConfig,
-      COLOR_SCHEME: colorConfiguration,
     };
 
     // Calculate boundaries based on skew
@@ -146,7 +145,6 @@ export function DuffingShader({
     const mergedConfig: Config = {
       ...DEFAULT_CONFIG,
       ...userConfig,
-      COLOR_SCHEME: colorConfiguration,
     };
 
     rendererRef.current.updateConfig(mergedConfig);

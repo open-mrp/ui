@@ -158,19 +158,6 @@ export interface SplatProgram {
   };
 }
 
-export interface Pointer {
-  id: number;
-  texcoordX: number;
-  texcoordY: number;
-  prevTexcoordX: number;
-  prevTexcoordY: number;
-  deltaX: number;
-  deltaY: number;
-  down: boolean;
-  moved: boolean;
-  color: RGBColor;
-}
-
 // Sunrays Types
 export interface SunraysConfig {
   resolution: number;
@@ -226,12 +213,6 @@ export interface Config {
     ALPHA: number;
     GAMMA: number;
     OMEGA: number;
-  };
-  boundaries?: {
-    botLeft: [number, number];
-    botRight: [number, number];
-    topLeft: [number, number];
-    topRight: [number, number];
   };
 }
 
@@ -398,18 +379,6 @@ export interface SplatData {
   color: RGBColor;
 }
 
-export interface PointerData {
-  id: number;
-  texcoordX: number;
-  texcoordY: number;
-  prevTexcoordX: number;
-  prevTexcoordY: number;
-  deltaX: number;
-  deltaY: number;
-  down: boolean;
-  moved: boolean;
-  color: RGBColor;
-}
 export interface DuffingShaderProps {
   width?: number;
   height?: number;
