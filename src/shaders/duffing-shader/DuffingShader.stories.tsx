@@ -64,7 +64,7 @@ export const CustomColors: Story = {
     ...Default.args,
     config: {
       BACK_COLOR: { r: 0.1, g: 0.1, b: 0.15 },
-      COLOR_SCHEME: "organic",
+      COLOR_SCHEME: "dusk",
       DUFFING: {
         NUM_OSCILLATORS: 8,
         DELTA: 0.2,
@@ -81,6 +81,7 @@ export const HighPerformance: Story = {
   args: {
     ...Default.args,
     config: {
+      COLOR_SCHEME: "organic",
       SIM_RESOLUTION: 256,
       DYE_RESOLUTION: 512,
       DENSITY_DISSIPATION: 3,

@@ -49,9 +49,9 @@ export class DuffingOscillator {
   };
 
   // Cached calculations for performance
-  private cachedMaxDist: number = 0.4;
-  private cachedMaxDistSquared: number = 0.16; // 0.4 * 0.4
-  private readonly baseRadius: number = 0.4;
+  private cachedMaxDist: number = 0.25;
+  private cachedMaxDistSquared: number = 0.0625; // 0.25 * 0.25
+  private readonly baseRadius: number = 0.25;
 
   constructor(
     params: {
@@ -75,7 +75,7 @@ export class DuffingOscillator {
     this.delta = params.delta ?? 0.05;
     this.alpha = params.alpha ?? 1.2;
     this.beta = params.beta ?? 0.1;
-    this.gamma = params.gamma ?? 1.0;
+    this.gamma = params.gamma ?? 0.6; // Reduced forcing amplitude
     this.omega = params.omega ?? 0.6;
 
     this.index = params.index ?? 0;
