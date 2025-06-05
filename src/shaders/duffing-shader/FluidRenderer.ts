@@ -613,7 +613,20 @@ export class FluidRenderer {
       gradientSubtract: this.gradienSubtractProgram,
     };
 
-    applyCurl(this.gl, this.velocity, this.curl, programs, this.blit);
+    // Cache texel size to avoid repeated property access
+    const velocityTexelSize = {
+      x: this.velocity.texelSizeX,
+      y: this.velocity.texelSizeY,
+    };
+
+    applyCurl(
+      this.gl,
+      this.velocity,
+      this.curl,
+      programs,
+      this.blit,
+      velocityTexelSize
+    );
     applyVorticity(
       this.gl,
       this.config,
@@ -621,14 +634,16 @@ export class FluidRenderer {
       this.velocity,
       this.curl,
       programs,
-      this.blit
+      this.blit,
+      velocityTexelSize
     );
     applyDivergence(
       this.gl,
       this.velocity,
       this.divergence,
       programs,
-      this.blit
+      this.blit,
+      velocityTexelSize
     );
 
     this.clearProgram.bind();
@@ -647,14 +662,16 @@ export class FluidRenderer {
       this.divergence,
       this.velocity,
       programs,
-      this.blit
+      this.blit,
+      velocityTexelSize
     );
     applyGradientSubtract(
       this.gl,
       this.pressure,
       this.velocity,
       programs,
-      this.blit
+      this.blit,
+      velocityTexelSize
     );
 
     applyAdvection(
