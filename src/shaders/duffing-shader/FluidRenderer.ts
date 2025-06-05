@@ -75,13 +75,18 @@ export class FluidRenderer {
   };
   private config: Config;
   private canvas: HTMLCanvasElement;
-  private oscillators: DuffingOscillator[];
-  private oscillatorColors: { r: number; g: number; b: number }[];
-  private oscillatorPrevPositions: { x: number; y: number }[];
+  private oscillators!: DuffingOscillator[];
+  private oscillatorColors!: { r: number; g: number; b: number }[];
+  private oscillatorPrevPositions!: { x: number; y: number }[];
   private lastUpdateTime: number;
   private animationFrameId: number | null = null;
   private skewType?: "full" | "bottom";
   private skewDegree: number = 6;
+
+  // Cached canvas dimensions to avoid repeated property access
+  private cachedCanvasWidth: number = 0;
+  private cachedCanvasHeight: number = 0;
+  private cachedAspectRatio: number = 1;
 
   // FBOs
   private dye!: DyeFBO;
@@ -174,37 +179,8 @@ export class FluidRenderer {
     this.gl = gl;
     this.ext = ext;
 
-    // Calculate skew based on skewType and skewDegree
-    const skewRadians = (this.skewDegree * Math.PI) / 180;
-    const skewAmount = Math.tan(skewRadians);
-
-    if (this.skewType === "full") {
-      this.boundaries = {
-        botLeft: [-1, -1 - skewAmount],
-        botRight: [1, -1 + skewAmount],
-        topLeft: [-1, 1 - skewAmount],
-        topRight: [1, 1 + skewAmount],
-      };
-    } else if (this.skewType === "bottom") {
-      // Convert from percentage space to NDC space (-1 to 1)
-      // In WaveShader: right edge goes to (50 + skewDegree/2)% of height
-      // Convert from [0,100] to [-1,1] space: (x/50 - 1)
-      const rightEdgeY = (50 + skewDegree / 2) / 50 - 1;
-
-      this.boundaries = {
-        botLeft: [-1, -1], // (0%, 100%) -> (-1, -1)
-        botRight: [1, rightEdgeY], // (100%, 50+skewDegree/2%) -> (1, rightEdgeY)
-        topLeft: [-1, 1], // (0%, 0%) -> (-1, 1)
-        topRight: [1, 1], // (100%, 0%) -> (1, 1)
-      };
-    } else {
-      this.boundaries = {
-        botLeft: [-1, -1],
-        botRight: [1, -1],
-        topLeft: [-1, 1],
-        topRight: [1, 1],
-      };
-    }
+    // Calculate boundaries once and reuse
+    this.calculateBoundaries();
 
     const vertices = new Float32Array([
       ...this.boundaries.botLeft, // bottom left
@@ -278,6 +254,52 @@ export class FluidRenderer {
     // Initialize display keywords
     this.updateKeywords();
 
+    // Initialize oscillator data
+    this.initializeOscillators();
+
+    this.lastUpdateTime = Date.now();
+    this.ditheringTexture = this.createDitheringTexture();
+
+    // Start the animation loop
+    this.update();
+  }
+
+  // Extract boundary calculation logic to avoid duplication
+  private calculateBoundaries(): void {
+    const skewRadians = (this.skewDegree * Math.PI) / 180;
+    const skewAmount = Math.tan(skewRadians);
+
+    if (this.skewType === "full") {
+      this.boundaries = {
+        botLeft: [-1, -1 - skewAmount],
+        botRight: [1, -1 + skewAmount],
+        topLeft: [-1, 1 - skewAmount],
+        topRight: [1, 1 + skewAmount],
+      };
+    } else if (this.skewType === "bottom") {
+      // Convert from percentage space to NDC space (-1 to 1)
+      // In WaveShader: right edge goes to (50 + skewDegree/2)% of height
+      // Convert from [0,100] to [-1,1] space: (x/50 - 1)
+      const rightEdgeY = (50 + this.skewDegree / 2) / 50 - 1;
+
+      this.boundaries = {
+        botLeft: [-1, -1], // (0%, 100%) -> (-1, -1)
+        botRight: [1, rightEdgeY], // (100%, 50+skewDegree/2%) -> (1, rightEdgeY)
+        topLeft: [-1, 1], // (0%, 0%) -> (-1, 1)
+        topRight: [1, 1], // (100%, 0%) -> (1, 1)
+      };
+    } else {
+      this.boundaries = {
+        botLeft: [-1, -1],
+        botRight: [1, -1],
+        topLeft: [-1, 1],
+        topRight: [1, 1],
+      };
+    }
+  }
+
+  // Separate oscillator initialization for cleaner code
+  private initializeOscillators(): void {
     // Pre-generate fixed colors for each oscillator
     this.oscillatorColors = Array.from(
       { length: this.config.DUFFING.NUM_OSCILLATORS },
@@ -305,12 +327,6 @@ export class FluidRenderer {
       { length: this.config.DUFFING.NUM_OSCILLATORS },
       () => ({ x: 0.5, y: 0.5 })
     );
-
-    this.lastUpdateTime = Date.now();
-    this.ditheringTexture = this.createDitheringTexture();
-
-    // Start the animation loop
-    this.update();
   }
 
   private initProgramsWithShaders(
@@ -532,6 +548,17 @@ export class FluidRenderer {
 
   private update = () => {
     const dt = this.calcDeltaTime();
+
+    // Cache canvas dimensions if they changed to avoid repeated property access
+    if (
+      this.canvas.width !== this.cachedCanvasWidth ||
+      this.canvas.height !== this.cachedCanvasHeight
+    ) {
+      this.cachedCanvasWidth = this.canvas.width;
+      this.cachedCanvasHeight = this.canvas.height;
+      this.cachedAspectRatio = this.cachedCanvasWidth / this.cachedCanvasHeight;
+    }
+
     if (this.resizeCanvas()) this.initFramebuffers();
     this.applyInputs(dt);
     this.step(dt);
@@ -766,12 +793,28 @@ export class FluidRenderer {
   public updateConfig(newConfig: Partial<Config>) {
     this.config = { ...this.config, ...newConfig };
 
-    // Update color scheme and regenerate colors
+    // Update color scheme and regenerate colors only if needed
     this.initColorScheme(this.config.COLOR_SCHEME);
-    this.oscillatorColors = Array.from(
-      { length: this.config.DUFFING.NUM_OSCILLATORS },
-      () => getRandomColor()
-    );
+
+    // Only regenerate colors if the number of oscillators changed
+    if (
+      newConfig.DUFFING?.NUM_OSCILLATORS &&
+      newConfig.DUFFING.NUM_OSCILLATORS !== this.oscillators.length
+    ) {
+      this.oscillatorColors = Array.from(
+        { length: this.config.DUFFING.NUM_OSCILLATORS },
+        () => getRandomColor()
+      );
+
+      // Reinitialize oscillators with new count
+      this.initializeOscillators();
+    } else {
+      // Just regenerate colors for existing oscillators
+      this.oscillatorColors = Array.from(
+        { length: this.config.DUFFING.NUM_OSCILLATORS },
+        () => getRandomColor()
+      );
+    }
   }
 
   public destroy() {
@@ -1400,36 +1443,8 @@ export class FluidRenderer {
     this.skewType = skewType;
     this.skewDegree = skewDegree;
 
-    const skewRadians = (this.skewDegree * Math.PI) / 180;
-    const skewAmount = Math.tan(skewRadians);
-
-    if (this.skewType === "full") {
-      this.boundaries = {
-        botLeft: [-1, -1 - skewAmount],
-        botRight: [1, -1 + skewAmount],
-        topLeft: [-1, 1 - skewAmount],
-        topRight: [1, 1 + skewAmount],
-      };
-    } else if (this.skewType === "bottom") {
-      // Convert from percentage space to NDC space (-1 to 1)
-      // In WaveShader: right edge goes to (50 + skewDegree/2)% of height
-      // Convert from [0,100] to [-1,1] space: (x/50 - 1)
-      const rightEdgeY = (50 + skewDegree / 2) / 50 - 1;
-
-      this.boundaries = {
-        botLeft: [-1, -1], // (0%, 100%) -> (-1, -1)
-        botRight: [1, rightEdgeY], // (100%, 50+skewDegree/2%) -> (1, rightEdgeY)
-        topLeft: [-1, 1], // (0%, 0%) -> (-1, 1)
-        topRight: [1, 1], // (100%, 0%) -> (1, 1)
-      };
-    } else {
-      this.boundaries = {
-        botLeft: [-1, -1],
-        botRight: [1, -1],
-        topLeft: [-1, 1],
-        topRight: [1, 1],
-      };
-    }
+    // Use the extracted boundary calculation method
+    this.calculateBoundaries();
 
     // Update vertex buffer with new boundaries
     const vertices = new Float32Array([
