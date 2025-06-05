@@ -205,7 +205,6 @@ export interface Config {
   BLOOM_SOFT_KNEE: number;
   SUNRAYS_RESOLUTION: number;
   SUNRAYS_WEIGHT: number;
-  COLOR_SCHEME: ColorConfiguration;
   DUFFING: {
     NUM_OSCILLATORS: number;
     DELTA: number;
@@ -366,6 +365,7 @@ export interface DuffingShaderProps {
   minWidth?: number;
   maintainHeight?: number;
   colorConfiguration?: ColorConfiguration;
+  backgroundColor?: { r: number; g: number; b: number };
 }
 
 export interface Boundaries {

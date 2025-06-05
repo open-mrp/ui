@@ -28,6 +28,10 @@ const meta = {
       options: colorSchemeOptions,
       description: "Color scheme to use for the shader effect",
     },
+    backgroundColor: {
+      control: "object",
+      description: "Background color as RGB object with r, g, b values (0-1)",
+    },
     height: {
       control: { type: "range", min: 100, max: 800, step: 50 },
       description: "Height of the shader effect in pixels",
@@ -62,18 +66,16 @@ export const Default: Story = {
 export const CustomColors: Story = {
   args: {
     ...Default.args,
-    config: {
-      BACK_COLOR: { r: 0.1, g: 0.1, b: 0.15 },
-      COLOR_SCHEME: "dusk",
-    },
+    colorConfiguration: "dusk",
+    backgroundColor: { r: 0.1, g: 0.1, b: 0.15 },
   },
 };
 
 export const HighPerformance: Story = {
   args: {
     ...Default.args,
+    colorConfiguration: "organic",
     config: {
-      COLOR_SCHEME: "organic",
       SIM_RESOLUTION: 256,
       DYE_RESOLUTION: 512,
       DENSITY_DISSIPATION: 3,
@@ -95,11 +97,12 @@ export const HighPerformance: Story = {
 export const ChaoticOscillators: Story = {
   args: {
     ...Default.args,
+    colorConfiguration: "rosolane_to_helvetia",
     config: {
       CURL: 0.9,
-      SPLAT_RADIUS: 0.2,
-      SPLAT_FORCE: 700,
-      BLOOM_INTENSITY: 0.01,
+      // SPLAT_RADIUS: 0.2,
+      // SPLAT_FORCE: 700,
+      // BLOOM_INTENSITY: 0.01,
       DUFFING: {
         NUM_OSCILLATORS: 4,
         DELTA: 0.2,
@@ -108,7 +111,6 @@ export const ChaoticOscillators: Story = {
         GAMMA: 0.8,
         OMEGA: 0.4,
       },
-      COLOR_SCHEME: "rosolane_to_helvetia",
     },
   },
 };
@@ -119,6 +121,7 @@ export const WithBottomSkew: Story = {
     skew: "bottom",
     skewDegree: 6,
     height: 300,
+    colorConfiguration: "trifecta",
     config: {
       SUNRAYS_WEIGHT: 0.5,
       DUFFING: {
@@ -129,7 +132,6 @@ export const WithBottomSkew: Story = {
         GAMMA: 0.8,
         OMEGA: 0.4,
       },
-      COLOR_SCHEME: "trifecta",
     },
   },
 };

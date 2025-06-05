@@ -20,8 +20,8 @@ export class DuffingOscillator {
   // Multi-oscillator system
   private baseX!: number; // Fixed position in circle formation
   private baseY!: number; // Fixed position in circle formation
-  private index: number; // Oscillator index (0, 1, 2, ...)
-  private totalOscillators: number; // Total count for phase calculation
+  private readonly index: number; // Oscillator index (0, 1, 2, ...)
+  private readonly totalOscillators: number; // Total count for phase calculation
 
   // Spatial constraints Geometric boundary definition
   private boundaries: {

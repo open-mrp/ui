@@ -65,8 +65,8 @@ import {
 } from "./shaders";
 
 export class FluidRenderer {
-  private gl: WebGLRenderingContext;
-  private ext: {
+  private readonly gl: WebGLRenderingContext;
+  private readonly ext: {
     formatRGBA: { internalFormat: number; format: number } | null;
     formatRG: { internalFormat: number; format: number } | null;
     formatR: { internalFormat: number; format: number } | null;
@@ -74,7 +74,8 @@ export class FluidRenderer {
     supportLinearFiltering: boolean;
   };
   private config: Config;
-  private canvas: HTMLCanvasElement;
+  private readonly canvas: HTMLCanvasElement;
+  private colorConfiguration: ColorConfiguration;
   private oscillators!: DuffingOscillator[];
   private oscillatorColors!: { r: number; g: number; b: number }[];
   private oscillatorPrevPositions!: { x: number; y: number }[];
@@ -156,7 +157,7 @@ export class FluidRenderer {
   private clearProgram!: Program;
   private boundaries!: Boundaries;
 
-  private ditheringTexture: {
+  private readonly ditheringTexture!: {
     texture: WebGLTexture | null;
     width: number;
     height: number;
@@ -168,13 +169,16 @@ export class FluidRenderer {
     config?: Partial<Config>,
     skewType?: "full" | "bottom",
     skewDegree: number = 6,
-    shaders?: Record<string, FragmentShader>
+    shaders?: Record<string, FragmentShader>,
+    colorConfiguration: ColorConfiguration = "default",
+    backgroundColor?: { r: number; g: number; b: number }
   ) {
     this.canvas = canvas;
     this.skewType = skewType;
     this.skewDegree = skewDegree;
 
-    this.config = {
+    // Default configuration values
+    const defaultConfig: Config = {
       SIM_RESOLUTION: 512,
       DYE_RESOLUTION: 1024,
       DENSITY_DISSIPATION: 2.5,
@@ -184,7 +188,7 @@ export class FluidRenderer {
       CURL: 0.1,
       SPLAT_RADIUS: 0.005,
       SPLAT_FORCE: 8000,
-      BACK_COLOR: { r: 0, g: 0, b: 0 },
+      BACK_COLOR: backgroundColor || { r: 0, g: 0, b: 0 },
       BLOOM_ITERATIONS: 10,
       BLOOM_RESOLUTION: 256,
       BLOOM_INTENSITY: 0.15,
@@ -192,7 +196,6 @@ export class FluidRenderer {
       BLOOM_SOFT_KNEE: 0.7,
       SUNRAYS_RESOLUTION: 256,
       SUNRAYS_WEIGHT: 0.1,
-      COLOR_SCHEME: "dusk",
       DUFFING: {
         NUM_OSCILLATORS: 8,
         DELTA: 0.2,
@@ -204,6 +207,8 @@ export class FluidRenderer {
       ...config,
     };
 
+    this.config = defaultConfig;
+
     const { gl, ext } = this.getWebGLContext(canvas);
     this.gl = gl;
     this.ext = ext;
@@ -212,6 +217,7 @@ export class FluidRenderer {
     this.initializeGeometry();
 
     // Initialize color scheme
+    this.colorConfiguration = colorConfiguration;
     this.initColorScheme();
 
     // Compile base shaders
@@ -259,7 +265,11 @@ export class FluidRenderer {
     this.initializeOscillators();
 
     this.lastUpdateTime = Date.now();
-    this.ditheringTexture = this.createDitheringTexture();
+
+    // Initialize readonly ditheringTexture
+    const ditheringTexture = this.createDitheringTexture();
+    // Use type assertion to set readonly property during construction
+    (this as any).ditheringTexture = ditheringTexture;
 
     // Start the animation loop
     this.update();
@@ -602,10 +612,8 @@ export class FluidRenderer {
     );
   }
 
-  private initColorScheme(
-    scheme: ColorConfiguration = this.config.COLOR_SCHEME
-  ) {
-    setColorScheme(scheme);
+  private initColorScheme() {
+    setColorScheme(this.colorConfiguration);
   }
 
   private update = () => {
@@ -859,7 +867,7 @@ export class FluidRenderer {
     Object.assign(this.config, newConfig);
 
     // Update color scheme and regenerate colors only if needed
-    this.initColorScheme(this.config.COLOR_SCHEME);
+    this.initColorScheme();
 
     // Only regenerate colors if the number of oscillators changed
     if (
@@ -874,6 +882,17 @@ export class FluidRenderer {
       for (let i = 0; i < numOscillators; i++) {
         this.oscillatorColors[i] = getRandomColor();
       }
+    }
+  }
+
+  public updateColorConfiguration(colorConfiguration: ColorConfiguration) {
+    this.colorConfiguration = colorConfiguration;
+    this.initColorScheme();
+
+    // Regenerate colors for existing oscillators
+    const numOscillators = this.config.DUFFING.NUM_OSCILLATORS;
+    for (let i = 0; i < numOscillators; i++) {
+      this.oscillatorColors[i] = getRandomColor();
     }
   }
 
@@ -1525,9 +1544,9 @@ export class FluidRenderer {
 }
 
 class Program<T extends ShaderUniforms = ShaderUniforms> {
-  public uniforms: T;
-  private program: WebGLProgram;
-  private gl: WebGLRenderingContext;
+  public readonly uniforms: T;
+  private readonly program: WebGLProgram;
+  private readonly gl: WebGLRenderingContext;
 
   constructor(
     gl: WebGLRenderingContext,
@@ -1583,11 +1602,11 @@ class Program<T extends ShaderUniforms = ShaderUniforms> {
 }
 
 class Material {
-  private vertexShader: WebGLShader;
-  private fragmentShader: WebGLShader;
-  private programs: { [key: number]: WebGLProgram };
+  private readonly vertexShader: WebGLShader;
+  private readonly fragmentShader: WebGLShader;
+  private readonly programs: { [key: number]: WebGLProgram };
   private activeProgram: WebGLProgram | null;
-  private gl: WebGLRenderingContext;
+  private readonly gl: WebGLRenderingContext;
   public uniforms: ShaderUniforms;
 
   constructor(

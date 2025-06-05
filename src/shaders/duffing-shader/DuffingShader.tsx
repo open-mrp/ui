@@ -26,7 +26,6 @@ const DEFAULT_CONFIG: Config = {
   BLOOM_SOFT_KNEE: 0.7,
   SUNRAYS_RESOLUTION: 256,
   SUNRAYS_WEIGHT: 0.1,
-  COLOR_SCHEME: "default",
   DUFFING: {
     NUM_OSCILLATORS: 8,
     DELTA: 0.2,
@@ -38,7 +37,8 @@ const DEFAULT_CONFIG: Config = {
 };
 
 export function DuffingShader({
-  colorConfiguration = DEFAULT_CONFIG.COLOR_SCHEME,
+  colorConfiguration = "default",
+  backgroundColor,
   skew,
   skewDegree = 6,
   minWidth = 600,
@@ -143,7 +143,9 @@ export function DuffingShader({
       mergedConfig,
       skew,
       skewDegree,
-      shaders
+      shaders,
+      colorConfiguration,
+      backgroundColor
     );
 
     // Clean up the renderer on unmount
@@ -151,13 +153,26 @@ export function DuffingShader({
       rendererRef.current?.destroy();
       rendererRef.current = null;
     };
-  }, [colorConfiguration, mergedConfig, skew, skewDegree, shaders]);
+  }, [
+    colorConfiguration,
+    mergedConfig,
+    skew,
+    skewDegree,
+    shaders,
+    backgroundColor,
+  ]);
 
   // Update renderer configuration when props change - memoize to avoid unnecessary calls
   useEffect(() => {
     if (!rendererRef.current) return;
     rendererRef.current.updateConfig(mergedConfig);
   }, [mergedConfig]);
+
+  // Update color configuration when it changes
+  useEffect(() => {
+    if (!rendererRef.current) return;
+    rendererRef.current.updateColorConfiguration(colorConfiguration);
+  }, [colorConfiguration]);
 
   // Memoize resize handler to avoid recreation
   const handleResize = useCallback(() => {
