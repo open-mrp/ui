@@ -1,7 +1,6 @@
 import {
   applySunrays,
   applySunraysBlur,
-  getSunraysFramebuffers,
   initSunraysFramebuffers,
   initSunraysShaders,
 } from "./sunraysManager";
@@ -475,35 +474,7 @@ describe("SunraysManager Functionality Tests", () => {
     });
   });
 
-  describe("getSunraysFramebuffers", () => {
-    test("should return current framebuffer state", () => {
-      // Initialize framebuffers first
-      initSunraysFramebuffers(
-        mockGL,
-        testConfig,
-        mockCreateFBO,
-        mockGetResolution,
-        testExtensions
-      );
-
-      const result = getSunraysFramebuffers();
-
-      expect(result).toHaveProperty("sunrays");
-      expect(result).toHaveProperty("temp");
-      expect(result.sunrays).not.toBeNull();
-      expect(result.temp).not.toBeNull();
-    });
-
-    test("should return null framebuffers when not initialized", () => {
-      // This test would require module reset which isn't available in Bun
-      // Instead we test the initial state before any initialization
-      const result = getSunraysFramebuffers();
-
-      // Should have framebuffers if previously initialized in other tests
-      expect(result).toHaveProperty("sunrays");
-      expect(result).toHaveProperty("temp");
-    });
-  });
+  // Removed getSunraysFramebuffers tests - function was deleted for performance optimization
 });
 
 describe("SunraysManager Performance Tests", () => {

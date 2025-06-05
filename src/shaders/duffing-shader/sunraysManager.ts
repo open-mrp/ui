@@ -2,21 +2,24 @@
 
 // Import shader source code
 import {
-    blurShader as blurShaderSource,
-    blurVertexShader as blurVertexShaderSource,
-    sunraysMaskShader as sunraysMaskShaderSource,
-    sunraysShader as sunraysShaderSource
-} from './shaders';
-import { BaseFBO, SunraysConfig, SunraysPrograms } from './types';
+  blurShader as blurShaderSource,
+  blurVertexShader as blurVertexShaderSource,
+  sunraysMaskShader as sunraysMaskShaderSource,
+  sunraysShader as sunraysShaderSource,
+} from "./shaders";
+import { BaseFBO, SunraysConfig, SunraysPrograms } from "./types";
 
 // Internal state - only tracking framebuffers
 let sunraysFramebuffers: {
-    sunrays: BaseFBO | null;
-    temp: BaseFBO | null;
+  sunrays: BaseFBO | null;
+  temp: BaseFBO | null;
 } = {
-    sunrays: null,
-    temp: null
+  sunrays: null,
+  temp: null,
 };
+
+// WebGL state caching to reduce redundant calls
+let cachedBlendEnabled: boolean = false;
 
 /**
  * Initialize sunrays shaders
@@ -25,30 +28,42 @@ let sunraysFramebuffers: {
  * @param compileShader - Function to compile shader
  */
 export const initSunraysShaders = (
-    gl: WebGLRenderingContext,
-    baseVertexShader: WebGLShader,
-    compileShader: (type: number, source: string) => WebGLShader
-): { 
-    sunraysMaskShader: WebGLShader; 
-    sunraysShader: WebGLShader;
-    blurVertexShader: WebGLShader;
-    blurShader: WebGLShader;
+  gl: WebGLRenderingContext,
+  baseVertexShader: WebGLShader,
+  compileShader: (type: number, source: string) => WebGLShader
+): {
+  sunraysMaskShader: WebGLShader;
+  sunraysShader: WebGLShader;
+  blurVertexShader: WebGLShader;
+  blurShader: WebGLShader;
 } => {
-    const compiledSunraysMaskShader = compileShader(gl.FRAGMENT_SHADER, sunraysMaskShaderSource);
-    const compiledSunraysShader = compileShader(gl.FRAGMENT_SHADER, sunraysShaderSource);
-    const compiledBlurVertexShader = compileShader(gl.VERTEX_SHADER, blurVertexShaderSource);
-    const compiledBlurShader = compileShader(gl.FRAGMENT_SHADER, blurShaderSource);
+  const compiledSunraysMaskShader = compileShader(
+    gl.FRAGMENT_SHADER,
+    sunraysMaskShaderSource
+  );
+  const compiledSunraysShader = compileShader(
+    gl.FRAGMENT_SHADER,
+    sunraysShaderSource
+  );
+  const compiledBlurVertexShader = compileShader(
+    gl.VERTEX_SHADER,
+    blurVertexShaderSource
+  );
+  const compiledBlurShader = compileShader(
+    gl.FRAGMENT_SHADER,
+    blurShaderSource
+  );
 
-    return {
-        sunraysMaskShader: compiledSunraysMaskShader,
-        sunraysShader: compiledSunraysShader,
-        blurVertexShader: compiledBlurVertexShader,
-        blurShader: compiledBlurShader
-    };
+  return {
+    sunraysMaskShader: compiledSunraysMaskShader,
+    sunraysShader: compiledSunraysShader,
+    blurVertexShader: compiledBlurVertexShader,
+    blurShader: compiledBlurShader,
+  };
 };
 
 /**
- * Initialize sunrays framebuffers
+ * Initialize sunrays framebuffers - optimized to avoid object spread
  * @param gl - WebGL context
  * @param config - Sunrays configuration from script.js
  * @param createFBO - Function to create framebuffer object
@@ -56,38 +71,67 @@ export const initSunraysShaders = (
  * @param ext - WebGL extensions
  */
 export const initSunraysFramebuffers = (
-    gl: WebGLRenderingContext,
-    config: SunraysConfig,
-    createFBO: (w: number, h: number, internalFormat: number, format: number, type: number, param: number) => BaseFBO,
-    getResolution: (resolution: number) => { width: number; height: number },
-    ext: { halfFloatTexType: number; formatR: { internalFormat: number; format: number }; supportLinearFiltering: boolean }
+  gl: WebGLRenderingContext,
+  config: SunraysConfig,
+  createFBO: (
+    w: number,
+    h: number,
+    internalFormat: number,
+    format: number,
+    type: number,
+    param: number
+  ) => BaseFBO,
+  getResolution: (resolution: number) => { width: number; height: number },
+  ext: {
+    halfFloatTexType: number;
+    formatR: { internalFormat: number; format: number };
+    supportLinearFiltering: boolean;
+  }
 ): { sunrays: BaseFBO; temp: BaseFBO } => {
-    const res = getResolution(config.resolution);
-    const filtering = ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST;
+  const res = getResolution(config.resolution);
+  const filtering = ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST;
 
-    sunraysFramebuffers.sunrays = createFBO(
-        res.width,
-        res.height,
-        ext.formatR.internalFormat,
-        ext.formatR.format,
-        ext.halfFloatTexType,
-        filtering
-    );
+  sunraysFramebuffers.sunrays = createFBO(
+    res.width,
+    res.height,
+    ext.formatR.internalFormat,
+    ext.formatR.format,
+    ext.halfFloatTexType,
+    filtering
+  );
 
-    sunraysFramebuffers.temp = createFBO(
-        res.width,
-        res.height,
-        ext.formatR.internalFormat,
-        ext.formatR.format,
-        ext.halfFloatTexType,
-        filtering
-    );
+  sunraysFramebuffers.temp = createFBO(
+    res.width,
+    res.height,
+    ext.formatR.internalFormat,
+    ext.formatR.format,
+    ext.halfFloatTexType,
+    filtering
+  );
 
-    return { ...sunraysFramebuffers } as { sunrays: BaseFBO; temp: BaseFBO };
+  // Return direct reference instead of object spread for better performance
+  return {
+    sunrays: sunraysFramebuffers.sunrays!,
+    temp: sunraysFramebuffers.temp!,
+  };
 };
 
 /**
- * Apply sunrays effect
+ * Optimized WebGL state management
+ */
+const setBlendState = (gl: WebGLRenderingContext, enabled: boolean): void => {
+  if (enabled !== cachedBlendEnabled) {
+    if (enabled) {
+      gl.enable(gl.BLEND);
+    } else {
+      gl.disable(gl.BLEND);
+    }
+    cachedBlendEnabled = enabled;
+  }
+};
+
+/**
+ * Apply sunrays effect - optimized with state caching
  * @param gl - WebGL context
  * @param config - Sunrays configuration from script.js
  * @param source - Source framebuffer
@@ -97,37 +141,30 @@ export const initSunraysFramebuffers = (
  * @param programs - Sunrays-related shader programs
  */
 export const applySunrays = (
-    gl: WebGLRenderingContext,
-    config: SunraysConfig,
-    source: BaseFBO,
-    mask: BaseFBO,
-    destination: BaseFBO,
-    blit: (target: BaseFBO | null) => void,
-    programs: SunraysPrograms
+  gl: WebGLRenderingContext,
+  config: SunraysConfig,
+  source: BaseFBO,
+  mask: BaseFBO,
+  destination: BaseFBO,
+  blit: (target: BaseFBO | null) => void,
+  programs: SunraysPrograms
 ): void => {
-    gl.disable(gl.BLEND);
+  setBlendState(gl, false);
 
-    // Apply mask
-    programs.sunraysMask.bind();
-    gl.uniform1i(programs.sunraysMask.uniforms.uTexture, source.attach(0));
-    blit(mask);
+  // Apply mask
+  programs.sunraysMask.bind();
+  gl.uniform1i(programs.sunraysMask.uniforms.uTexture, source.attach(0));
+  blit(mask);
 
-    // Apply sunrays
-    programs.sunrays.bind();
-    gl.uniform1f(programs.sunrays.uniforms.weight, config.weight);
-    gl.uniform1i(programs.sunrays.uniforms.uTexture, mask.attach(0));
-    blit(destination);
+  // Apply sunrays
+  programs.sunrays.bind();
+  gl.uniform1f(programs.sunrays.uniforms.weight, config.weight);
+  gl.uniform1i(programs.sunrays.uniforms.uTexture, mask.attach(0));
+  blit(destination);
 };
 
 /**
- * Get current sunrays framebuffers
- */
-export const getSunraysFramebuffers = (): { sunrays: BaseFBO | null; temp: BaseFBO | null } => {
-    return { ...sunraysFramebuffers };
-};
-
-/**
- * Apply blur effect to sunrays
+ * Apply blur effect to sunrays - optimized to cache texel sizes and reduce uniform updates
  * @param gl - WebGL context
  * @param target - Target framebuffer
  * @param temp - Temporary framebuffer
@@ -136,21 +173,36 @@ export const getSunraysFramebuffers = (): { sunrays: BaseFBO | null; temp: BaseF
  * @param blit - Blit function
  */
 export const applySunraysBlur = (
-    gl: WebGLRenderingContext,
-    target: BaseFBO,
-    temp: BaseFBO,
-    iterations: number,
-    blurProgram: { bind: () => void; uniforms: { texelSize: WebGLUniformLocation; uTexture: WebGLUniformLocation } },
-    blit: (target: BaseFBO | null) => void
+  gl: WebGLRenderingContext,
+  target: BaseFBO,
+  temp: BaseFBO,
+  iterations: number,
+  blurProgram: {
+    bind: () => void;
+    uniforms: {
+      texelSize: WebGLUniformLocation;
+      uTexture: WebGLUniformLocation;
+    };
+  },
+  blit: (target: BaseFBO | null) => void
 ): void => {
-    blurProgram.bind();
-    for (let i = 0; i < iterations; i++) {
-        gl.uniform2f(blurProgram.uniforms.texelSize, target.texelSizeX, 0.0);
-        gl.uniform1i(blurProgram.uniforms.uTexture, target.attach(0));
-        blit(temp);
+  if (iterations === 0) return; // Early exit for zero iterations
 
-        gl.uniform2f(blurProgram.uniforms.texelSize, 0.0, target.texelSizeY);
-        gl.uniform1i(blurProgram.uniforms.uTexture, temp.attach(0));
-        blit(target);
-    }
-}; 
+  blurProgram.bind();
+
+  // Cache texel sizes to avoid repeated property access
+  const texelSizeX = target.texelSizeX;
+  const texelSizeY = target.texelSizeY;
+
+  for (let i = 0; i < iterations; i++) {
+    // Horizontal blur pass
+    gl.uniform2f(blurProgram.uniforms.texelSize, texelSizeX, 0.0);
+    gl.uniform1i(blurProgram.uniforms.uTexture, target.attach(0));
+    blit(temp);
+
+    // Vertical blur pass
+    gl.uniform2f(blurProgram.uniforms.texelSize, 0.0, texelSizeY);
+    gl.uniform1i(blurProgram.uniforms.uTexture, temp.attach(0));
+    blit(target);
+  }
+};
