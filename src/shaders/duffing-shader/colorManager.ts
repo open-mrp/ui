@@ -11,15 +11,27 @@ let currentScheme: ColorConfiguration = "default";
 let currentColors: RGBColor[] = [];
 let currentColorIndex: number = 0;
 
+// Pre-compiled regex for better performance
+const HSLA_REGEX =
+  /hsla?\((\d+)(?:deg)?\s*,?\s*(\d+)%?\s*,?\s*(\d+)%?\s*,?\s*(\d*\.?\d*)?\)/;
+
+// Helper function for HSL to RGB conversion - moved outside to avoid redefinition
+const hue2rgb = (p: number, q: number, t: number): number => {
+  if (t < 0) t += 1;
+  if (t > 1) t -= 1;
+  if (t < 1 / 6) return p + (q - p) * 6 * t;
+  if (t < 1 / 2) return q;
+  if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+  return p;
+};
+
 /**
  * Parse HSLA color string into HSLAColor object
  * @param hslaStr - HSLA color string (e.g., "hsla(360, 100%, 50%, 1)" or "hsl(360deg, 100%, 50%)")
  */
 export const parseHSLA = (hslaStr: string): HSLAColor => {
   // Handle both hsl and hsla, with optional deg suffix and flexible spacing
-  const matches = hslaStr.match(
-    /hsla?\((\d+)(?:deg)?\s*,?\s*(\d+)%?\s*,?\s*(\d+)%?\s*,?\s*(\d*\.?\d*)?\)/
-  );
+  const matches = hslaStr.match(HSLA_REGEX);
   if (!matches) {
     throw new Error(`Invalid HSLA string: ${hslaStr}`);
   }
@@ -46,15 +58,6 @@ export const HSLAtoRGB = (hsla: HSLAColor | string): RGBColor => {
   if (s === 0) {
     r = g = b = l;
   } else {
-    const hue2rgb = (p: number, q: number, t: number): number => {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1 / 6) return p + (q - p) * 6 * t;
-      if (t < 1 / 2) return q;
-      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-      return p;
-    };
-
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
     const p = 2 * l - q;
     r = hue2rgb(p, q, h + 1 / 3);
