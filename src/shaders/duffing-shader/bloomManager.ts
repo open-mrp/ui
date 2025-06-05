@@ -13,6 +13,9 @@ let bloomFramebuffers: BaseFBO[] = [];
 let cachedBloomConfig: BloomConfig | null = null;
 let cachedResolution: { width: number; height: number } | null = null;
 
+// Pre-allocated objects for hot paths to avoid garbage collection
+let cachedCurveValues = { curve0: 0, curve1: 0, curve2: 0 };
+
 /**
  * Initialize bloom shaders
  * @param gl - WebGL context
@@ -49,23 +52,6 @@ export const initBloomShaders = (
 };
 
 /**
- * Check if bloom framebuffers need to be recreated
- */
-const needsFramebufferUpdate = (
-  config: BloomConfig,
-  res: { width: number; height: number }
-): boolean => {
-  if (!cachedBloomConfig || !cachedResolution) return true;
-
-  return (
-    cachedBloomConfig.iterations !== config.iterations ||
-    cachedBloomConfig.resolution !== config.resolution ||
-    cachedResolution.width !== res.width ||
-    cachedResolution.height !== res.height
-  );
-};
-
-/**
  * Initialize bloom framebuffers based on resolution
  * @param gl - WebGL context
  * @param config - Bloom configuration from script.js
@@ -93,8 +79,17 @@ export const initBloomFramebuffers = (
 ): BaseFBO[] => {
   const res = getResolution(config.resolution);
 
+  // Inline needsFramebufferUpdate check for better performance
+  const needsUpdate =
+    !cachedBloomConfig ||
+    !cachedResolution ||
+    cachedBloomConfig.iterations !== config.iterations ||
+    cachedBloomConfig.resolution !== config.resolution ||
+    cachedResolution.width !== res.width ||
+    cachedResolution.height !== res.height;
+
   // Early return if framebuffers don't need updating
-  if (!needsFramebufferUpdate(config, res)) {
+  if (!needsUpdate) {
     return bloomFramebuffers;
   }
 
@@ -136,9 +131,27 @@ export const initBloomFramebuffers = (
     bloomFramebuffers.push(fbo);
   }
 
-  // Cache current config and resolution
-  cachedBloomConfig = { ...config };
-  cachedResolution = { ...res };
+  // Cache current config and resolution - avoid object spreading
+  if (!cachedBloomConfig) {
+    cachedBloomConfig = {
+      iterations: 0,
+      resolution: 0,
+      intensity: 0,
+      threshold: 0,
+      softKnee: 0,
+    };
+  }
+  if (!cachedResolution) {
+    cachedResolution = { width: 0, height: 0 };
+  }
+
+  cachedBloomConfig.iterations = config.iterations;
+  cachedBloomConfig.resolution = config.resolution;
+  cachedBloomConfig.intensity = config.intensity;
+  cachedBloomConfig.threshold = config.threshold;
+  cachedBloomConfig.softKnee = config.softKnee;
+  cachedResolution.width = res.width;
+  cachedResolution.height = res.height;
 
   return bloomFramebuffers;
 };
@@ -170,13 +183,18 @@ export const applyBloom = (
   // Prefilter pass with optimized uniform setting
   programs.bloomPrefilter.bind();
 
-  // Pre-calculate curve values to avoid repeated arithmetic
+  // Pre-calculate curve values to cached object to avoid repeated arithmetic
   const knee = config.threshold * config.softKnee + 0.0001;
-  const curve0 = config.threshold - knee;
-  const curve1 = knee * 2;
-  const curve2 = 0.25 / knee;
+  cachedCurveValues.curve0 = config.threshold - knee;
+  cachedCurveValues.curve1 = knee * 2;
+  cachedCurveValues.curve2 = 0.25 / knee;
 
-  gl.uniform3f(programs.bloomPrefilter.uniforms.curve, curve0, curve1, curve2);
+  gl.uniform3f(
+    programs.bloomPrefilter.uniforms.curve,
+    cachedCurveValues.curve0,
+    cachedCurveValues.curve1,
+    cachedCurveValues.curve2
+  );
   gl.uniform1f(programs.bloomPrefilter.uniforms.threshold, config.threshold);
   gl.uniform1i(programs.bloomPrefilter.uniforms.uTexture, source.attach(0));
   blit(last);
@@ -184,10 +202,11 @@ export const applyBloom = (
   // Blur and downscale passes
   programs.bloomBlur.bind();
 
-  // Cache the blur program uniforms to avoid repeated property access
+  // Cache the blur program uniforms and texel sizes to avoid repeated property access
   const blurUniforms = programs.bloomBlur.uniforms;
+  const framebufferCount = bloomFramebuffers.length;
 
-  for (let i = 0; i < bloomFramebuffers.length; i++) {
+  for (let i = 0; i < framebufferCount; i++) {
     const dest = bloomFramebuffers[i];
     gl.uniform2f(blurUniforms.texelSize, last.texelSizeX, last.texelSizeY);
     gl.uniform1i(blurUniforms.uTexture, last.attach(0));
@@ -199,8 +218,8 @@ export const applyBloom = (
   gl.blendFunc(gl.ONE, gl.ONE);
   gl.enable(gl.BLEND);
 
-  // Reverse iteration for better cache locality
-  for (let i = bloomFramebuffers.length - 2; i >= 0; i--) {
+  // Reverse iteration for better cache locality - cache length to avoid repeated access
+  for (let i = framebufferCount - 2; i >= 0; i--) {
     const baseTex = bloomFramebuffers[i];
     gl.uniform2f(blurUniforms.texelSize, last.texelSizeX, last.texelSizeY);
     gl.uniform1i(blurUniforms.uTexture, last.attach(0));

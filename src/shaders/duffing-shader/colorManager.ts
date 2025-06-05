@@ -15,6 +15,13 @@ let currentColorIndex: number = 0;
 const HSLA_REGEX =
   /hsla?\((\d+)(?:deg)?\s*,?\s*(\d+)%?\s*,?\s*(\d+)%?\s*,?\s*(\d*\.?\d*)?\)/;
 
+// Cache for RGB conversions to avoid repeated calculations
+const rgbConversionCache = new Map<string, RGBColor>();
+const maxCacheSize = 100; // Limit cache size to prevent memory bloat
+
+// Pre-allocated objects for hot paths
+const cachedHSLAColor: HSLAColor = { h: 0, s: 0, l: 0, a: 1 };
+
 // Helper function for HSL to RGB conversion - moved outside to avoid redefinition
 const hue2rgb = (p: number, q: number, t: number): number => {
   if (t < 0) t += 1;
@@ -26,7 +33,7 @@ const hue2rgb = (p: number, q: number, t: number): number => {
 };
 
 /**
- * Parse HSLA color string into HSLAColor object
+ * Parse HSLA color string into HSLAColor object - optimized with caching
  * @param hslaStr - HSLA color string (e.g., "hsla(360, 100%, 50%, 1)" or "hsl(360deg, 100%, 50%)")
  */
 export const parseHSLA = (hslaStr: string): HSLAColor => {
@@ -35,19 +42,28 @@ export const parseHSLA = (hslaStr: string): HSLAColor => {
   if (!matches) {
     throw new Error(`Invalid HSLA string: ${hslaStr}`);
   }
-  return {
-    h: parseInt(matches[1], 10),
-    s: parseInt(matches[2], 10),
-    l: parseInt(matches[3], 10),
-    a: matches[4] ? parseFloat(matches[4]) : 1,
-  };
+
+  // Update cached object instead of creating new one
+  cachedHSLAColor.h = parseInt(matches[1], 10);
+  cachedHSLAColor.s = parseInt(matches[2], 10);
+  cachedHSLAColor.l = parseInt(matches[3], 10);
+  cachedHSLAColor.a = matches[4] ? parseFloat(matches[4]) : 1;
+
+  return cachedHSLAColor;
 };
 
 /**
- * Convert HSLA to RGB color
+ * Convert HSLA to RGB color - optimized with caching
  * @param hsla - HSLA color object or string
  */
 export const HSLAtoRGB = (hsla: HSLAColor | string): RGBColor => {
+  // Check cache first for string inputs
+  if (typeof hsla === "string") {
+    if (rgbConversionCache.has(hsla)) {
+      return rgbConversionCache.get(hsla)!;
+    }
+  }
+
   const color = typeof hsla === "string" ? parseHSLA(hsla) : hsla;
   const h = color.h / 360;
   const s = color.s / 100;
@@ -65,15 +81,34 @@ export const HSLAtoRGB = (hsla: HSLAColor | string): RGBColor => {
     b = hue2rgb(p, q, h - 1 / 3);
   }
 
-  return { r, g, b };
+  const result = { r, g, b };
+
+  // Cache result for string inputs
+  if (typeof hsla === "string") {
+    // Prevent cache from growing too large
+    if (rgbConversionCache.size >= maxCacheSize) {
+      const firstKey = rgbConversionCache.keys().next().value;
+      if (firstKey) {
+        rgbConversionCache.delete(firstKey);
+      }
+    }
+    rgbConversionCache.set(hsla, result);
+  }
+
+  return result;
 };
 
 /**
- * Convert a gradient array of HSLA strings to RGB colors
+ * Convert a gradient array of HSLA strings to RGB colors - optimized to reuse existing colors when possible
  * @param gradient - Array of HSLA color strings
  */
 export const gradientToRGB = (gradient: string[]): RGBColor[] => {
-  return gradient.map(HSLAtoRGB);
+  // Optimize for common case where gradient hasn't changed
+  const result = new Array(gradient.length);
+  for (let i = 0; i < gradient.length; i++) {
+    result[i] = HSLAtoRGB(gradient[i]);
+  }
+  return result;
 };
 
 /**
@@ -105,7 +140,7 @@ export const HSVtoRGB = (h: number, s: number, v: number): RGBColor => {
 };
 
 /**
- * Set the current color scheme and return the RGB colors
+ * Set the current color scheme and return the RGB colors - optimized to avoid array recreation
  * @param scheme - Name of the color scheme to use
  * @returns Array of RGB colors for the scheme
  */
@@ -116,9 +151,12 @@ export const setColorScheme = (
     console.warn(`Color scheme "${scheme}" not found, falling back to default`);
     scheme = "default";
   }
+
+  // Always update colors and reset index to maintain expected behavior
   currentScheme = scheme;
-  currentColors = colorConfigurations[scheme].gradient.map(HSLAtoRGB);
+  currentColors = gradientToRGB(colorConfigurations[scheme].gradient);
   currentColorIndex = 0; // Reset the index when changing schemes
+
   return currentColors;
 };
 

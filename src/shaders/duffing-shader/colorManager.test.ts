@@ -733,6 +733,77 @@ describe("ColorManager Performance Tests", () => {
     });
   });
 
+  describe("Cache Performance", () => {
+    test("should handle RGB conversion cache eviction when maxCacheSize is reached", () => {
+      const { HSLAtoRGB } = require("./colorManager");
+
+      // Generate enough unique HSLA strings to trigger cache eviction
+      // The maxCacheSize is 100, so we'll generate 105 unique strings
+      const colors: RGBColor[] = [];
+
+      tracker.reset();
+      tracker.startTimer();
+
+      for (let i = 0; i < 105; i++) {
+        // Generate unique HSLA strings to fill the cache
+        const hslaString = `hsla(${(i * 3) % 360}, 100%, 50%, 1)`;
+        colors.push(HSLAtoRGB(hslaString));
+      }
+
+      tracker.endTimer();
+      const metrics = tracker.getMetrics();
+
+      // Should have converted 105 colors successfully
+      expect(colors.length).toBe(105);
+
+      // Each color should be valid
+      colors.forEach((color) => {
+        expect(color).toHaveProperty("r");
+        expect(color).toHaveProperty("g");
+        expect(color).toHaveProperty("b");
+        expect(typeof color.r).toBe("number");
+        expect(typeof color.g).toBe("number");
+        expect(typeof color.b).toBe("number");
+      });
+
+      // Performance should still be reasonable even with cache eviction
+      expect(metrics.executionTime).toBeLessThan(50);
+    });
+
+    test("should handle cache key retrieval and eviction edge cases", () => {
+      const { HSLAtoRGB } = require("./colorManager");
+
+      // Test multiple cache operations to ensure proper eviction
+      const testColors: string[] = [];
+      const results: RGBColor[] = [];
+
+      // Generate more colors than cache size to trigger eviction multiple times
+      for (let i = 0; i < 150; i++) {
+        const hslaString = `hsla(${(i * 7) % 360}, ${50 + (i % 50)}%, ${
+          30 + (i % 40)
+        }%, 1)`;
+        testColors.push(hslaString);
+        results.push(HSLAtoRGB(hslaString));
+      }
+
+      // All conversions should succeed
+      expect(results.length).toBe(150);
+      results.forEach((color) => {
+        expect(color).toHaveProperty("r");
+        expect(color).toHaveProperty("g");
+        expect(color).toHaveProperty("b");
+        expect(typeof color.r).toBe("number");
+        expect(typeof color.g).toBe("number");
+        expect(typeof color.b).toBe("number");
+      });
+
+      // Test cache hits by re-converting recent colors
+      const recentColor = testColors[testColors.length - 10];
+      const cachedResult = HSLAtoRGB(recentColor);
+      expect(cachedResult).toEqual(results[results.length - 10]);
+    });
+  });
+
   describe("Drawing Performance", () => {
     test("should draw colors efficiently", () => {
       const mockTarget = createMockFBO();

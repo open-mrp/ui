@@ -26,6 +26,9 @@ let cachedBlendDst: number = 0;
 // Object pooling for splat data to reduce garbage collection - optimized structure
 const splatPool: BatchedSplatData[] = [];
 
+// Pre-allocated arrays for batched operations to avoid repeated allocations
+const preallocatedSplats: BatchedSplatData[] = new Array(50); // Maximum expected splats
+
 // Batch splat data for reduced GPU calls
 interface BatchedSplatData {
   x: number;
@@ -39,9 +42,14 @@ interface BatchedSplatData {
 
 // Pre-calculated constants to avoid repeated math
 const SPEED_THRESHOLD = 0.001;
+const SPEED_THRESHOLD_SQUARED = SPEED_THRESHOLD * SPEED_THRESHOLD;
 const SPEED_MULTIPLIER = 20;
 const MAX_TRAIL_SPLATS = 10;
 const POOL_SIZE_LIMIT = 50;
+
+// Pre-computed values for trail calculations
+const TRAIL_RADIUS_MULTIPLIER = 1.2;
+const TRAIL_FORCE_MULTIPLIER = 0.5;
 
 /**
  * Initialize splat and advection shaders
@@ -225,7 +233,7 @@ export const handlePointerSplatOptimized = (
     pointer.deltaX * pointer.deltaX + pointer.deltaY * pointer.deltaY;
 
   // Early exit for minimal movement (using squared comparison to avoid sqrt)
-  if (speedSquared < SPEED_THRESHOLD * SPEED_THRESHOLD) return;
+  if (speedSquared < SPEED_THRESHOLD_SQUARED) return;
 
   // Only calculate sqrt when needed
   const speed = Math.sqrt(speedSquared);
@@ -240,8 +248,8 @@ export const handlePointerSplatOptimized = (
     MAX_TRAIL_SPLATS
   );
 
-  // Pre-allocate array size
-  const splats: BatchedSplatData[] = new Array(numExtraSplats + 1);
+  // Use pre-allocated array to avoid repeated allocations
+  const totalSplats = numExtraSplats + 1;
   let splatIndex = 0;
 
   // Main splat
@@ -253,15 +261,15 @@ export const handlePointerSplatOptimized = (
   mainSplat.color = pointer.color;
   mainSplat.radius = dynamicRadius / 100.0;
   mainSplat.force = dynamicForce;
-  splats[splatIndex++] = mainSplat;
+  preallocatedSplats[splatIndex++] = mainSplat;
 
   // Trail splats (pre-computed) - optimize when numExtraSplats > 0
   if (numExtraSplats > 0) {
     const invNumPlusOne = 1 / (numExtraSplats + 1); // Avoid repeated division
     const deltaX = (pointer.texcoordX - pointer.prevTexcoordX) * invNumPlusOne;
     const deltaY = (pointer.texcoordY - pointer.prevTexcoordY) * invNumPlusOne;
-    const trailRadius = (dynamicRadius * 1.2) / 100.0;
-    const trailForce = dynamicForce * 0.5;
+    const trailRadius = (dynamicRadius * TRAIL_RADIUS_MULTIPLIER) / 100.0;
+    const trailForce = dynamicForce * TRAIL_FORCE_MULTIPLIER;
 
     // Pre-calculate base position
     let currentX = pointer.prevTexcoordX;
@@ -279,16 +287,17 @@ export const handlePointerSplatOptimized = (
       trailSplat.color = pointer.color;
       trailSplat.radius = trailRadius;
       trailSplat.force = trailForce;
-      splats[splatIndex++] = trailSplat;
+      preallocatedSplats[splatIndex++] = trailSplat;
     }
   }
 
-  // Apply all splats in batch
-  applyBatchedSplats(gl, splats, velocity, dye, canvas, splatProgram, blit);
+  // Apply all splats in batch - use slice only when necessary for API compatibility
+  const splatBatch = preallocatedSplats.slice(0, splatIndex);
+  applyBatchedSplats(gl, splatBatch, velocity, dye, canvas, splatProgram, blit);
 
   // Return objects to pool
   for (let i = 0; i < splatIndex; i++) {
-    returnSplatToPool(splats[i]);
+    returnSplatToPool(preallocatedSplats[i]);
   }
 };
 
@@ -365,8 +374,7 @@ export const multipleSplatsOptimized = (
 ): void => {
   if (amount === 0) return;
 
-  // Pre-allocate array
-  const splats: BatchedSplatData[] = new Array(amount);
+  // Use pre-allocated array to avoid allocation
   const baseRadius = config.SPLAT_RADIUS / 100.0;
   const baseForce = config.SPLAT_FORCE;
 
@@ -383,15 +391,16 @@ export const multipleSplatsOptimized = (
     splat.radius = baseRadius;
     splat.force = baseForce;
 
-    splats[i] = splat;
+    preallocatedSplats[i] = splat;
   }
 
-  // Apply all splats in batch
-  applyBatchedSplats(gl, splats, velocity, dye, canvas, splatProgram, blit);
+  // Apply all splats in batch - use slice only when necessary for API compatibility
+  const splatBatch = preallocatedSplats.slice(0, amount);
+  applyBatchedSplats(gl, splatBatch, velocity, dye, canvas, splatProgram, blit);
 
   // Return objects to pool
   for (let i = 0; i < amount; i++) {
-    returnSplatToPool(splats[i]);
+    returnSplatToPool(preallocatedSplats[i]);
   }
 };
 

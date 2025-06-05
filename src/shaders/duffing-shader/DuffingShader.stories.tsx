@@ -65,14 +65,6 @@ export const CustomColors: Story = {
     config: {
       BACK_COLOR: { r: 0.1, g: 0.1, b: 0.15 },
       COLOR_SCHEME: "dusk",
-      DUFFING: {
-        NUM_OSCILLATORS: 8,
-        DELTA: 0.2,
-        BETA: 0.08,
-        ALPHA: 0.9,
-        GAMMA: 0.8,
-        OMEGA: 0.4,
-      },
     },
   },
 };
@@ -96,14 +88,6 @@ export const HighPerformance: Story = {
       BLOOM_SOFT_KNEE: 0.7,
       SUNRAYS_RESOLUTION: 196,
       SUNRAYS_WEIGHT: 5.0,
-      DUFFING: {
-        NUM_OSCILLATORS: 8,
-        DELTA: 0.2,
-        BETA: 0.08,
-        ALPHA: 0.9,
-        GAMMA: 0.8,
-        OMEGA: 0.4,
-      },
     },
   },
 };
@@ -116,8 +100,6 @@ export const ChaoticOscillators: Story = {
       SPLAT_RADIUS: 0.2,
       SPLAT_FORCE: 700,
       BLOOM_INTENSITY: 0.01,
-      // BLOOM_THRESHOLD: 0.9,
-      // SUNRAYS_WEIGHT: 0.95,
       DUFFING: {
         NUM_OSCILLATORS: 4,
         DELTA: 0.2,
@@ -138,14 +120,6 @@ export const WithBottomSkew: Story = {
     skewDegree: 6,
     height: 300,
     config: {
-      // DENSITY_DISSIPATION: 1.5,
-      // VELOCITY_DISSIPATION: 0.95,
-      // CURL: 1.2,
-      // SPLAT_RADIUS: 0.2,
-      // SPLAT_FORCE: 700,
-      // BLOOM_INTENSITY: 0.05,
-      // BLOOM_THRESHOLD: 9.9,
-      // BLOOM_SOFT_KNEE: 0.7,
       SUNRAYS_WEIGHT: 0.5,
       DUFFING: {
         NUM_OSCILLATORS: 3,

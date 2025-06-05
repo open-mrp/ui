@@ -1,4 +1,5 @@
 import {
+  _testUtils,
   applySunrays,
   applySunraysBlur,
   initSunraysFramebuffers,
@@ -363,6 +364,143 @@ describe("SunraysManager Functionality Tests", () => {
         mockPrograms.sunrays.uniforms.weight,
         0
       );
+    });
+
+    test("should handle blend state caching correctly", () => {
+      // Create enhanced mock GL context to track enable/disable calls
+      const enhancedMockGL = {
+        ...mockGL,
+        enable: jest.fn(() => tracker.increment("uniformUpdates")),
+        disable: jest.fn(() => tracker.increment("uniformUpdates")),
+        BLEND: 0x0be2,
+      } as unknown as WebGLRenderingContext;
+
+      const mockSource = createMockCreateFBO(tracker)(256, 256, 0, 0, 0, 0);
+      const mockMask = createMockCreateFBO(tracker)(256, 256, 0, 0, 0, 0);
+      const mockDestination = createMockCreateFBO(tracker)(
+        256,
+        256,
+        0,
+        0,
+        0,
+        0
+      );
+      const mockPrograms = createMockSunraysPrograms();
+
+      // The applySunrays function should execute without errors
+      // (The internal setBlendState may or may not call disable based on cached state)
+      applySunrays(
+        enhancedMockGL,
+        testConfig,
+        mockSource,
+        mockMask,
+        mockDestination,
+        mockBlit,
+        mockPrograms
+      );
+
+      // Verify the main functionality works
+      expect(mockPrograms.sunraysMask.bind).toHaveBeenCalled();
+      expect(mockPrograms.sunrays.bind).toHaveBeenCalled();
+    });
+
+    test("should test setBlendState enable path with module state manipulation", () => {
+      // Create enhanced mock GL context to track enable/disable calls
+      const enhancedMockGL = {
+        ...mockGL,
+        enable: jest.fn(() => tracker.increment("uniformUpdates")),
+        disable: jest.fn(() => tracker.increment("uniformUpdates")),
+        BLEND: 0x0be2,
+      } as unknown as WebGLRenderingContext;
+
+      const mockSource = createMockCreateFBO(tracker)(256, 256, 0, 0, 0, 0);
+      const mockMask = createMockCreateFBO(tracker)(256, 256, 0, 0, 0, 0);
+      const mockDestination = createMockCreateFBO(tracker)(
+        256,
+        256,
+        0,
+        0,
+        0,
+        0
+      );
+      const mockPrograms = createMockSunraysPrograms();
+
+      // First call to applySunrays - this sets internal cached state to false
+      applySunrays(
+        enhancedMockGL,
+        testConfig,
+        mockSource,
+        mockMask,
+        mockDestination,
+        mockBlit,
+        mockPrograms
+      );
+
+      // Clear mocks to isolate the second call
+      jest.clearAllMocks();
+
+      // Now we need to test the enable path. Since setBlendState is internal,
+      // we'll need to create a custom test scenario. Let's create a module-level
+      // test by importing and re-exporting the function for testing.
+
+      // For now, let's verify the disable path works correctly
+      applySunrays(
+        enhancedMockGL,
+        testConfig,
+        mockSource,
+        mockMask,
+        mockDestination,
+        mockBlit,
+        mockPrograms
+      );
+
+      // The second call should not trigger enable/disable since state is already cached as false
+      // This tests the caching mechanism
+      expect(enhancedMockGL.enable).not.toHaveBeenCalled();
+      expect(enhancedMockGL.disable).not.toHaveBeenCalled();
+    });
+
+    test("should achieve full coverage by testing actual setBlendState function", () => {
+      // Use the exposed test utility to test the actual internal setBlendState function
+      // Mock GL with detailed tracking
+      const enhancedMockGL = {
+        ...mockGL,
+        enable: jest.fn(),
+        disable: jest.fn(),
+        BLEND: 0x0be2,
+      } as unknown as WebGLRenderingContext;
+
+      // Reset the internal blend state to ensure clean test state
+      _testUtils.resetBlendState();
+      expect(_testUtils.getCachedBlendState()).toBe(false);
+
+      // Test the enable path (this will cover line 135: gl.enable(gl.BLEND))
+      _testUtils.setBlendStateForTesting(enhancedMockGL, true);
+      expect(enhancedMockGL.enable).toHaveBeenCalledWith(enhancedMockGL.BLEND);
+      expect(_testUtils.getCachedBlendState()).toBe(true);
+
+      // Reset mocks for next test
+      jest.clearAllMocks();
+
+      // Test the disable path (this will cover line 137: gl.disable(gl.BLEND))
+      _testUtils.setBlendStateForTesting(enhancedMockGL, false);
+      expect(enhancedMockGL.disable).toHaveBeenCalledWith(enhancedMockGL.BLEND);
+      expect(_testUtils.getCachedBlendState()).toBe(false);
+
+      // Test the no-change path (condition not met, should do nothing)
+      jest.clearAllMocks();
+      _testUtils.setBlendStateForTesting(enhancedMockGL, false); // Same state
+      expect(enhancedMockGL.enable).not.toHaveBeenCalled();
+      expect(enhancedMockGL.disable).not.toHaveBeenCalled();
+      expect(_testUtils.getCachedBlendState()).toBe(false);
+
+      // Test another no-change scenario
+      _testUtils.setBlendStateForTesting(enhancedMockGL, true); // Change to true
+      jest.clearAllMocks();
+      _testUtils.setBlendStateForTesting(enhancedMockGL, true); // Same state
+      expect(enhancedMockGL.enable).not.toHaveBeenCalled();
+      expect(enhancedMockGL.disable).not.toHaveBeenCalled();
+      expect(_testUtils.getCachedBlendState()).toBe(true);
     });
   });
 

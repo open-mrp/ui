@@ -1,7 +1,7 @@
 "use client";
 
 import { useViewportWidth } from "@/hooks/useViewportWidth";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { colorConfigurations } from "../colorConfigurations";
 import { calculateShaderCanvasDimensions } from "../utils/calculateShaderCanvasDimensions";
 import { FluidRenderer } from "./FluidRenderer";
@@ -58,15 +58,35 @@ export function DuffingShader({
     return [minWidth, initialHeight];
   });
 
-  useEffect(() => {
-    if (viewportWidth) {
-      const [newWidth, newHeight] = calculateShaderCanvasDimensions(
-        { colorConfiguration, skew, minWidth, height: initialHeight },
-        viewportWidth
-      );
-      setDimensions([newWidth, newHeight]);
+  // Memoize merged config to avoid repeated object spreading
+  const mergedConfig = useMemo((): Config => {
+    if (!userConfig) return DEFAULT_CONFIG;
+
+    // Optimized merge without object spreading
+    const config = { ...DEFAULT_CONFIG };
+    Object.assign(config, userConfig);
+
+    // Handle nested DUFFING config specially to avoid deep merge issues
+    if (userConfig.DUFFING) {
+      config.DUFFING = { ...DEFAULT_CONFIG.DUFFING, ...userConfig.DUFFING };
     }
+
+    return config;
+  }, [userConfig]);
+
+  // Memoize dimension calculation to avoid repeated work
+  const calculatedDimensions = useMemo(() => {
+    if (!viewportWidth) return [minWidth, initialHeight];
+
+    return calculateShaderCanvasDimensions(
+      { colorConfiguration, skew, minWidth, height: initialHeight },
+      viewportWidth
+    );
   }, [viewportWidth, colorConfiguration, skew, minWidth, initialHeight]);
+
+  useEffect(() => {
+    setDimensions(calculatedDimensions);
+  }, [calculatedDimensions]);
 
   const [canvasWidth, canvasHeight] = dimensions;
 
@@ -79,27 +99,13 @@ export function DuffingShader({
     loadShaders();
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !shaders) return;
-
-    if (!colorConfigurations[colorConfiguration]) {
-      console.warn(`Color configuration "${colorConfiguration}" not found`);
-    }
-
-    // Merge default config with user config
-    const mergedConfig: Config = {
-      ...DEFAULT_CONFIG,
-      ...userConfig,
-    };
-
-    // Calculate boundaries based on skew
+  // Memoize boundary calculation to avoid repeated work
+  const boundaries = useMemo(() => {
     const skewRadians = (skewDegree * Math.PI) / 180;
     const skewAmount = Math.tan(skewRadians);
-    let boundaries;
 
     if (skew === "full") {
-      boundaries = {
+      return {
         botLeft: [-1, -1 - skewAmount] as [number, number],
         botRight: [1, -1 + skewAmount] as [number, number],
         topLeft: [-1, 1 - skewAmount] as [number, number],
@@ -107,19 +113,28 @@ export function DuffingShader({
       };
     } else if (skew === "bottom") {
       const rightEdgeY = (50 + skewDegree / 2) / 50 - 1;
-      boundaries = {
+      return {
         botLeft: [-1, -1] as [number, number],
         botRight: [1, rightEdgeY] as [number, number],
         topLeft: [-1, 1] as [number, number],
         topRight: [1, 1] as [number, number],
       };
     } else {
-      boundaries = {
+      return {
         botLeft: [-1, -1] as [number, number],
         botRight: [1, -1] as [number, number],
         topLeft: [-1, 1] as [number, number],
         topRight: [1, 1] as [number, number],
       };
+    }
+  }, [skew, skewDegree]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !shaders) return;
+
+    if (!colorConfigurations[colorConfiguration]) {
+      console.warn(`Color configuration "${colorConfiguration}" not found`);
     }
 
     // Initialize the FluidRenderer with the canvas and configuration
@@ -136,30 +151,25 @@ export function DuffingShader({
       rendererRef.current?.destroy();
       rendererRef.current = null;
     };
-  }, [colorConfiguration, userConfig, skew, skewDegree, shaders]);
+  }, [colorConfiguration, mergedConfig, skew, skewDegree, shaders]);
 
-  // Update renderer configuration when props change
+  // Update renderer configuration when props change - memoize to avoid unnecessary calls
   useEffect(() => {
     if (!rendererRef.current) return;
-
-    const mergedConfig: Config = {
-      ...DEFAULT_CONFIG,
-      ...userConfig,
-    };
-
     rendererRef.current.updateConfig(mergedConfig);
-  }, [colorConfiguration, userConfig]);
+  }, [mergedConfig]);
+
+  // Memoize resize handler to avoid recreation
+  const handleResize = useCallback(() => {
+    if (!canvasRef.current) return;
+    canvasRef.current.width = canvasWidth;
+    canvasRef.current.height = canvasHeight;
+    rendererRef.current?.updateSkew(skew, skewDegree);
+  }, [canvasWidth, canvasHeight, skew, skewDegree]);
 
   // Handle resize
   useEffect(() => {
     if (!rendererRef.current || !canvasRef.current) return;
-
-    const handleResize = () => {
-      if (!canvasRef.current) return;
-      canvasRef.current.width = canvasWidth;
-      canvasRef.current.height = canvasHeight;
-      rendererRef.current?.updateSkew(skew, skewDegree);
-    };
 
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -167,7 +177,7 @@ export function DuffingShader({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [canvasWidth, canvasHeight, skew, skewDegree]);
+  }, [handleResize]);
 
   return (
     <div

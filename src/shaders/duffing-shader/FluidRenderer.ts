@@ -88,6 +88,35 @@ export class FluidRenderer {
   private cachedCanvasHeight: number = 0;
   private cachedAspectRatio: number = 1;
 
+  // Pre-allocated objects for hot paths to avoid garbage collection
+  private cachedPhysicsPrograms!: PhysicsPrograms;
+  private readonly cachedVelocityTexelSize = { x: 0, y: 0 };
+  private readonly cachedBloomConfig = {
+    iterations: 0,
+    resolution: 0,
+    intensity: 0,
+    threshold: 0,
+    softKnee: 0,
+  };
+  private readonly cachedSunraysConfig = {
+    resolution: 0,
+    weight: 0,
+  };
+  private readonly cachedBloomPrograms = {
+    bloomPrefilter: null as any,
+    bloomBlur: null as any,
+    bloomFinal: null as any,
+  };
+  private readonly cachedSunraysPrograms = {
+    sunraysMask: null as any,
+    sunrays: null as any,
+    blur: null as any,
+  };
+  private readonly cachedSplatConfig = {
+    SPLAT_FORCE: 0,
+    SPLAT_RADIUS: 0,
+  };
+
   // FBOs
   private dye!: DyeFBO;
   private velocity!: VelocityFBO;
@@ -179,39 +208,8 @@ export class FluidRenderer {
     this.gl = gl;
     this.ext = ext;
 
-    // Calculate boundaries once and reuse
-    this.calculateBoundaries();
-
-    const vertices = new Float32Array([
-      ...this.boundaries.botLeft, // bottom left
-      ...this.boundaries.botRight, // bottom right
-      ...this.boundaries.topLeft, // top left
-      ...this.boundaries.topRight, // top right
-    ]);
-
-    const indices = new Uint16Array([
-      0,
-      1,
-      2, // first triangle
-      2,
-      1,
-      3, // second triangle
-    ]);
-
-    // Create and bind vertex array object (VAO)
-    const vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-    // Create and bind element array buffer
-    const elementBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-    // Enable vertex attributes
-    const vertexPosition = 0; // attribute location 0
-    gl.enableVertexAttribArray(vertexPosition);
-    gl.vertexAttribPointer(vertexPosition, 2, gl.FLOAT, false, 0, 0);
+    // Initialize geometry
+    this.initializeGeometry();
 
     // Initialize color scheme
     this.initColorScheme();
@@ -254,6 +252,9 @@ export class FluidRenderer {
     // Initialize display keywords
     this.updateKeywords();
 
+    // Initialize cached objects for hot paths
+    this.initializeCachedObjects();
+
     // Initialize oscillator data
     this.initializeOscillators();
 
@@ -262,6 +263,66 @@ export class FluidRenderer {
 
     // Start the animation loop
     this.update();
+  }
+
+  // Initialize geometry for rendering
+  private initializeGeometry(): void {
+    // Calculate boundaries once and reuse
+    this.calculateBoundaries();
+
+    const vertices = new Float32Array([
+      ...this.boundaries.botLeft, // bottom left
+      ...this.boundaries.botRight, // bottom right
+      ...this.boundaries.topLeft, // top left
+      ...this.boundaries.topRight, // top right
+    ]);
+
+    const indices = new Uint16Array([
+      0,
+      1,
+      2, // first triangle
+      2,
+      1,
+      3, // second triangle
+    ]);
+
+    // Create and bind vertex array object (VAO)
+    const vertexBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+
+    // Create and bind element array buffer
+    const elementBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, elementBuffer);
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      indices,
+      this.gl.STATIC_DRAW
+    );
+
+    // Enable vertex attributes
+    const vertexPosition = 0; // attribute location 0
+    this.gl.enableVertexAttribArray(vertexPosition);
+    this.gl.vertexAttribPointer(vertexPosition, 2, this.gl.FLOAT, false, 0, 0);
+  }
+
+  // Initialize cached objects for performance optimization
+  private initializeCachedObjects(): void {
+    this.cachedPhysicsPrograms = {
+      pressure: this.pressureProgram,
+      divergence: this.divergenceProgram,
+      curl: this.curlProgram,
+      vorticity: this.vorticityProgram,
+      gradientSubtract: this.gradienSubtractProgram,
+    };
+
+    this.cachedBloomPrograms.bloomPrefilter = this.bloomPrefilterProgram;
+    this.cachedBloomPrograms.bloomBlur = this.bloomBlurProgram;
+    this.cachedBloomPrograms.bloomFinal = this.bloomFinalProgram;
+
+    this.cachedSunraysPrograms.sunraysMask = this.sunraysMaskProgram;
+    this.cachedSunraysPrograms.sunrays = this.sunraysProgram;
+    this.cachedSunraysPrograms.blur = this.blurProgram;
   }
 
   // Extract boundary calculation logic to avoid duplication
@@ -300,33 +361,34 @@ export class FluidRenderer {
 
   // Separate oscillator initialization for cleaner code
   private initializeOscillators(): void {
+    const numOscillators = this.config.DUFFING.NUM_OSCILLATORS;
+
     // Pre-generate fixed colors for each oscillator
-    this.oscillatorColors = Array.from(
-      { length: this.config.DUFFING.NUM_OSCILLATORS },
-      () => getRandomColor()
-    );
+    this.oscillatorColors = new Array(numOscillators);
+    for (let i = 0; i < numOscillators; i++) {
+      this.oscillatorColors[i] = getRandomColor();
+    }
 
     // Initialize oscillators
-    this.oscillators = Array.from(
-      { length: this.config.DUFFING.NUM_OSCILLATORS },
-      (_, i) =>
-        new DuffingOscillator({
-          delta: this.config.DUFFING.DELTA,
-          beta: this.config.DUFFING.BETA,
-          alpha: this.config.DUFFING.ALPHA,
-          gamma: this.config.DUFFING.GAMMA,
-          omega: this.config.DUFFING.OMEGA,
-          index: i,
-          total: this.config.DUFFING.NUM_OSCILLATORS,
-          boundaries: this.boundaries,
-        })
-    );
+    this.oscillators = new Array(numOscillators);
+    for (let i = 0; i < numOscillators; i++) {
+      this.oscillators[i] = new DuffingOscillator({
+        delta: this.config.DUFFING.DELTA,
+        beta: this.config.DUFFING.BETA,
+        alpha: this.config.DUFFING.ALPHA,
+        gamma: this.config.DUFFING.GAMMA,
+        omega: this.config.DUFFING.OMEGA,
+        index: i,
+        total: numOscillators,
+        boundaries: this.boundaries,
+      });
+    }
 
     // Initialize previous positions for each oscillator
-    this.oscillatorPrevPositions = Array.from(
-      { length: this.config.DUFFING.NUM_OSCILLATORS },
-      () => ({ x: 0.5, y: 0.5 })
-    );
+    this.oscillatorPrevPositions = new Array(numOscillators);
+    for (let i = 0; i < numOscillators; i++) {
+      this.oscillatorPrevPositions[i] = { x: 0.5, y: 0.5 };
+    }
   }
 
   private initProgramsWithShaders(
@@ -605,27 +667,17 @@ export class FluidRenderer {
   private step(dt: number) {
     this.gl.disable(this.gl.BLEND);
 
-    const programs: PhysicsPrograms = {
-      pressure: this.pressureProgram,
-      divergence: this.divergenceProgram,
-      curl: this.curlProgram,
-      vorticity: this.vorticityProgram,
-      gradientSubtract: this.gradienSubtractProgram,
-    };
-
-    // Cache texel size to avoid repeated property access
-    const velocityTexelSize = {
-      x: this.velocity.texelSizeX,
-      y: this.velocity.texelSizeY,
-    };
+    // Update cached velocity texel size
+    this.cachedVelocityTexelSize.x = this.velocity.texelSizeX;
+    this.cachedVelocityTexelSize.y = this.velocity.texelSizeY;
 
     applyCurl(
       this.gl,
       this.velocity,
       this.curl,
-      programs,
+      this.cachedPhysicsPrograms,
       this.blit,
-      velocityTexelSize
+      this.cachedVelocityTexelSize
     );
     applyVorticity(
       this.gl,
@@ -633,17 +685,17 @@ export class FluidRenderer {
       dt,
       this.velocity,
       this.curl,
-      programs,
+      this.cachedPhysicsPrograms,
       this.blit,
-      velocityTexelSize
+      this.cachedVelocityTexelSize
     );
     applyDivergence(
       this.gl,
       this.velocity,
       this.divergence,
-      programs,
+      this.cachedPhysicsPrograms,
       this.blit,
-      velocityTexelSize
+      this.cachedVelocityTexelSize
     );
 
     this.clearProgram.bind();
@@ -661,17 +713,17 @@ export class FluidRenderer {
       this.pressure,
       this.divergence,
       this.velocity,
-      programs,
+      this.cachedPhysicsPrograms,
       this.blit,
-      velocityTexelSize
+      this.cachedVelocityTexelSize
     );
     applyGradientSubtract(
       this.gl,
       this.pressure,
       this.velocity,
-      programs,
+      this.cachedPhysicsPrograms,
       this.blit,
-      velocityTexelSize
+      this.cachedVelocityTexelSize
     );
 
     applyAdvection(
@@ -698,40 +750,34 @@ export class FluidRenderer {
   }
 
   private render(target: BaseFBO | null) {
+    // Update cached bloom config
+    this.cachedBloomConfig.iterations = this.config.BLOOM_ITERATIONS;
+    this.cachedBloomConfig.resolution = this.config.BLOOM_RESOLUTION;
+    this.cachedBloomConfig.intensity = this.config.BLOOM_INTENSITY;
+    this.cachedBloomConfig.threshold = this.config.BLOOM_THRESHOLD;
+    this.cachedBloomConfig.softKnee = this.config.BLOOM_SOFT_KNEE;
+
+    // Update cached sunrays config
+    this.cachedSunraysConfig.resolution = this.config.SUNRAYS_RESOLUTION;
+    this.cachedSunraysConfig.weight = this.config.SUNRAYS_WEIGHT;
+
     applyBloom(
       this.gl,
-      {
-        iterations: this.config.BLOOM_ITERATIONS,
-        resolution: this.config.BLOOM_RESOLUTION,
-        intensity: this.config.BLOOM_INTENSITY,
-        threshold: this.config.BLOOM_THRESHOLD,
-        softKnee: this.config.BLOOM_SOFT_KNEE,
-      },
+      this.cachedBloomConfig,
       this.dye.read,
       this.bloom,
       this.blit,
-      {
-        bloomPrefilter: this.bloomPrefilterProgram,
-        bloomBlur: this.bloomBlurProgram,
-        bloomFinal: this.bloomFinalProgram,
-      }
+      this.cachedBloomPrograms
     );
 
     applySunrays(
       this.gl,
-      {
-        resolution: this.config.SUNRAYS_RESOLUTION,
-        weight: this.config.SUNRAYS_WEIGHT,
-      },
+      this.cachedSunraysConfig,
       this.dye.read,
       this.dye.write,
       this.sunrays,
       this.blit,
-      {
-        sunraysMask: this.sunraysMaskProgram,
-        sunrays: this.sunraysProgram,
-        blur: this.blurProgram,
-      }
+      this.cachedSunraysPrograms
     );
 
     applySunraysBlur(
@@ -792,12 +838,13 @@ export class FluidRenderer {
   }
 
   private handleSplat(splatData: SplatData) {
+    // Update cached splat config
+    this.cachedSplatConfig.SPLAT_FORCE = this.config.SPLAT_FORCE;
+    this.cachedSplatConfig.SPLAT_RADIUS = this.config.SPLAT_RADIUS;
+
     handlePointerSplatOptimized(
       splatData,
-      {
-        SPLAT_FORCE: this.config.SPLAT_FORCE,
-        SPLAT_RADIUS: this.config.SPLAT_RADIUS,
-      },
+      this.cachedSplatConfig,
       this.gl,
       this.velocity,
       this.dye,
@@ -808,7 +855,8 @@ export class FluidRenderer {
   }
 
   public updateConfig(newConfig: Partial<Config>) {
-    this.config = { ...this.config, ...newConfig };
+    // Only update changed properties to avoid unnecessary spreading
+    Object.assign(this.config, newConfig);
 
     // Update color scheme and regenerate colors only if needed
     this.initColorScheme(this.config.COLOR_SCHEME);
@@ -818,19 +866,14 @@ export class FluidRenderer {
       newConfig.DUFFING?.NUM_OSCILLATORS &&
       newConfig.DUFFING.NUM_OSCILLATORS !== this.oscillators.length
     ) {
-      this.oscillatorColors = Array.from(
-        { length: this.config.DUFFING.NUM_OSCILLATORS },
-        () => getRandomColor()
-      );
-
       // Reinitialize oscillators with new count
       this.initializeOscillators();
     } else {
-      // Just regenerate colors for existing oscillators
-      this.oscillatorColors = Array.from(
-        { length: this.config.DUFFING.NUM_OSCILLATORS },
-        () => getRandomColor()
-      );
+      // Just regenerate colors for existing oscillators (optimized loop)
+      const numOscillators = this.config.DUFFING.NUM_OSCILLATORS;
+      for (let i = 0; i < numOscillators; i++) {
+        this.oscillatorColors[i] = getRandomColor();
+      }
     }
   }
 
@@ -1157,10 +1200,8 @@ export class FluidRenderer {
   }
 
   private updateKeywords() {
-    let displayKeywords = [];
-    displayKeywords.push("SHADING");
-    displayKeywords.push("BLOOM");
-    displayKeywords.push("SUNRAYS");
+    // Use static array instead of dynamic push operations
+    const displayKeywords = ["SHADING", "BLOOM", "SUNRAYS"];
     this.displayMaterial.setKeywords(displayKeywords);
   }
 

@@ -21,6 +21,9 @@ let sunraysFramebuffers: {
 // WebGL state caching to reduce redundant calls
 let cachedBlendEnabled: boolean = false;
 
+// Pre-allocated return object to avoid object creation
+let framebufferResult: { sunrays: BaseFBO; temp: BaseFBO } | null = null;
+
 /**
  * Initialize sunrays shaders
  * @param gl - WebGL context
@@ -109,11 +112,18 @@ export const initSunraysFramebuffers = (
     filtering
   );
 
-  // Return direct reference instead of object spread for better performance
-  return {
-    sunrays: sunraysFramebuffers.sunrays!,
-    temp: sunraysFramebuffers.temp!,
-  };
+  // Update cached return object instead of creating new one
+  if (!framebufferResult) {
+    framebufferResult = {
+      sunrays: sunraysFramebuffers.sunrays!,
+      temp: sunraysFramebuffers.temp!,
+    };
+  } else {
+    framebufferResult.sunrays = sunraysFramebuffers.sunrays!;
+    framebufferResult.temp = sunraysFramebuffers.temp!;
+  }
+
+  return framebufferResult;
 };
 
 /**
@@ -128,6 +138,25 @@ const setBlendState = (gl: WebGLRenderingContext, enabled: boolean): void => {
     }
     cachedBlendEnabled = enabled;
   }
+};
+
+/**
+ * Test utility function to manipulate internal blend state for coverage testing
+ * @internal - Only for testing purposes
+ */
+export const _testUtils = {
+  resetBlendState: (): void => {
+    cachedBlendEnabled = false;
+  },
+  setBlendStateForTesting: (
+    gl: WebGLRenderingContext,
+    enabled: boolean
+  ): void => {
+    setBlendState(gl, enabled);
+  },
+  getCachedBlendState: (): boolean => {
+    return cachedBlendEnabled;
+  },
 };
 
 /**
@@ -190,19 +219,34 @@ export const applySunraysBlur = (
 
   blurProgram.bind();
 
-  // Cache texel sizes to avoid repeated property access
+  // Cache texel sizes and uniform locations to avoid repeated property access
   const texelSizeX = target.texelSizeX;
   const texelSizeY = target.texelSizeY;
+  const texelSizeUniform = blurProgram.uniforms.texelSize;
+  const textureUniform = blurProgram.uniforms.uTexture;
 
-  for (let i = 0; i < iterations; i++) {
-    // Horizontal blur pass
-    gl.uniform2f(blurProgram.uniforms.texelSize, texelSizeX, 0.0);
-    gl.uniform1i(blurProgram.uniforms.uTexture, target.attach(0));
+  // Unroll the loop for common cases for better performance
+  if (iterations === 1) {
+    // Single iteration case - optimized
+    gl.uniform2f(texelSizeUniform, texelSizeX, 0.0);
+    gl.uniform1i(textureUniform, target.attach(0));
     blit(temp);
 
-    // Vertical blur pass
-    gl.uniform2f(blurProgram.uniforms.texelSize, 0.0, texelSizeY);
-    gl.uniform1i(blurProgram.uniforms.uTexture, temp.attach(0));
+    gl.uniform2f(texelSizeUniform, 0.0, texelSizeY);
+    gl.uniform1i(textureUniform, temp.attach(0));
     blit(target);
+  } else {
+    // Multiple iterations - optimized loop
+    for (let i = 0; i < iterations; i++) {
+      // Horizontal blur pass
+      gl.uniform2f(texelSizeUniform, texelSizeX, 0.0);
+      gl.uniform1i(textureUniform, target.attach(0));
+      blit(temp);
+
+      // Vertical blur pass
+      gl.uniform2f(texelSizeUniform, 0.0, texelSizeY);
+      gl.uniform1i(textureUniform, temp.attach(0));
+      blit(target);
+    }
   }
 };
