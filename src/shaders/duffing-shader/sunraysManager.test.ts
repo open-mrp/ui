@@ -5,7 +5,7 @@ import {
   initSunraysFramebuffers,
   initSunraysShaders,
 } from "./sunraysManager";
-import { BaseFBO, SunraysConfig, SunraysPrograms } from "./types";
+import type { BaseFBO, SunraysConfig, SunraysPrograms } from "./types";
 // Import actual shader sources
 import {
   blurShader,

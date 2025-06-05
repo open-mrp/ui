@@ -36,6 +36,7 @@ import {
 } from "./sunraysManager";
 import {
   AdvectionProgram,
+  BaseFBO,
   BloomPrograms,
   BlurProgram,
   Boundaries,
@@ -45,7 +46,6 @@ import {
   DivergenceFBO,
   DoubleFBO,
   DyeFBO,
-  FBO,
   PhysicsPrograms,
   ShaderUniforms,
   SplatData,
@@ -94,10 +94,10 @@ export class FluidRenderer {
   private divergence!: DivergenceFBO;
   private curl!: CurlFBO;
   private pressure!: DoubleFBO;
-  private bloom!: FBO;
-  private bloomFramebuffers: FBO[] = [];
-  private sunrays!: FBO;
-  private sunraysTemp!: FBO;
+  private bloom!: BaseFBO;
+  private bloomFramebuffers: BaseFBO[] = [];
+  private sunrays!: BaseFBO;
+  private sunraysTemp!: BaseFBO;
 
   // Programs
   private displayMaterial!: Material;
@@ -680,7 +680,7 @@ export class FluidRenderer {
     );
   }
 
-  private render(target: FBO | null) {
+  private render(target: BaseFBO | null) {
     applyBloom(
       this.gl,
       {
@@ -739,7 +739,7 @@ export class FluidRenderer {
     this.drawDisplay(target);
   }
 
-  private drawDisplay(target: FBO | null) {
+  private drawDisplay(target: BaseFBO | null) {
     const width = target == null ? this.gl.drawingBufferWidth : target.width;
     const height = target == null ? this.gl.drawingBufferHeight : target.height;
 
@@ -1023,7 +1023,7 @@ export class FluidRenderer {
     return keywordsString + source;
   }
 
-  private blit = (target: FBO | null, clear = false) => {
+  private blit = (target: BaseFBO | null, clear = false) => {
     if (target == null) {
       this.gl.viewport(
         0,
@@ -1293,7 +1293,7 @@ export class FluidRenderer {
     format: number,
     type: number,
     param: number
-  ): FBO {
+  ): BaseFBO {
     this.gl.activeTexture(this.gl.TEXTURE0);
     const texture = this.gl.createTexture();
     if (!texture) throw new Error("Failed to create texture");
@@ -1397,14 +1397,14 @@ export class FluidRenderer {
   }
 
   private resizeFBO(
-    target: FBO,
+    target: BaseFBO,
     w: number,
     h: number,
     internalFormat: number,
     format: number,
     type: number,
     param: number
-  ): FBO {
+  ): BaseFBO {
     let newFBO = this.createFBO(w, h, internalFormat, format, type, param);
     this.copyProgram.bind();
     this.gl.uniform1i(this.copyProgram.uniforms.uTexture, target.attach(0));

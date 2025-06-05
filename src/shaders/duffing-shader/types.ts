@@ -249,29 +249,6 @@ export interface ShaderUniforms {
   [key: string]: WebGLUniformLocation;
 }
 
-export interface FBO {
-  texture: WebGLTexture;
-  fbo: WebGLFramebuffer;
-  width: number;
-  height: number;
-  texelSizeX: number;
-  texelSizeY: number;
-  attach: (id: number) => number;
-}
-
-export interface DoubleFBO {
-  width: number;
-  height: number;
-  texelSizeX: number;
-  texelSizeY: number;
-  read: FBO;
-  write: FBO;
-  swap: () => void;
-  texture: WebGLTexture;
-  fbo: WebGLFramebuffer;
-  attach: (id: number) => number;
-}
-
 /**
  * Velocity framebuffer - stores fluid velocity field
  * Uses RG texture format where:
@@ -288,8 +265,8 @@ export interface VelocityFBO extends DoubleFBO {
  * Divergence framebuffer - stores velocity field divergence
  * Uses R texture format to store scalar divergence values
  */
-export interface DivergenceFBO extends FBO {
-  // Inherits all FBO properties
+export interface DivergenceFBO extends BaseFBO {
+  // Inherits all BaseFBO properties
   // Single channel (R) texture format
 }
 
@@ -297,8 +274,8 @@ export interface DivergenceFBO extends FBO {
  * Curl framebuffer - stores fluid vorticity
  * Uses R texture format to store scalar curl values
  */
-export interface CurlFBO extends FBO {
-  // Inherits all FBO properties
+export interface CurlFBO extends BaseFBO {
+  // Inherits all BaseFBO properties
   // Single channel (R) texture format
 }
 

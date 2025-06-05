@@ -5,7 +5,7 @@ import {
   initBloomFramebuffers,
   initBloomShaders,
 } from "./bloomManager";
-import { BaseFBO, BloomConfig, BloomPrograms } from "./types";
+import type { BaseFBO, BloomConfig, BloomPrograms } from "./types";
 // Import actual shader sources
 import {
   bloomBlurShader,

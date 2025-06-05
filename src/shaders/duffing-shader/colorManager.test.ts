@@ -5,7 +5,7 @@ import {
   initColorShaders,
   setColorScheme,
 } from "./colorManager";
-import { FBO, Program, RGBColor } from "./types";
+import type { BaseFBO, ColorProgram, RGBColor } from "./types";
 // Import shader sources exactly as colorManager does
 import { colorShader } from "./shaders";
 
@@ -60,7 +60,7 @@ const createMockCompileShader = (tracker: PerformanceTracker) =>
   });
 
 // Mock FBO
-const createMockFBO = (): FBO => ({
+const createMockFBO = (): BaseFBO => ({
   texture: { id: Math.random() },
   fbo: { id: Math.random() },
   width: 512,
@@ -71,7 +71,7 @@ const createMockFBO = (): FBO => ({
 });
 
 // Mock Program
-const createMockProgram = (): Program => ({
+const createMockProgram = (): ColorProgram => ({
   bind: jest.fn(),
   uniforms: {
     color: {} as WebGLUniformLocation,

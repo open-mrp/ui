@@ -6,7 +6,12 @@ import {
   applyVorticity,
   initPhysicsShaders,
 } from "./physicsManager";
-import { BaseFBO, DoubleFBO, PhysicsConfig, PhysicsPrograms } from "./types";
+import type {
+  BaseFBO,
+  DoubleFBO,
+  PhysicsConfig,
+  PhysicsPrograms,
+} from "./types";
 // Import actual shader sources
 import {
   curlShader,

@@ -1,4 +1,4 @@
-import { FragmentShader } from "../types";
+import type { FragmentShader } from "../types";
 import advectionShader from "./advectionShader.glsl";
 import baseVertexShader from "./baseVertexShader.glsl";
 import bloomBlurShader from "./bloomBlurShader.glsl";

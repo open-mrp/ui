@@ -9,7 +9,13 @@ import {
   multipleSplats,
   multipleSplatsOptimized,
 } from "./splatManager";
-import { DoubleFBO, RGBColor, SplatConfig, SplatProgram } from "./types";
+import type {
+  BaseFBO,
+  DoubleFBO,
+  RGBColor,
+  SplatConfig,
+  SplatProgram,
+} from "./types";
 
 // Performance tracking utilities
 class PerformanceTracker {
@@ -99,7 +105,7 @@ const createMockCanvas = () =>
   } as unknown as HTMLCanvasElement);
 
 // Mock FBO
-const createMockFBO = (tracker: PerformanceTracker) => {
+const createMockFBO = (tracker: PerformanceTracker): BaseFBO => {
   const texture = { id: Math.random() };
   return {
     texture,
@@ -692,14 +698,12 @@ describe("SplatManager Integration", () => {
 
     // First call should be for splat shader (no keywords)
     expect(firstCall[0]).toBe(mockGL.FRAGMENT_SHADER);
-    expect(typeof firstCall[1]).toBe("object");
-    expect(firstCall[1]).toHaveProperty("process");
+    expect(typeof firstCall[1]).toBe("string");
     expect(firstCall[2]).toBeUndefined();
 
     // Second call should be for advection shader (with MANUAL_FILTERING)
     expect(secondCall[0]).toBe(mockGL.FRAGMENT_SHADER);
-    expect(typeof secondCall[1]).toBe("object");
-    expect(secondCall[1]).toHaveProperty("process");
+    expect(typeof secondCall[1]).toBe("string");
     expect(secondCall[2]).toEqual(["MANUAL_FILTERING"]);
   });
 

@@ -4,7 +4,7 @@ import {
   colorConfigurations,
 } from "../colorConfigurations";
 import { colorShader as colorShaderSource } from "./shaders";
-import { FBO, HSLAColor, Program, RGBColor } from "./types";
+import { BaseFBO, ColorProgram, HSLAColor, RGBColor } from "./types";
 
 // Internal state for color management
 let currentScheme: ColorConfiguration = "default";
@@ -152,10 +152,10 @@ export const initColorShaders = (
  */
 export const drawColor = (
   gl: WebGLRenderingContext,
-  target: FBO | null,
+  target: BaseFBO | null,
   color: RGBColor,
-  colorProgram: Program,
-  blit: (target: FBO | null) => void
+  colorProgram: ColorProgram,
+  blit: (target: BaseFBO | null) => void
 ): void => {
   colorProgram.bind();
   gl.uniform4f(colorProgram.uniforms.color, color.r, color.g, color.b, 1);
