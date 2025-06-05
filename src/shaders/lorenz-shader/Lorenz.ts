@@ -33,9 +33,6 @@ export class Lorenz {
   public tail_length: Float32Array = new Float32Array(0);
   public program!: LorenzWebGLProgram;
   public frame = 0;
-  public fps = 0;
-  public accum = 0;
-  public second = Math.floor(Date.now() / 1000);
   public ready = false;
   private startTime = Date.now(); // For oscillation timing
   private customColors?: RGBColor[]; // Updated type to RGBColor
@@ -435,15 +432,6 @@ export class Lorenz {
     this.display.rotation[2] += this.display.rotationd[2];
 
     this.frame++;
-    const second = Math.floor(Date.now() / 1000);
-    if (second !== this.second) {
-      this.fps = this.accum;
-      this.accum = 1;
-      this.second = second;
-    } else {
-      this.accum++;
-    }
-
     return this;
   }
 

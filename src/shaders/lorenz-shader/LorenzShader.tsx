@@ -12,7 +12,6 @@ export function LorenzShader({
   maintainHeight,
   className = "",
   onSolutionCountChange,
-  onFpsChange,
   initialParams,
   initialDisplay,
   particleCount = 12,
@@ -157,9 +156,6 @@ export function LorenzShader({
       if (lorenzRef.current) {
         lorenzRef.current.step();
         lorenzRef.current.draw();
-
-        // Update FPS callback
-        onFpsChange?.(lorenzRef.current.fps);
       }
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -171,7 +167,7 @@ export function LorenzShader({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isInitialized, onFpsChange]);
+  }, [isInitialized]);
 
   // Cleanup
   useEffect(() => {
