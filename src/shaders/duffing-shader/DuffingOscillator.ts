@@ -90,10 +90,11 @@ export class DuffingOscillator {
     // Calculate base position once during construction
     this.calculateBasePosition();
 
-    // Initialize with small random velocities for more chaotic initial conditions
-    const randSpeed = 0.02;
-    this.dx = (Math.random() - 0.5) * randSpeed;
-    this.dy = (Math.random() - 0.5) * randSpeed;
+    // Initialize velocities based on position in circle for more consistent behavior
+    const baseSpeed = 0.02;
+    const angle = this.phaseOffset;
+    this.dx = Math.cos(angle) * baseSpeed;
+    this.dy = Math.sin(angle) * baseSpeed;
   }
 
   // Extract common position calculation logic
