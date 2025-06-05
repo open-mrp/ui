@@ -15,7 +15,7 @@ let currentColorIndex: number = 0;
  * Parse HSLA color string into HSLAColor object
  * @param hslaStr - HSLA color string (e.g., "hsla(360, 100%, 50%, 1)" or "hsl(360deg, 100%, 50%)")
  */
-const parseHSLA = (hslaStr: string): HSLAColor => {
+export const parseHSLA = (hslaStr: string): HSLAColor => {
   // Handle both hsl and hsla, with optional deg suffix and flexible spacing
   const matches = hslaStr.match(
     /hsla?\((\d+)(?:deg)?\s*,?\s*(\d+)%?\s*,?\s*(\d+)%?\s*,?\s*(\d*\.?\d*)?\)/
@@ -35,7 +35,7 @@ const parseHSLA = (hslaStr: string): HSLAColor => {
  * Convert HSLA to RGB color
  * @param hsla - HSLA color object or string
  */
-const HSLAtoRGB = (hsla: HSLAColor | string): RGBColor => {
+export const HSLAtoRGB = (hsla: HSLAColor | string): RGBColor => {
   const color = typeof hsla === "string" ? parseHSLA(hsla) : hsla;
   const h = color.h / 360;
   const s = color.s / 100;
@@ -69,7 +69,7 @@ const HSLAtoRGB = (hsla: HSLAColor | string): RGBColor => {
  * Convert a gradient array of HSLA strings to RGB colors
  * @param gradient - Array of HSLA color strings
  */
-const gradientToRGB = (gradient: string[]): RGBColor[] => {
+export const gradientToRGB = (gradient: string[]): RGBColor[] => {
   return gradient.map(HSLAtoRGB);
 };
 
@@ -80,7 +80,7 @@ const gradientToRGB = (gradient: string[]): RGBColor[] => {
  * @param v - Value/Brightness (0-1)
  * @returns RGB color object
  */
-const HSVtoRGB = (h: number, s: number, v: number): RGBColor => {
+export const HSVtoRGB = (h: number, s: number, v: number): RGBColor => {
   const i: number = Math.floor(h * 6);
   const f: number = h * 6 - i;
   const p: number = v * (1 - s);

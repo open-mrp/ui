@@ -470,7 +470,10 @@ export const multipleSplats = (
 /**
  * Correct delta X based on aspect ratio
  */
-const correctDeltaX = (delta: number, canvas: HTMLCanvasElement): number => {
+export const correctDeltaX = (
+  delta: number,
+  canvas: HTMLCanvasElement
+): number => {
   const aspectRatio = canvas.width / canvas.height;
   if (aspectRatio < 1) delta *= aspectRatio;
   return delta;
@@ -479,7 +482,10 @@ const correctDeltaX = (delta: number, canvas: HTMLCanvasElement): number => {
 /**
  * Correct delta Y based on aspect ratio
  */
-const correctDeltaY = (delta: number, canvas: HTMLCanvasElement): number => {
+export const correctDeltaY = (
+  delta: number,
+  canvas: HTMLCanvasElement
+): number => {
   const aspectRatio = canvas.width / canvas.height;
   if (aspectRatio > 1) delta /= aspectRatio;
   return delta;
