@@ -23,9 +23,8 @@ let cachedBlendEnabled: boolean = false;
 let cachedBlendSrc: number = 0;
 let cachedBlendDst: number = 0;
 
-// Object pooling for splat data to reduce garbage collection
+// Object pooling for splat data to reduce garbage collection - optimized structure
 const splatPool: BatchedSplatData[] = [];
-const pooledSplats: BatchedSplatData[] = [];
 
 // Batch splat data for reduced GPU calls
 interface BatchedSplatData {
@@ -38,8 +37,11 @@ interface BatchedSplatData {
   force: number;
 }
 
-let velocitySplatBatch: BatchedSplatData[] = [];
-let dyeSplatBatch: BatchedSplatData[] = [];
+// Pre-calculated constants to avoid repeated math
+const SPEED_THRESHOLD = 0.001;
+const SPEED_MULTIPLIER = 20;
+const MAX_TRAIL_SPLATS = 10;
+const POOL_SIZE_LIMIT = 50;
 
 /**
  * Initialize splat and advection shaders
@@ -138,38 +140,7 @@ export const applySplatOptimized = (
   dye.swap();
 };
 
-/**
- * Legacy splat application for compatibility
- */
-export const applySplat = (
-  gl: WebGLRenderingContext,
-  config: SplatConfig,
-  x: number,
-  y: number,
-  dx: number,
-  dy: number,
-  color: RGBColor,
-  velocity: DoubleFBO,
-  dye: DoubleFBO,
-  canvas: HTMLCanvasElement,
-  splatProgram: SplatProgram,
-  blit: (target: BaseFBO | null) => void
-): void => {
-  applySplatOptimized(
-    gl,
-    config,
-    x,
-    y,
-    dx,
-    dy,
-    color,
-    velocity,
-    dye,
-    canvas,
-    splatProgram,
-    blit
-  );
-};
+// Removed unused applySplat function (dead code)
 
 /**
  * Batch multiple splats to reduce GPU state changes
@@ -249,23 +220,29 @@ export const handlePointerSplatOptimized = (
   splatProgram: SplatProgram,
   blit: (target: BaseFBO | null) => void
 ): void => {
-  // Calculate speed once
-  const speed = Math.sqrt(
-    pointer.deltaX * pointer.deltaX + pointer.deltaY * pointer.deltaY
-  );
+  // Pre-calculate speed squared to avoid sqrt when possible
+  const speedSquared =
+    pointer.deltaX * pointer.deltaX + pointer.deltaY * pointer.deltaY;
 
-  // Early exit for minimal movement
-  if (speed < 0.001) return;
+  // Early exit for minimal movement (using squared comparison to avoid sqrt)
+  if (speedSquared < SPEED_THRESHOLD * SPEED_THRESHOLD) return;
+
+  // Only calculate sqrt when needed
+  const speed = Math.sqrt(speedSquared);
 
   // Pre-compute scaling factors
   const dynamicRadius = config.SPLAT_RADIUS * (1.0 / (1 + speed * 10));
   const dynamicForce = config.SPLAT_FORCE * (1 + speed * 2);
 
   // Calculate number of trail splats (clamped for performance)
-  const numExtraSplats = Math.min(Math.floor(speed * 20), 10); // Clamp max trail length
+  const numExtraSplats = Math.min(
+    Math.floor(speed * SPEED_MULTIPLIER),
+    MAX_TRAIL_SPLATS
+  );
 
-  // Use pooled objects to reduce allocations
-  const splats: BatchedSplatData[] = [];
+  // Pre-allocate array size
+  const splats: BatchedSplatData[] = new Array(numExtraSplats + 1);
+  let splatIndex = 0;
 
   // Main splat
   const mainSplat = getPooledSplat();
@@ -276,27 +253,33 @@ export const handlePointerSplatOptimized = (
   mainSplat.color = pointer.color;
   mainSplat.radius = dynamicRadius / 100.0;
   mainSplat.force = dynamicForce;
-  splats.push(mainSplat);
+  splats[splatIndex++] = mainSplat;
 
-  // Trail splats (pre-computed)
+  // Trail splats (pre-computed) - optimize when numExtraSplats > 0
   if (numExtraSplats > 0) {
-    const deltaX =
-      (pointer.texcoordX - pointer.prevTexcoordX) / (numExtraSplats + 1);
-    const deltaY =
-      (pointer.texcoordY - pointer.prevTexcoordY) / (numExtraSplats + 1);
+    const invNumPlusOne = 1 / (numExtraSplats + 1); // Avoid repeated division
+    const deltaX = (pointer.texcoordX - pointer.prevTexcoordX) * invNumPlusOne;
+    const deltaY = (pointer.texcoordY - pointer.prevTexcoordY) * invNumPlusOne;
     const trailRadius = (dynamicRadius * 1.2) / 100.0;
     const trailForce = dynamicForce * 0.5;
 
+    // Pre-calculate base position
+    let currentX = pointer.prevTexcoordX;
+    let currentY = pointer.prevTexcoordY;
+
     for (let i = 1; i <= numExtraSplats; i++) {
+      currentX += deltaX;
+      currentY += deltaY;
+
       const trailSplat = getPooledSplat();
-      trailSplat.x = pointer.prevTexcoordX + deltaX * i;
-      trailSplat.y = pointer.prevTexcoordY + deltaY * i;
+      trailSplat.x = currentX;
+      trailSplat.y = currentY;
       trailSplat.dx = pointer.deltaX;
       trailSplat.dy = pointer.deltaY;
       trailSplat.color = pointer.color;
       trailSplat.radius = trailRadius;
       trailSplat.force = trailForce;
-      splats.push(trailSplat);
+      splats[splatIndex++] = trailSplat;
     }
   }
 
@@ -304,43 +287,12 @@ export const handlePointerSplatOptimized = (
   applyBatchedSplats(gl, splats, velocity, dye, canvas, splatProgram, blit);
 
   // Return objects to pool
-  for (const splat of splats) {
-    returnSplatToPool(splat);
+  for (let i = 0; i < splatIndex; i++) {
+    returnSplatToPool(splats[i]);
   }
 };
 
-/**
- * Legacy pointer splat handler for compatibility
- */
-export const handlePointerSplat = (
-  pointer: {
-    deltaX: number;
-    deltaY: number;
-    texcoordX: number;
-    texcoordY: number;
-    prevTexcoordX: number;
-    prevTexcoordY: number;
-    color: RGBColor;
-  },
-  config: SplatConfig,
-  gl: WebGLRenderingContext,
-  velocity: DoubleFBO,
-  dye: DoubleFBO,
-  canvas: HTMLCanvasElement,
-  splatProgram: SplatProgram,
-  blit: (target: BaseFBO | null) => void
-): void => {
-  handlePointerSplatOptimized(
-    pointer,
-    config,
-    gl,
-    velocity,
-    dye,
-    canvas,
-    splatProgram,
-    blit
-  );
-};
+// Removed unused handlePointerSplat function (dead code)
 
 /**
  * Apply advection effect
@@ -413,7 +365,10 @@ export const multipleSplatsOptimized = (
 ): void => {
   if (amount === 0) return;
 
-  const splats: BatchedSplatData[] = [];
+  // Pre-allocate array
+  const splats: BatchedSplatData[] = new Array(amount);
+  const baseRadius = config.SPLAT_RADIUS / 100.0;
+  const baseForce = config.SPLAT_FORCE;
 
   // Pre-generate all splat data
   for (let i = 0; i < amount; i++) {
@@ -425,47 +380,22 @@ export const multipleSplatsOptimized = (
     splat.dx = 1000 * (Math.random() - 0.5);
     splat.dy = 1000 * (Math.random() - 0.5);
     splat.color = { r: color.r * 10.0, g: color.g * 10.0, b: color.b * 10.0 };
-    splat.radius = config.SPLAT_RADIUS / 100.0;
-    splat.force = config.SPLAT_FORCE;
+    splat.radius = baseRadius;
+    splat.force = baseForce;
 
-    splats.push(splat);
+    splats[i] = splat;
   }
 
   // Apply all splats in batch
   applyBatchedSplats(gl, splats, velocity, dye, canvas, splatProgram, blit);
 
   // Return objects to pool
-  for (const splat of splats) {
-    returnSplatToPool(splat);
+  for (let i = 0; i < amount; i++) {
+    returnSplatToPool(splats[i]);
   }
 };
 
-/**
- * Create multiple random splats (legacy version for compatibility)
- */
-export const multipleSplats = (
-  amount: number,
-  config: SplatConfig,
-  gl: WebGLRenderingContext,
-  velocity: DoubleFBO,
-  dye: DoubleFBO,
-  canvas: HTMLCanvasElement,
-  splatProgram: SplatProgram,
-  blit: (target: BaseFBO | null) => void,
-  getColorFromScheme: () => RGBColor
-): void => {
-  multipleSplatsOptimized(
-    amount,
-    config,
-    gl,
-    velocity,
-    dye,
-    canvas,
-    splatProgram,
-    blit,
-    getColorFromScheme
-  );
-};
+// Removed unused multipleSplats function (dead code)
 
 /**
  * Correct delta X based on aspect ratio
@@ -512,8 +442,7 @@ const getPooledSplat = (): BatchedSplatData => {
  * Return splat object to pool
  */
 const returnSplatToPool = (splat: BatchedSplatData): void => {
-  if (splatPool.length < 50) {
-    // Limit pool size
+  if (splatPool.length < POOL_SIZE_LIMIT) {
     splatPool.push(splat);
   }
 };
