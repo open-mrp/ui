@@ -1,12 +1,11 @@
 import {
   applyAdvection,
   applyBatchedSplats,
-  applySplat,
   applySplatOptimized,
-  handlePointerSplat,
+  correctDeltaX,
+  correctDeltaY,
   handlePointerSplatOptimized,
   initSplatShaders,
-  multipleSplats,
   multipleSplatsOptimized,
 } from "./splatManager";
 import type {
@@ -188,26 +187,7 @@ describe("SplatManager Performance Tests", () => {
   });
 
   describe("Single Splat Performance", () => {
-    test("should reduce GPU calls with optimized splat", () => {
-      tracker.reset();
-
-      // Test original implementation
-      applySplat(
-        mockGL,
-        testConfig,
-        0.5,
-        0.5,
-        10,
-        10,
-        testColor,
-        mockVelocity,
-        mockDye,
-        mockCanvas,
-        mockProgram,
-        mockBlit
-      );
-      const originalMetrics = tracker.getMetrics();
-
+    test("should perform optimized splat operations", () => {
       tracker.reset();
 
       // Test optimized implementation
@@ -225,13 +205,11 @@ describe("SplatManager Performance Tests", () => {
         mockProgram,
         mockBlit
       );
-      const optimizedMetrics = tracker.getMetrics();
+      const metrics = tracker.getMetrics();
 
-      // Both should have same number of operations since this is single splat
-      expect(optimizedMetrics.blitCalls).toBe(originalMetrics.blitCalls);
-      expect(optimizedMetrics.uniformUpdates).toBe(
-        originalMetrics.uniformUpdates
-      );
+      // Should perform expected operations
+      expect(metrics.blitCalls).toBe(2); // velocity + dye
+      expect(metrics.uniformUpdates).toBeGreaterThan(0);
     });
   });
 
@@ -246,25 +224,8 @@ describe("SplatManager Performance Tests", () => {
       color: testColor,
     });
 
-    test("should handle high-speed movement more efficiently", () => {
+    test("should handle high-speed movement efficiently", () => {
       const highSpeedPointer = createPointerData(50); // High speed = many trail splats
-
-      tracker.reset();
-      tracker.startTimer();
-
-      // Test original implementation
-      handlePointerSplat(
-        highSpeedPointer,
-        testConfig,
-        mockGL,
-        mockVelocity,
-        mockDye,
-        mockCanvas,
-        mockProgram,
-        mockBlit
-      );
-      tracker.endTimer();
-      const originalMetrics = tracker.getMetrics();
 
       tracker.reset();
       tracker.startTimer();
@@ -281,14 +242,11 @@ describe("SplatManager Performance Tests", () => {
         mockBlit
       );
       tracker.endTimer();
-      const optimizedMetrics = tracker.getMetrics();
+      const metrics = tracker.getMetrics();
 
-      // Both implementations should have similar performance in this mock environment
-      // The real benefits come from reduced GPU state changes in actual WebGL context
-      expect(optimizedMetrics.blitCalls).toBe(originalMetrics.blitCalls);
-
-      // In a real environment, optimized would be faster, but mocks don't show this
-      expect(optimizedMetrics.executionTime).toBeGreaterThan(0);
+      // Should handle high-speed movement with trails
+      expect(metrics.blitCalls).toBeGreaterThan(2); // More than just main splat
+      expect(metrics.executionTime).toBeGreaterThan(0);
     });
 
     test("should clamp excessive trail splats for performance", () => {
@@ -340,26 +298,8 @@ describe("SplatManager Performance Tests", () => {
   describe("Multiple Splats Performance", () => {
     const mockGetColor = jest.fn(() => testColor);
 
-    test("should significantly improve batched multiple splats", () => {
+    test("should handle batched multiple splats efficiently", () => {
       const splatCount = 20;
-
-      tracker.reset();
-      tracker.startTimer();
-
-      // Test original implementation
-      multipleSplats(
-        splatCount,
-        testConfig,
-        mockGL,
-        mockVelocity,
-        mockDye,
-        mockCanvas,
-        mockProgram,
-        mockBlit,
-        mockGetColor
-      );
-      tracker.endTimer();
-      const originalMetrics = tracker.getMetrics();
 
       tracker.reset();
       tracker.startTimer();
@@ -377,17 +317,12 @@ describe("SplatManager Performance Tests", () => {
         mockGetColor
       );
       tracker.endTimer();
-      const optimizedMetrics = tracker.getMetrics();
+      const metrics = tracker.getMetrics();
 
-      // Should have same visual output
-      expect(optimizedMetrics.blitCalls).toBe(originalMetrics.blitCalls);
-
-      // Both should complete successfully (performance gains are real-world only)
-      expect(optimizedMetrics.executionTime).toBeGreaterThan(0);
-      expect(originalMetrics.executionTime).toBeGreaterThan(0);
-
-      // In mocked environment, blend state changes might be similar
-      expect(optimizedMetrics.blendStateChanges).toBeGreaterThanOrEqual(0);
+      // Should handle multiple splats efficiently
+      expect(metrics.blitCalls).toBe(splatCount * 2); // Each splat × 2 fields (velocity + dye)
+      expect(metrics.executionTime).toBeGreaterThan(0);
+      expect(metrics.blendStateChanges).toBeGreaterThanOrEqual(0);
     });
 
     test("should handle zero splats gracefully", () => {
@@ -976,8 +911,6 @@ describe("SplatManager Integration", () => {
   });
 
   test("should test correctDeltaX and correctDeltaY functions directly", () => {
-    const { correctDeltaX, correctDeltaY } = require("./splatManager");
-
     // Test correctDeltaX with portrait canvas (aspect ratio < 1)
     const portraitCanvas = createMockCanvas();
     portraitCanvas.width = 400;
