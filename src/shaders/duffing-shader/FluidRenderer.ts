@@ -5,6 +5,7 @@ import { FragmentShader } from "./types";
 // Import managers for their functionality
 import {
   applyBloom,
+  clearBloomCache,
   initBloomFramebuffers,
   initBloomShaders,
 } from "./bloomManager";
@@ -788,6 +789,9 @@ export class FluidRenderer {
     );
     if (vertexBuffer) this.gl.deleteBuffer(vertexBuffer);
     if (elementBuffer) this.gl.deleteBuffer(elementBuffer);
+
+    // Clean up bloom cache
+    clearBloomCache();
 
     // Clean up WebGL resources
     this.gl.getExtension("WEBGL_lose_context")?.loseContext();

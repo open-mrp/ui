@@ -1,5 +1,6 @@
 import {
   applyBloom,
+  clearBloomCache,
   getBloomFramebuffers,
   initBloomFramebuffers,
   initBloomShaders,
@@ -163,6 +164,8 @@ describe("BloomManager Functionality Tests", () => {
   let mockBlit: jest.Mock;
 
   beforeEach(() => {
+    // Clear bloom cache before each test to ensure fresh state
+    clearBloomCache();
     tracker = new PerformanceTracker();
     mockGL = createMockWebGLContext(tracker);
     mockCompileShader = createMockCompileShader(tracker);
@@ -173,6 +176,8 @@ describe("BloomManager Functionality Tests", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    // Clear cache after each test for clean state
+    clearBloomCache();
   });
 
   describe("initBloomShaders", () => {
@@ -264,6 +269,9 @@ describe("BloomManager Functionality Tests", () => {
         supportLinearFiltering: false,
       };
 
+      // Clear cache to ensure fresh initialization
+      clearBloomCache();
+
       initBloomFramebuffers(
         mockGL,
         testConfig,
@@ -303,6 +311,25 @@ describe("BloomManager Functionality Tests", () => {
       );
 
       expect(Array.isArray(result)).toBe(true);
+    });
+
+    test("should handle edge case that triggers early break in mip generation", () => {
+      // Create a config that will trigger the early break condition (width < 2 || height < 2)
+      const tinyConfig = { ...testConfig, resolution: 4, iterations: 10 };
+
+      // Mock getResolution to return very small dimensions
+      const mockGetTinyResolution = jest.fn(() => ({ width: 4, height: 4 }));
+
+      const result = initBloomFramebuffers(
+        mockGL,
+        tinyConfig,
+        mockCreateFBO,
+        mockGetTinyResolution,
+        testExtensions
+      );
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(mockGetTinyResolution).toHaveBeenCalledWith(4);
     });
   });
 
@@ -521,6 +548,101 @@ describe("BloomManager Functionality Tests", () => {
       expect(result1.length).toBe(result2.length);
     });
   });
+
+  describe("clearBloomCache", () => {
+    test("should clear cached configuration and resolution", () => {
+      // Initialize framebuffers to set cache
+      initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      tracker.reset();
+
+      // Clear cache
+      clearBloomCache();
+
+      // Initialize again with same config - should recreate framebuffers
+      initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      const metrics = tracker.getMetrics();
+
+      // Should have created framebuffers again after cache clear
+      expect(metrics.framebufferCreations).toBeGreaterThan(0);
+    });
+
+    test("should force framebuffer recreation after cache clear", () => {
+      // Initialize with specific config
+      const initialConfig = { ...testConfig, resolution: 128 };
+      initBloomFramebuffers(
+        mockGL,
+        initialConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      // Clear cache
+      clearBloomCache();
+      tracker.reset();
+
+      // Initialize with same config - should recreate due to cache clear
+      initBloomFramebuffers(
+        mockGL,
+        initialConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      const metrics = tracker.getMetrics();
+      expect(metrics.framebufferCreations).toBeGreaterThan(0);
+    });
+
+    test("should work correctly with getBloomFramebuffers after cache clear", () => {
+      // Initialize framebuffers
+      initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      const framebuffersBeforeClear = getBloomFramebuffers();
+      expect(framebuffersBeforeClear.length).toBeGreaterThan(0);
+
+      // Clear cache
+      clearBloomCache();
+
+      // Should still return current framebuffers (cache clear doesn't destroy them)
+      const framebuffersAfterClear = getBloomFramebuffers();
+      expect(framebuffersAfterClear.length).toBe(
+        framebuffersBeforeClear.length
+      );
+
+      // Initialize again - should create new framebuffers
+      initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      const newFramebuffers = getBloomFramebuffers();
+      expect(newFramebuffers.length).toBeGreaterThan(0);
+    });
+  });
 });
 
 describe("BloomManager Performance Tests", () => {
@@ -532,6 +654,8 @@ describe("BloomManager Performance Tests", () => {
   let mockBlit: jest.Mock;
 
   beforeEach(() => {
+    // Clear bloom cache before each test to ensure fresh state
+    clearBloomCache();
     tracker = new PerformanceTracker();
     mockGL = createMockWebGLContext(tracker);
     mockCompileShader = createMockCompileShader(tracker);
@@ -542,6 +666,8 @@ describe("BloomManager Performance Tests", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    // Clear cache after each test for clean state
+    clearBloomCache();
   });
 
   describe("Initialization Performance", () => {
@@ -711,6 +837,92 @@ describe("BloomManager Performance Tests", () => {
       results.forEach((result) => {
         expect(result.time).toBeLessThan(15);
       });
+    });
+  });
+
+  describe("Caching Performance", () => {
+    test("should avoid recreating framebuffers when config unchanged", () => {
+      // Initialize framebuffers first time
+      initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      tracker.reset();
+
+      // Initialize again with same config - should not recreate
+      const result = initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      const metrics = tracker.getMetrics();
+
+      // Should not create new framebuffers due to caching
+      expect(metrics.framebufferCreations).toBe(0);
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    test("should recreate framebuffers when resolution changes", () => {
+      // Initialize with initial config
+      initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      tracker.reset();
+
+      // Change resolution
+      const newConfig = { ...testConfig, resolution: 512 };
+      initBloomFramebuffers(
+        mockGL,
+        newConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      const metrics = tracker.getMetrics();
+
+      // Should create new framebuffers due to resolution change
+      expect(metrics.framebufferCreations).toBeGreaterThan(0);
+    });
+
+    test("should recreate framebuffers when iterations change", () => {
+      // Initialize with initial config
+      initBloomFramebuffers(
+        mockGL,
+        testConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      tracker.reset();
+
+      // Change iterations
+      const newConfig = { ...testConfig, iterations: 4 };
+      initBloomFramebuffers(
+        mockGL,
+        newConfig,
+        mockCreateFBO,
+        mockGetResolution,
+        testExtensions
+      );
+
+      const metrics = tracker.getMetrics();
+
+      // Should create new framebuffers due to iterations change
+      expect(metrics.framebufferCreations).toBeGreaterThan(0);
     });
   });
 
