@@ -170,8 +170,7 @@ export class FluidRenderer {
     skewType?: "full" | "bottom",
     skewDegree: number = 6,
     shaders?: Record<string, FragmentShader>,
-    colorConfiguration: ColorConfiguration = "default",
-    backgroundColor?: { r: number; g: number; b: number }
+    colorConfiguration: ColorConfiguration = "default"
   ) {
     this.canvas = canvas;
     this.skewType = skewType;
@@ -188,7 +187,7 @@ export class FluidRenderer {
       CURL: 0.1,
       SPLAT_RADIUS: 0.005,
       SPLAT_FORCE: 8000,
-      BACK_COLOR: backgroundColor || { r: 0, g: 0, b: 0 },
+      BACK_COLOR: { r: 0, g: 0, b: 0 },
       BLOOM_ITERATIONS: 10,
       BLOOM_RESOLUTION: 256,
       BLOOM_INTENSITY: 0.15,

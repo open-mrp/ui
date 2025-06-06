@@ -60,9 +60,12 @@ export function DuffingShader({
 
   // Memoize merged config to avoid repeated object spreading
   const mergedConfig = useMemo((): Config => {
-    if (!userConfig) return DEFAULT_CONFIG;
+    if (!userConfig)
+      return {
+        ...DEFAULT_CONFIG,
+        BACK_COLOR: backgroundColor || DEFAULT_CONFIG.BACK_COLOR,
+      };
 
-    // Optimized merge without object spreading
     const config = { ...DEFAULT_CONFIG };
     Object.assign(config, userConfig);
 
@@ -71,8 +74,11 @@ export function DuffingShader({
       config.DUFFING = { ...DEFAULT_CONFIG.DUFFING, ...userConfig.DUFFING };
     }
 
+    // Set BACK_COLOR from backgroundColor prop if provided
+    if (backgroundColor) config.BACK_COLOR = backgroundColor;
+
     return config;
-  }, [userConfig]);
+  }, [userConfig, backgroundColor]);
 
   // Memoize dimension calculation to avoid repeated work
   const calculatedDimensions = useMemo(() => {
@@ -144,8 +150,7 @@ export function DuffingShader({
       skew,
       skewDegree,
       shaders,
-      colorConfiguration,
-      backgroundColor
+      colorConfiguration
     );
 
     // Clean up the renderer on unmount
@@ -153,14 +158,7 @@ export function DuffingShader({
       rendererRef.current?.destroy();
       rendererRef.current = null;
     };
-  }, [
-    colorConfiguration,
-    mergedConfig,
-    skew,
-    skewDegree,
-    shaders,
-    backgroundColor,
-  ]);
+  }, [colorConfiguration, mergedConfig, skew, skewDegree, shaders]);
 
   // Update renderer configuration when props change - memoize to avoid unnecessary calls
   useEffect(() => {

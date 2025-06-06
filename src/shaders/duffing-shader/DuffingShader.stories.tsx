@@ -67,7 +67,7 @@ export const CustomColors: Story = {
   args: {
     ...Default.args,
     colorConfiguration: "dusk",
-    backgroundColor: { r: 0.1, g: 0.1, b: 0.15 },
+    backgroundColor: { r: 0.3, g: 0.3, b: 0.35 },
   },
 };
 
