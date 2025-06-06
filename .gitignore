@@ -137,3 +137,7 @@ dist
 
 *storybook.log
 storybook-static
+
+# DS Store
+.DS_Store
+**/.DS_Store

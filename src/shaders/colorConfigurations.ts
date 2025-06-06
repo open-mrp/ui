@@ -18,7 +18,6 @@ export const colorConfigurations = {
       "hsl(55deg 100% 50%)", // Lime
     ],
   },
-
   fire: {
     gradient: [
       "hsla(31, 100%, 50%, 1)",
@@ -26,7 +25,6 @@ export const colorConfigurations = {
       "hsla(42, 100%, 56%, 1)",
     ],
   },
-
   red_to_purple: {
     gradient: [
       "hsla(333, 93%, 56%, 1)", // Rose
@@ -41,7 +39,6 @@ export const colorConfigurations = {
       "hsla(194, 85%, 62%, 1)", // Vivid Sky Blue
     ],
   },
-
   blue_to_yellow: {
     gradient: [
       "hsl(204deg 100% 22%)", // Deep navy
@@ -49,11 +46,10 @@ export const colorConfigurations = {
       "hsl(189deg 100% 32%)", // Turquoise
       "hsl(173deg 100% 33%)", // Teal
       "hsl(154deg 100% 39%)", // Emerald
-      "hsl( 89deg  70% 56%)", // Lime
-      "hsl( 55deg 100% 50%)", // Bright yellow
+      "hsl(89deg 70% 56%)", // Lime
+      "hsl(55deg 100% 50%)", // Bright yellow
     ],
   },
-
   red_to_blue: {
     gradient: [
       "hsl(0deg 100% 50%)", // Bright red
@@ -63,7 +59,6 @@ export const colorConfigurations = {
       "hsl(240deg 100% 50%)", // Blue
     ],
   },
-
   sunset: {
     gradient: [
       "hsl(200deg 100% 20%)", // Deep ocean blue
@@ -73,7 +68,6 @@ export const colorConfigurations = {
       "hsl(45deg 100% 60%)", // Golden yellow
     ],
   },
-
   blue_to_purple: {
     gradient: [
       "hsl(333deg 93% 56%)", // Rose
@@ -83,7 +77,6 @@ export const colorConfigurations = {
       "hsl(194deg 85% 62%)", // Vivid sky blue
     ],
   },
-
   blue_to_pink: {
     gradient: [
       "hsla(44, 100%, 52%, 1)", // Amber
@@ -93,13 +86,41 @@ export const colorConfigurations = {
       "hsla(217, 100%, 61%, 1)", // Azure
     ],
   },
-
   crazy: {
     gradient: [
       "hsla(43, 92%, 66%, 1)", // Golden yellow
       "hsla(355, 98%, 60%, 1)", // Red
       "hsla(281, 78%, 61%, 1)", // Purple
       "hsla(198, 99%, 78%, 1)", // Light blue
+    ],
+  },
+  dusk: {
+    gradient: [
+      "hsla(315, 20%, 45%, 1)", // Dusky madder violet
+      "hsla(228, 31%, 60%, 1)", // Deep lyons blue
+      "hsla(320, 100%, 68%, 1)", // Eosine pink
+      "hsla(25, 65%, 30%, 1)", // Hay's russe
+    ],
+  },
+  rosolane_to_helvetia: {
+    gradient: [
+      "hsla(207, 70%, 37%, 1)", // Helvetia blue
+      "hsla(288, 37%, 55%, 1)", // Rosolane purple
+    ],
+  },
+  organic: {
+    gradient: [
+      "hsl(147, 30%, 30%)", // Deep slate green
+      "hsl(48, 40%, 85%)", // Cream yellow
+      "hsl(270, 15%, 75%)", // Grayish lavender
+      "hsl(282, 60%, 40%)", // Cotinga purple
+    ],
+  },
+  trifecta: {
+    gradient: [
+      "hsla(216, 57%, 55%, 1)", // light glaucous blue
+      "hsla(288, 57%, 55%, 1)", // Rosolane purple
+      "hsla(21, 88%, 55%, 1)", // cinnamon rufous
     ],
   },
 };

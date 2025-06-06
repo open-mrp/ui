@@ -1,0 +1,204 @@
+// Color management utilities using functional programming
+import {
+  ColorConfiguration,
+  colorConfigurations,
+} from "../colorConfigurations";
+import { colorShader as colorShaderSource } from "./shaders";
+import { BaseFBO, ColorProgram, HSLAColor, RGBColor } from "./types";
+
+// Internal state for color management
+let currentScheme: ColorConfiguration = "default";
+let currentColors: RGBColor[] = [];
+let currentColorIndex: number = 0;
+
+// Pre-compiled regex for better performance
+const HSLA_REGEX =
+  /hsla?\((\d+)(?:deg)?\s*,?\s*(\d+)%?\s*,?\s*(\d+)%?\s*,?\s*(\d*\.?\d*)?\)/;
+
+// Cache for RGB conversions to avoid repeated calculations
+const rgbConversionCache = new Map<string, RGBColor>();
+const maxCacheSize = 100; // Limit cache size to prevent memory bloat
+
+// Pre-allocated objects for hot paths
+const cachedHSLAColor: HSLAColor = { h: 0, s: 0, l: 0, a: 1 };
+
+// Helper function for HSL to RGB conversion - moved outside to avoid redefinition
+const hue2rgb = (p: number, q: number, t: number): number => {
+  if (t < 0) t += 1;
+  if (t > 1) t -= 1;
+  if (t < 1 / 6) return p + (q - p) * 6 * t;
+  if (t < 1 / 2) return q;
+  if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+  return p;
+};
+
+/**
+ * Parse HSLA color string into HSLAColor object - optimized with caching
+ * @param hslaStr - HSLA color string (e.g., "hsla(360, 100%, 50%, 1)" or "hsl(360deg, 100%, 50%)")
+ */
+export const parseHSLA = (hslaStr: string): HSLAColor => {
+  // Handle both hsl and hsla, with optional deg suffix and flexible spacing
+  const matches = hslaStr.match(HSLA_REGEX);
+  if (!matches) {
+    throw new Error(`Invalid HSLA string: ${hslaStr}`);
+  }
+
+  // Update cached object instead of creating new one
+  cachedHSLAColor.h = parseInt(matches[1], 10);
+  cachedHSLAColor.s = parseInt(matches[2], 10);
+  cachedHSLAColor.l = parseInt(matches[3], 10);
+  cachedHSLAColor.a = matches[4] ? parseFloat(matches[4]) : 1;
+
+  return cachedHSLAColor;
+};
+
+/**
+ * Convert HSLA to RGB color - optimized with caching
+ * @param hsla - HSLA color object or string
+ */
+export const HSLAtoRGB = (hsla: HSLAColor | string): RGBColor => {
+  // Check cache first for string inputs
+  if (typeof hsla === "string") {
+    if (rgbConversionCache.has(hsla)) {
+      return rgbConversionCache.get(hsla)!;
+    }
+  }
+
+  const color = typeof hsla === "string" ? parseHSLA(hsla) : hsla;
+  const h = color.h / 360;
+  const s = color.s / 100;
+  const l = color.l / 100;
+
+  let r: number, g: number, b: number;
+
+  if (s === 0) {
+    r = g = b = l;
+  } else {
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+
+  const result = { r, g, b };
+
+  // Cache result for string inputs
+  if (typeof hsla === "string") {
+    // Prevent cache from growing too large
+    if (rgbConversionCache.size >= maxCacheSize) {
+      const firstKey = rgbConversionCache.keys().next().value;
+      if (firstKey) {
+        rgbConversionCache.delete(firstKey);
+      }
+    }
+    rgbConversionCache.set(hsla, result);
+  }
+
+  return result;
+};
+
+/**
+ * Convert a gradient array of HSLA strings to RGB colors - optimized to reuse existing colors when possible
+ * @param gradient - Array of HSLA color strings
+ */
+export const gradientToRGB = (gradient: string[]): RGBColor[] => {
+  // Optimize for common case where gradient hasn't changed
+  const result = new Array(gradient.length);
+  for (let i = 0; i < gradient.length; i++) {
+    result[i] = HSLAtoRGB(gradient[i]);
+  }
+  return result;
+};
+
+/**
+ * Converts HSV color values to RGB
+ * @param h - Hue value (0-1)
+ * @param s - Saturation value (0-1)
+ * @param v - Value/Brightness (0-1)
+ * @returns RGB color object
+ */
+export const HSVtoRGB = (h: number, s: number, v: number): RGBColor => {
+  const i: number = Math.floor(h * 6);
+  const f: number = h * 6 - i;
+  const p: number = v * (1 - s);
+  const q: number = v * (1 - f * s);
+  const t: number = v * (1 - (1 - f) * s);
+
+  const colorMap: [number, number, number][] = [
+    [v, t, p],
+    [q, v, p],
+    [p, v, t],
+    [p, q, v],
+    [t, p, v],
+    [v, p, q],
+  ];
+
+  const [r, g, b] = colorMap[i % 6];
+
+  return { r, g, b };
+};
+
+/**
+ * Set the current color scheme and return the RGB colors - optimized to avoid array recreation
+ * @param scheme - Name of the color scheme to use
+ * @returns Array of RGB colors for the scheme
+ */
+export const setColorScheme = (
+  scheme: ColorConfiguration = "default"
+): RGBColor[] => {
+  if (!colorConfigurations[scheme]) {
+    console.warn(`Color scheme "${scheme}" not found, falling back to default`);
+    scheme = "default";
+  }
+
+  // Always update colors and reset index to maintain expected behavior
+  currentScheme = scheme;
+  currentColors = gradientToRGB(colorConfigurations[scheme].gradient);
+  currentColorIndex = 0; // Reset the index when changing schemes
+
+  return currentColors;
+};
+
+/**
+ * Get the next color from the current color scheme in sequence
+ * @returns RGB color object
+ */
+export const getRandomColor = (): RGBColor => {
+  if (currentColors.length === 0) {
+    setColorScheme(currentScheme);
+  }
+  const color = currentColors[currentColorIndex];
+  currentColorIndex = (currentColorIndex + 1) % currentColors.length;
+  return color;
+};
+
+/**
+ * Initialize color shaders
+ */
+export const initColorShaders = (
+  gl: WebGLRenderingContext,
+  baseVertexShader: WebGLShader,
+  compileShader: (type: number, source: string) => WebGLShader
+): { colorShader: WebGLShader } => {
+  const compiledColorShader = compileShader(
+    gl.FRAGMENT_SHADER,
+    colorShaderSource
+  );
+  return { colorShader: compiledColorShader };
+};
+
+/**
+ * Draw color
+ */
+export const drawColor = (
+  gl: WebGLRenderingContext,
+  target: BaseFBO | null,
+  color: RGBColor,
+  colorProgram: ColorProgram,
+  blit: (target: BaseFBO | null) => void
+): void => {
+  colorProgram.bind();
+  gl.uniform4f(colorProgram.uniforms.color, color.r, color.g, color.b, 1);
+  blit(target);
+};
