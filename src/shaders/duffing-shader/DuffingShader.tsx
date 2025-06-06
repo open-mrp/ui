@@ -99,8 +99,12 @@ export function DuffingShader({
   // Load shaders
   useEffect(() => {
     async function loadShaders() {
-      const loadedShaders = await getShaders();
-      setShaders(loadedShaders);
+      try {
+        const loadedShaders = await getShaders();
+        setShaders(loadedShaders);
+      } catch (error) {
+        console.error("Failed to load shaders:", error);
+      }
     }
     loadShaders();
   }, []);
