@@ -367,7 +367,6 @@ export interface DuffingShaderProps {
   colorConfiguration?: ColorConfiguration;
   backgroundColor?: { r: number; g: number; b: number };
 }
-
 export interface Boundaries {
   botLeft: [number, number];
   botRight: [number, number];

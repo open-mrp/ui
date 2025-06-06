@@ -633,12 +633,12 @@ describe("SplatManager Integration", () => {
 
     // First call should be for splat shader (no keywords)
     expect(firstCall[0]).toBe(mockGL.FRAGMENT_SHADER);
-    expect(typeof firstCall[1]).toBe("string");
+    expect(typeof firstCall[1]).toBe("object");
     expect(firstCall[2]).toBeUndefined();
 
     // Second call should be for advection shader (with MANUAL_FILTERING)
     expect(secondCall[0]).toBe(mockGL.FRAGMENT_SHADER);
-    expect(typeof secondCall[1]).toBe("string");
+    expect(typeof secondCall[1]).toBe("object");
     expect(secondCall[2]).toEqual(["MANUAL_FILTERING"]);
   });
 
