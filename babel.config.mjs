@@ -22,6 +22,6 @@ export default function (api) {
       ],
       ["inline-import", { extensions: [".glsl"] }],
     ],
-    ignore: ["**/*.test.tsx", "**/*.stories.tsx"],
+    ignore: ["**/*.test.tsx", "**/*.stories.tsx", "**/*.test.ts"],
   };
 }
