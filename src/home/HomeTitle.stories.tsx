@@ -24,7 +24,7 @@ const shaderDecorator = (Story: any) => (
   <div className="inline-block p-32 rounded-lg overflow-hidden relative">
     <div className="absolute inset-0">
       <WaveShader
-        colorConfiguration="default"
+        colorConfiguration="blue_to_yellow"
         height={600}
         width={400}
         animate={true}

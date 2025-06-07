@@ -132,16 +132,6 @@ float simplex_noise(vec2 v) {
   return 130.0 * dot(m, g);
 }
 
-// Wave parameters
-// const float WAVE1_Y = 0.45;
-// const float WAVE2_Y = 0.9;
-// const float WAVE1_HEIGHT = 0.195;
-// const float WAVE2_HEIGHT = 0.144;
-
-float get_x() {
-  return 900.0 + gl_FragCoord.x - u_w / 2.0;
-}
-
 // Various utility functions
 float smoothstep(float t) {
   return t * t * t * (t * (6.0 * t - 15.0) + 10.0);
@@ -162,9 +152,27 @@ float wave_alpha_part(float dist, float blur_fac, float t) {
   v = smoothstep(v);
   v = clamp(v, 0.008, 1.0);
   v *= 345.0;
-  float alpha = clamp(0.5 + dist / v, 0.0, 1.0);
-  alpha = smoothstep(alpha);
+
+  // Create a thin line by using a sharp falloff around the wave position
+  float line_width = 2.0; // Adjust this to control line thickness
+  float alpha = 1.0 - smoothstep(0.0, line_width, abs(dist));
+  alpha = pow(alpha, 2.0); // Sharpen the line
+
+  // Add glow effect
+  float glow_width = 20.0; // Width of the glow
+  float glow_intensity = 0.8; // Base glow intensity
+  float glow = 1.0 - smoothstep(0.0, glow_width, abs(dist));
+  glow = pow(glow, 1.5); // Soften the glow edges
+
+  // Mix the sharp line with the glow based on blur factor
+  float glow_mix = mix(0.2, 1.0, blur_fac); // Vary glow intensity
+  alpha = max(alpha, glow * glow_intensity * glow_mix);
+
   return alpha;
+}
+
+float get_x() {
+  return 900.0 + gl_FragCoord.x - u_w / 2.0;
 }
 
 float background_noise(float offset) {
@@ -237,11 +245,11 @@ float wave_alpha(float Y, float wave_height, float offset) {
     float t = 7 == 1 ? 0.5 : PART * float(i);
     sum += wave_alpha_part(dist, blur_fac, t) * PART;
   }
-  
-  // Add opacity variation based on wave position and time
-  float opacity = 0.5 + 0.3 * (sin(u_time * 0.5 + offset * 0.01) + 1.0) * 0.5;
-  opacity = clamp(opacity, 0.5, 0.8);
-  
+
+  // Increase opacity for more visible lines and glow
+  float opacity = 0.8 + 0.2 * (sin(u_time * 0.5 + offset * 0.01) + 1.0) * 0.5;
+  opacity = clamp(opacity, 0.8, 1.0);
+
   return sum * opacity;
 }
 
@@ -251,19 +259,92 @@ vec3 calc_color(float lightness) {
 }
 
 void main() {
-  float bg_lightness = background_noise(-192.4);
-  float w1_lightness = background_noise(273.3);
-  float w2_lightness = background_noise(623.1);
+  // Calculate wave parameters
+  float WAVE1_Y = 0.45 * u_h;
+  float WAVE1_HEIGHT = 0.195 * u_h;
+  float WAVE1_SPEED = 1.0;
+  float WAVE1_OFFSET = 112.5 * 48.75;
 
-  float WAVE1_Y = 0.45 * u_h, WAVE2_Y = 0.9 * u_h;
-  float WAVE1_HEIGHT = 0.195 * u_h, WAVE2_HEIGHT = 0.144 * u_h;
+  float WAVE2_Y = 0.9 * u_h;
+  float WAVE2_HEIGHT = 0.144 * u_h;
+  float WAVE2_SPEED = 1.2;
+  float WAVE2_OFFSET = 225.0 * 36.00;
 
-  float w1_alpha = wave_alpha(WAVE1_Y, WAVE1_HEIGHT, 112.5 * 48.75);
-  float w2_alpha = wave_alpha(WAVE2_Y, WAVE2_HEIGHT, 225.0 * 36.00);
+  float WAVE3_Y = 0.65 * u_h;
+  float WAVE3_HEIGHT = 0.165 * u_h;
+  float WAVE3_SPEED = 0.8;
+  float WAVE3_OFFSET = 337.5 * 42.50;
 
-  float lightness = bg_lightness;
-  lightness = lerp(lightness, w2_lightness, w2_alpha);
-  lightness = lerp(lightness, w1_lightness, w1_alpha);
+  float WAVE4_Y = 0.35 * u_h;
+  float WAVE4_HEIGHT = 0.185 * u_h;
+  float WAVE4_SPEED = 1.1;
+  float WAVE4_OFFSET = 450.0 * 39.25;
+
+  float WAVE5_Y = 0.75 * u_h;
+  float WAVE5_HEIGHT = 0.155 * u_h;
+  float WAVE5_SPEED = 0.9;
+  float WAVE5_OFFSET = 562.5 * 45.75;
+
+  float WAVE6_Y = 0.55 * u_h;
+  float WAVE6_HEIGHT = 0.175 * u_h;
+  float WAVE6_SPEED = 1.3;
+  float WAVE6_OFFSET = 675.0 * 33.50;
+
+  float WAVE7_Y = 0.85 * u_h;
+  float WAVE7_HEIGHT = 0.135 * u_h;
+  float WAVE7_SPEED = 0.7;
+  float WAVE7_OFFSET = 787.5 * 48.25;
+
+  float WAVE8_Y = 0.25 * u_h;
+  float WAVE8_HEIGHT = 0.205 * u_h;
+  float WAVE8_SPEED = 1.4;
+  float WAVE8_OFFSET = 900.0 * 30.75;
+
+  // Start with a dark background
+  float lightness = 0.0;
+
+  // Process each wave
+  float wave_lightness, wave_alpha_value;
+
+  // Wave 1
+  wave_lightness = 0.95; // Slightly brighter for glow effect
+  wave_alpha_value = wave_alpha(WAVE1_Y, WAVE1_HEIGHT, WAVE1_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+
+  // Wave 2
+  wave_lightness = 0.95;
+  wave_alpha_value = wave_alpha(WAVE2_Y, WAVE2_HEIGHT, WAVE2_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+
+  // Wave 3
+  wave_lightness = 0.95;
+  wave_alpha_value = wave_alpha(WAVE3_Y, WAVE3_HEIGHT, WAVE3_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+
+  // Wave 4
+  wave_lightness = 0.95;
+  wave_alpha_value = wave_alpha(WAVE4_Y, WAVE4_HEIGHT, WAVE4_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+
+  // Wave 5
+  wave_lightness = 0.95;
+  wave_alpha_value = wave_alpha(WAVE5_Y, WAVE5_HEIGHT, WAVE5_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+
+  // Wave 6
+  wave_lightness = 0.95;
+  wave_alpha_value = wave_alpha(WAVE6_Y, WAVE6_HEIGHT, WAVE6_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+
+  // Wave 7
+  wave_lightness = 0.95;
+  wave_alpha_value = wave_alpha(WAVE7_Y, WAVE7_HEIGHT, WAVE7_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+
+  // Wave 8
+  wave_lightness = 0.95;
+  wave_alpha_value = wave_alpha(WAVE8_Y, WAVE8_HEIGHT, WAVE8_OFFSET);
+  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   gl_FragColor = vec4(calc_color(lightness), 1.0);
 }
