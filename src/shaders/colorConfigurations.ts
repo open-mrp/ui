@@ -123,4 +123,13 @@ export const colorConfigurations = {
       "hsla(21, 88%, 55%, 1)", // cinnamon rufous
     ],
   },
+  electric_wave: {
+    gradient: [
+      "hsl(214, 100%, 31%)",
+      "hsl(182, 97%, 56%)",
+      // "hsl(179, 98%, 54%)",
+      // "hsl(182, 97%, 56%)",
+      // "hsl(214, 100%, 31%)",
+    ],
+  },
 };

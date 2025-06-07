@@ -33,7 +33,7 @@ export default function HomeTitle({ title, description }: HomeTitleProps) {
           style={{
             ...styles.title,
             position: "relative",
-            mixBlendMode: "color-burn",
+            mixBlendMode: "soft-light",
           }}
         >
           {title}
@@ -44,7 +44,7 @@ export default function HomeTitle({ title, description }: HomeTitleProps) {
           style={{
             ...styles.description,
             position: "relative",
-            mixBlendMode: "color-burn",
+            mixBlendMode: "soft-light",
           }}
         >
           {description}

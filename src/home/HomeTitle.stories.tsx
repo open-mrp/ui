@@ -24,10 +24,11 @@ const shaderDecorator = (Story: any) => (
   <div className="inline-block p-32 rounded-lg overflow-hidden relative">
     <div className="absolute inset-0">
       <WaveShader
-        colorConfiguration="default"
-        height={600}
+        colorConfiguration="electric_wave"
+        height={400}
         width={400}
         animate={true}
+        verticalScale={0.7}
       />
     </div>
     <div className="relative">

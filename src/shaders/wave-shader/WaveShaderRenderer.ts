@@ -35,13 +35,19 @@ export class WaveShaderRenderer {
     fragmentShader: string,
     colorConfig: ColorConfiguration,
     seed: number | undefined,
+    numWaves: number,
+    verticalScale: number
   ) {
     const gl = canvas.getContext("webgl", { premultipliedAlpha: false });
     if (!gl) {
       throw new Error("Failed to acquire WaveShader context");
     }
     this.gl = gl;
-    this.program = WaveShaderRenderer.createProgram(gl, vertexShader, fragmentShader);
+    this.program = WaveShaderRenderer.createProgram(
+      gl,
+      vertexShader,
+      fragmentShader
+    );
     this.positionBuffer = gl.createBuffer();
     this.gradientTexture = gl.createTexture();
     this.a_position = gl.getAttribLocation(this.program, "a_position");
@@ -54,15 +60,38 @@ export class WaveShaderRenderer {
       timeSpeed: 1,
     }));
 
-    WaveShaderRenderer.writeGradientToTexture(gl, colorConfig.gradient, this.gradientTexture, 1000, 2);
+    WaveShaderRenderer.writeGradientToTexture(
+      gl,
+      colorConfig.gradient,
+      this.gradientTexture,
+      1000,
+      2
+    );
 
-    gl.vertexAttribPointer(this.a_position, /* vec2 */ 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(
+      this.a_position,
+      /* vec2 */ 2,
+      gl.FLOAT,
+      false,
+      0,
+      0
+    );
     gl.useProgram(this.program);
+
+    // Set initial uniform values
+    gl.uniform1i(this.getUniformLocation("u_num_waves"), numWaves);
+    gl.uniform1f(this.getUniformLocation("u_vertical_scale"), verticalScale);
   }
 
   public setColorConfig(colorConfig: ColorConfiguration) {
     const { gl } = this;
-    WaveShaderRenderer.writeGradientToTexture(gl, colorConfig.gradient, this.gradientTexture, 1000, 2);
+    WaveShaderRenderer.writeGradientToTexture(
+      gl,
+      colorConfig.gradient,
+      this.gradientTexture,
+      1000,
+      2
+    );
   }
 
   public getSeed() {
@@ -101,7 +130,14 @@ export class WaveShaderRenderer {
     this.clear();
 
     // Draw 2 triangles forming quad
-    gl.vertexAttribPointer(this.a_position, /* vec2 */ 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(
+      this.a_position,
+      /* vec2 */ 2,
+      gl.FLOAT,
+      false,
+      0,
+      0
+    );
     gl.enableVertexAttribArray(this.a_position);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.drawArrays(gl.TRIANGLES, 0, this.positions().length / 2);
@@ -132,7 +168,11 @@ export class WaveShaderRenderer {
 
     // Place positions into buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positions()), gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(this.positions()),
+      gl.STATIC_DRAW
+    );
   }
 
   private getUniformLocation(key: string): WebGLUniformLocation | null {
@@ -163,7 +203,7 @@ export class WaveShaderRenderer {
     gradient: string[],
     texture: WebGLTexture | null,
     width: number,
-    height: number,
+    height: number
   ) {
     // Create canvas
     const canvas = document.createElement("canvas");
@@ -195,8 +235,10 @@ export class WaveShaderRenderer {
 
   private static createShader(
     gl: WebGLRenderingContext,
-    type: WebGLRenderingContext["VERTEX_SHADER"] | WebGLRenderingContext["FRAGMENT_SHADER"],
-    source: string,
+    type:
+      | WebGLRenderingContext["VERTEX_SHADER"]
+      | WebGLRenderingContext["FRAGMENT_SHADER"],
+    source: string
   ): WebGLShader {
     const shader = gl.createShader(type);
     if (!shader) {
@@ -217,14 +259,20 @@ export class WaveShaderRenderer {
   private static createProgram(
     gl: WebGLRenderingContext,
     vertexShader: string,
-    fragmentShader: string,
+    fragmentShader: string
   ) {
     const program = gl.createProgram();
     if (!program) {
       throw new Error("Failed to create program");
     }
-    gl.attachShader(program, this.createShader(gl, gl.VERTEX_SHADER, vertexShader));
-    gl.attachShader(program, this.createShader(gl, gl.FRAGMENT_SHADER, fragmentShader));
+    gl.attachShader(
+      program,
+      this.createShader(gl, gl.VERTEX_SHADER, vertexShader)
+    );
+    gl.attachShader(
+      program,
+      this.createShader(gl, gl.FRAGMENT_SHADER, fragmentShader)
+    );
     gl.linkProgram(program);
     const success = gl.getProgramParameter(program, gl.LINK_STATUS);
     if (success) {
