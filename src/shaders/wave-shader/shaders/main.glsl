@@ -157,17 +157,6 @@ float wave_alpha_part(float dist, float blur_fac, float t) {
   float line_width = 2.0; // Adjust this to control line thickness
   float alpha = 1.0 - smoothstep(0.0, line_width, abs(dist));
   alpha = pow(alpha, 2.0); // Sharpen the line
-
-  // Add glow effect
-  float glow_width = 20.0; // Width of the glow
-  float glow_intensity = 0.8; // Base glow intensity
-  float glow = 1.0 - smoothstep(0.0, glow_width, abs(dist));
-  glow = pow(glow, 1.5); // Soften the glow edges
-
-  // Mix the sharp line with the glow based on blur factor
-  float glow_mix = mix(0.2, 1.0, blur_fac); // Vary glow intensity
-  alpha = max(alpha, glow * glow_intensity * glow_mix);
-
   return alpha;
 }
 
@@ -246,7 +235,7 @@ float wave_alpha(float Y, float wave_height, float offset) {
     sum += wave_alpha_part(dist, blur_fac, t) * PART;
   }
 
-  // Increase opacity for more visible lines and glow
+  // Increase opacity for more visible lines
   float opacity = 0.8 + 0.2 * (sin(u_time * 0.5 + offset * 0.01) + 1.0) * 0.5;
   opacity = clamp(opacity, 0.8, 1.0);
 
@@ -307,42 +296,42 @@ void main() {
   float wave_lightness, wave_alpha_value;
 
   // Wave 1
-  wave_lightness = 0.95; // Slightly brighter for glow effect
+  wave_lightness = 0.9; // Bright wave lines
   wave_alpha_value = wave_alpha(WAVE1_Y, WAVE1_HEIGHT, WAVE1_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   // Wave 2
-  wave_lightness = 0.95;
+  wave_lightness = 0.9;
   wave_alpha_value = wave_alpha(WAVE2_Y, WAVE2_HEIGHT, WAVE2_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   // Wave 3
-  wave_lightness = 0.95;
+  wave_lightness = 0.9;
   wave_alpha_value = wave_alpha(WAVE3_Y, WAVE3_HEIGHT, WAVE3_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   // Wave 4
-  wave_lightness = 0.95;
+  wave_lightness = 0.9;
   wave_alpha_value = wave_alpha(WAVE4_Y, WAVE4_HEIGHT, WAVE4_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   // Wave 5
-  wave_lightness = 0.95;
+  wave_lightness = 0.9;
   wave_alpha_value = wave_alpha(WAVE5_Y, WAVE5_HEIGHT, WAVE5_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   // Wave 6
-  wave_lightness = 0.95;
+  wave_lightness = 0.9;
   wave_alpha_value = wave_alpha(WAVE6_Y, WAVE6_HEIGHT, WAVE6_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   // Wave 7
-  wave_lightness = 0.95;
+  wave_lightness = 0.9;
   wave_alpha_value = wave_alpha(WAVE7_Y, WAVE7_HEIGHT, WAVE7_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
   // Wave 8
-  wave_lightness = 0.95;
+  wave_lightness = 0.9;
   wave_alpha_value = wave_alpha(WAVE8_Y, WAVE8_HEIGHT, WAVE8_OFFSET);
   lightness = lerp(lightness, wave_lightness, wave_alpha_value);
 
