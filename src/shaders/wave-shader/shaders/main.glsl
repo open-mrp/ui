@@ -158,11 +158,11 @@ float wave_alpha_part(float dist, float blur_fac, float t) {
   float alpha = 1.0 - smoothstep(0.0, line_width, abs(dist));
   alpha = pow(alpha, 2.0);
 
-  // Add a softer glow effect
-  float glow_width = 20.0; // Increased from 12.0 to 20.0 for a bigger glow
+  // Add an extremely soft glow effect
+  float glow_width = 80.0; // Much wider glow area
   float glow_alpha = 1.0 - smoothstep(0.0, glow_width, abs(dist));
-  glow_alpha = pow(glow_alpha, 1.3); // Slightly softer falloff (1.5 -> 1.3)
-  glow_alpha *= 0.25; // Slightly reduced intensity to balance the larger size
+  glow_alpha = pow(glow_alpha, 0.5); // Extremely soft falloff for an almost imperceptible blend
+  glow_alpha *= 0.05; // Very subtle intensity
 
   // Combine the main line with the glow
   return max(alpha, glow_alpha);
