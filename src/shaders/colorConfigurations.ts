@@ -125,9 +125,11 @@ export const colorConfigurations = {
   },
   electric_wave: {
     gradient: [
-      "hsl(182deg, 97%, 56%)", // Electric blue
-      "hsl(260deg 100% 60%)", // Soft purple
-      "hsl(182deg, 97%, 56%)", // Electric blue
+      "hsl(214, 100%, 31%)",
+      "hsl(182, 97%, 56%)",
+      // "hsl(179, 98%, 54%)",
+      // "hsl(182, 97%, 56%)",
+      // "hsl(214, 100%, 31%)",
     ],
   },
 };

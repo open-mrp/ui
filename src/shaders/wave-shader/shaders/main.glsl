@@ -7,6 +7,10 @@ uniform sampler2D u_gradient;
 
 const float PI = 3.14159;
 
+float get_x() {
+  return 900.0 + gl_FragCoord.x - u_w / 2.0;
+}
+
 // Noise utility functions
 vec2 mod289(vec2 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -145,7 +149,7 @@ float ease_in(float x) {
   return 1.0 - cos((x * PI) * 0.5);
 }
 
-float wave_alpha_part(float dist, float blur_fac, float t) {
+float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float exp = mix(0.9, 1.2, t);
   float v = pow(blur_fac, exp);
   v = ease_in(v);
@@ -153,23 +157,61 @@ float wave_alpha_part(float dist, float blur_fac, float t) {
   v = clamp(v, 0.008, 1.0);
   v *= 345.0;
 
-  // Create the main line with a sharp falloff
   float line_width = 4.0;
-  float alpha = 1.0 - smoothstep(0.0, line_width, abs(dist));
+  float max_separation = 18.0;
+
+  float x_pos = get_x() * 0.001;
+  float time = u_time * 0.5;
+
+  // Add wave_offset to noise and time phase for uniqueness per wave
+  float noise1 = simplex_noise(vec2(x_pos * 0.6 + time * 0.2 + wave_offset, time * 0.1 + wave_offset)) * 0.5 + 0.5;
+  float noise2 = simplex_noise(vec2(x_pos * 0.5 - time * 0.25 + wave_offset, time * 0.15 + wave_offset * 1.3)) * 0.5 + 0.5;
+  float noise3 = simplex_noise(vec2(x_pos * 0.55 + time * 0.22 + wave_offset, time * 0.12 + wave_offset * 2.1)) * 0.5 + 0.5;
+
+  // Add twisting effect - only occurs occasionally
+  float twist_noise = simplex_noise(vec2(x_pos * 0.3 + time * 0.15 + wave_offset * 1.7, time * 0.2)) * 0.5 + 0.5;
+  float twist_threshold = 0.85; // Only twist occasionally
+  float twist_factor = smoothstep(twist_threshold, 1.0, twist_noise);
+
+  // Apply twisting effect to noise values
+  noise1 = mix(noise1, noise3, twist_factor * 0.5); // Subtle mixing between lines
+  noise3 = mix(noise3, noise1, twist_factor * 0.5);
+
+  float threshold = 0.7;
+  noise1 = smoothstep(threshold, 1.0, noise1);
+  noise2 = smoothstep(threshold, 1.0, noise2);
+  noise3 = smoothstep(threshold, 1.0, noise3);
+
+  float separation1 = max_separation * noise1;
+  float separation2 = max_separation * noise2;
+  float separation3 = max_separation * noise3;
+
+  // Add wave_offset to time_phase for unique animation per wave
+  float time_phase = sin(time * 0.2 + wave_offset) * 0.5 + 0.5;
+  separation1 *= time_phase;
+  separation2 *= (1.0 - time_phase);
+  separation3 *= time_phase * 0.5 + 0.5;
+
+  // Add slight vertical offset during twists
+  float vertical_offset = twist_factor * 4.0 * sin(time * 0.3 + wave_offset);
+
+  float line1_dist = dist + vertical_offset * 0.5;
+  float line2_dist = dist - separation2;
+  float line3_dist = dist + separation3 - vertical_offset * 0.5;
+
+  float alpha1 = 1.0 - smoothstep(0.0, line_width, abs(line1_dist));
+  float alpha2 = 1.0 - smoothstep(0.0, line_width, abs(line2_dist));
+  float alpha3 = 1.0 - smoothstep(0.0, line_width, abs(line3_dist));
+
+  float alpha = max(max(alpha1, alpha2), alpha3);
   alpha = pow(alpha, 2.0);
 
-  // Add an extremely soft glow effect
-  float glow_width = 80.0; // Much wider glow area
+  float glow_width = 80.0;
   float glow_alpha = 1.0 - smoothstep(0.0, glow_width, abs(dist));
-  glow_alpha = pow(glow_alpha, 0.5); // Extremely soft falloff for an almost imperceptible blend
-  glow_alpha *= 0.05; // Very subtle intensity
+  glow_alpha = pow(glow_alpha, 0.8);
+  glow_alpha *= 0.08;
 
-  // Combine the main line with the glow
   return max(alpha, glow_alpha);
-}
-
-float get_x() {
-  return 900.0 + gl_FragCoord.x - u_w / 2.0;
 }
 
 float background_noise(float offset) {
@@ -240,14 +282,13 @@ float wave_alpha(float Y, float wave_height, float offset) {
   float sum = 0.0;
   for(int i = 0; i < 7; i++) {
     float t = 7 == 1 ? 0.5 : PART * float(i);
-    sum += wave_alpha_part(dist, blur_fac, t) * PART;
+    sum += wave_alpha_part(dist, blur_fac, t, offset) * PART;
   }
 
   float min_opacity = 0.1;
   float max_opacity = 1.0;
 
-  // Add spatial variation to opacity
-  float x_pos = get_x() * 0.001; // Scale factor for x position
+  float x_pos = get_x() * 0.001;
   float time = u_time * 0.5;
   float opacity = min_opacity + max_opacity * (sin(time + x_pos + offset * 0.01) + max_opacity) * 0.5;
   opacity = clamp(opacity, min_opacity, max_opacity);
@@ -265,7 +306,7 @@ void main() {
   float lightness = 0.0;
 
   // Process waves using a loop
-  const int NUM_WAVES = 6;
+  const int NUM_WAVES = 12; // Doubled from 6 to 12
   for(int i = 0; i < NUM_WAVES; i++) {
     float t = float(i) / float(NUM_WAVES - 1);
 
@@ -278,6 +319,11 @@ void main() {
     // Process wave
     float wave_lightness = 0.9;
     float wave_alpha_value = wave_alpha(wave_y, wave_height, wave_offset);
+
+    // Reduce opacity for every other wave using step function
+    float opacity_multiplier = 1.0 - 0.5 * step(0.5, fract(float(i) * 0.5));
+    wave_alpha_value *= opacity_multiplier;
+
     lightness = lerp(lightness, wave_lightness, wave_alpha_value);
   }
 
