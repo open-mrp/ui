@@ -157,25 +157,15 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   v = clamp(v, 0.008, 1.0);
   v *= 345.0;
 
-  float line_width = 4.0;
-  float max_separation = 18.0;
+  float base_line_width = 4.0;
+  float max_separation = 12.0;
 
   float x_pos = get_x() * 0.001;
   float time = u_time * 0.5;
 
-  // Add wave_offset to noise and time phase for uniqueness per wave
   float noise1 = simplex_noise(vec2(x_pos * 0.6 + time * 0.2 + wave_offset, time * 0.1 + wave_offset)) * 0.5 + 0.5;
   float noise2 = simplex_noise(vec2(x_pos * 0.5 - time * 0.25 + wave_offset, time * 0.15 + wave_offset * 1.3)) * 0.5 + 0.5;
   float noise3 = simplex_noise(vec2(x_pos * 0.55 + time * 0.22 + wave_offset, time * 0.12 + wave_offset * 2.1)) * 0.5 + 0.5;
-
-  // Add twisting effect - only occurs occasionally
-  float twist_noise = simplex_noise(vec2(x_pos * 0.3 + time * 0.15 + wave_offset * 1.7, time * 0.2)) * 0.5 + 0.5;
-  float twist_threshold = 0.85; // Only twist occasionally
-  float twist_factor = smoothstep(twist_threshold, 1.0, twist_noise);
-
-  // Apply twisting effect to noise values
-  noise1 = mix(noise1, noise3, twist_factor * 0.5); // Subtle mixing between lines
-  noise3 = mix(noise3, noise1, twist_factor * 0.5);
 
   float threshold = 0.7;
   noise1 = smoothstep(threshold, 1.0, noise1);
@@ -186,18 +176,25 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float separation2 = max_separation * noise2;
   float separation3 = max_separation * noise3;
 
-  // Add wave_offset to time_phase for unique animation per wave
   float time_phase = sin(time * 0.2 + wave_offset) * 0.5 + 0.5;
   separation1 *= time_phase;
   separation2 *= (1.0 - time_phase);
   separation3 *= time_phase * 0.5 + 0.5;
 
-  // Add slight vertical offset during twists
-  float vertical_offset = twist_factor * 4.0 * sin(time * 0.3 + wave_offset);
-
-  float line1_dist = dist + vertical_offset * 0.5;
+  float line1_dist = dist;
   float line2_dist = dist - separation2;
-  float line3_dist = dist + separation3 - vertical_offset * 0.5;
+  float line3_dist = dist + separation3;
+
+  // Calculate wave opacity for this part
+  float min_opacity = 0.1;
+  float max_opacity = 1.0;
+  float wave_opacity = min_opacity + max_opacity * (sin(time + x_pos + wave_offset * 0.01) + max_opacity) * 0.5;
+  wave_opacity = clamp(wave_opacity, min_opacity, max_opacity);
+
+  // Adjust line width based on wave opacity, only when below 0.7
+  float blur_threshold = 0.7;
+  float blur_factor = smoothstep(blur_threshold, min_opacity, wave_opacity);
+  float line_width = mix(base_line_width, base_line_width * 2.0, blur_factor);
 
   float alpha1 = 1.0 - smoothstep(0.0, line_width, abs(line1_dist));
   float alpha2 = 1.0 - smoothstep(0.0, line_width, abs(line2_dist));
@@ -206,10 +203,15 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float alpha = max(max(alpha1, alpha2), alpha3);
   alpha = pow(alpha, 2.0);
 
-  float glow_width = 80.0;
+  // Calculate average separation between lines
+  float avg_separation = (abs(separation2) + abs(separation3)) * 0.5;
+  float separation_factor = 1.0 - smoothstep(0.0, max_separation * 0.3, avg_separation);
+
+  // Increase glow intensity when lines are close together
+  float glow_width = 120.0;
   float glow_alpha = 1.0 - smoothstep(0.0, glow_width, abs(dist));
-  glow_alpha = pow(glow_alpha, 0.8);
-  glow_alpha *= 0.08;
+  glow_alpha = pow(glow_alpha, 0.6);
+  glow_alpha *= 0.15 * (1.0 + separation_factor * 0.8);
 
   return max(alpha, glow_alpha);
 }
@@ -306,12 +308,12 @@ void main() {
   float lightness = 0.0;
 
   // Process waves using a loop
-  const int NUM_WAVES = 12; // Doubled from 6 to 12
+  const int NUM_WAVES = 12;
   for(int i = 0; i < NUM_WAVES; i++) {
     float t = float(i) / float(NUM_WAVES - 1);
 
     // Calculate wave parameters
-    float wave_y = mix(0.05, 0.85, t) * u_h;
+    float wave_y = mix(0.02, 0.95, t) * u_h;
     float wave_height = mix(0.09, 0.13, sin(t * PI * 0.5)) * u_h;
     float wave_speed = mix(0.7, 1.4, sin(t * PI * 0.375));
     float wave_offset = (112.5 + float(i) * 112.5) * mix(30.0, 48.0, sin(t * PI * 0.5));
