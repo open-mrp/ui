@@ -207,11 +207,17 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float avg_separation = (abs(separation2) + abs(separation3)) * 0.5;
   float separation_factor = 1.0 - smoothstep(0.0, max_separation * 0.3, avg_separation);
 
-  // Increase glow intensity when lines are close together
-  float glow_width = 120.0;
+  // Adjust glow based on wave opacity
+  float base_glow_width = 120.0;
+  float base_glow_intensity = 0.1;
+
+  // Make glow more diffuse and less intense when opacity is low
+  float glow_width = mix(base_glow_width * 1.5, base_glow_width, wave_opacity);
+  float glow_intensity = mix(base_glow_intensity * 0.8, base_glow_intensity, wave_opacity);
+
   float glow_alpha = 1.0 - smoothstep(0.0, glow_width, abs(dist));
   glow_alpha = pow(glow_alpha, 0.6);
-  glow_alpha *= 0.15 * (1.0 + separation_factor * 0.8);
+  glow_alpha *= glow_intensity * (1.0 + separation_factor * 0.6);
 
   return max(alpha, glow_alpha);
 }
@@ -308,7 +314,7 @@ void main() {
   float lightness = 0.0;
 
   // Process waves using a loop
-  const int NUM_WAVES = 12;
+  const int NUM_WAVES = 18;
   for(int i = 0; i < NUM_WAVES; i++) {
     float t = float(i) / float(NUM_WAVES - 1);
 

@@ -14,7 +14,7 @@ export default function HomeTextLayer({ children, style }: HomeTextLayerProps) {
         left: 0,
         userSelect: "none",
         pointerEvents: "none",
-        color: "#343434",
+        color: "#FFFFFF",
         ...style,
       }}
     >
