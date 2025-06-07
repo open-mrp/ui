@@ -66,6 +66,7 @@ export const Default: Story = {
     colorConfiguration: "default",
     height: 400,
     minWidth: 300,
+    verticalScale: 0.5,
   },
 };
 

@@ -10,4 +10,6 @@ export interface WaveShaderProps {
   height?: number;
   animate?: boolean;
   seed?: number;
+  numWaves?: number;
+  verticalScale?: number; // Scale factor for vertical space (0.0 to 1.0)
 }

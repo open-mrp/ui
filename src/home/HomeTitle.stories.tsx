@@ -25,9 +25,10 @@ const shaderDecorator = (Story: any) => (
     <div className="absolute inset-0">
       <WaveShader
         colorConfiguration="electric_wave"
-        height={600}
+        height={400}
         width={400}
         animate={true}
+        verticalScale={0.7}
       />
     </div>
     <div className="relative">
