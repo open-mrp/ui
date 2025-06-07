@@ -133,6 +133,13 @@ export const Dusk: Story = {
   },
 };
 
+export const ElectricWave: Story = {
+  args: {
+    ...Default.args,
+    colorConfiguration: "electric_wave",
+  },
+};
+
 export const RtH: Story = {
   args: {
     ...Default.args,

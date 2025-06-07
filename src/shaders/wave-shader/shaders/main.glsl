@@ -153,11 +153,19 @@ float wave_alpha_part(float dist, float blur_fac, float t) {
   v = clamp(v, 0.008, 1.0);
   v *= 345.0;
 
-  // Create a thin line by using a sharp falloff around the wave position
-  float line_width = 2.0; // Adjust this to control line thickness
+  // Create the main line with a sharp falloff
+  float line_width = 4.0;
   float alpha = 1.0 - smoothstep(0.0, line_width, abs(dist));
-  alpha = pow(alpha, 2.0); // Sharpen the line
-  return alpha;
+  alpha = pow(alpha, 2.0);
+
+  // Add a softer glow effect
+  float glow_width = 20.0; // Increased from 12.0 to 20.0 for a bigger glow
+  float glow_alpha = 1.0 - smoothstep(0.0, glow_width, abs(dist));
+  glow_alpha = pow(glow_alpha, 1.3); // Slightly softer falloff (1.5 -> 1.3)
+  glow_alpha *= 0.25; // Slightly reduced intensity to balance the larger size
+
+  // Combine the main line with the glow
+  return max(alpha, glow_alpha);
 }
 
 float get_x() {
@@ -185,13 +193,13 @@ float background_noise(float offset) {
 
 float wave_y_noise(float offset) {
   const float L = 0.000845;
-  const float S = 0.075;
-  const float F = 0.026;
+  const float S = 0.01875;
+  const float F = 0.0065;
 
-  float time = u_time * 0.5 + offset;
+  float time = u_time * 2.0 + offset;
   float x = get_x() * 0.000845;
   float y = time * S;
-  float x_shift = time * 0.026;
+  float x_shift = time * F;
 
   float sum = 0.0;
   sum += simplex_noise(vec2(x * 1.30 + x_shift, y * 0.54)) * 0.85;
@@ -237,8 +245,11 @@ float wave_alpha(float Y, float wave_height, float offset) {
 
   float min_opacity = 0.1;
   float max_opacity = 1.0;
-  // Increase opacity variation to allow waves to completely disappear
-  float opacity = min_opacity + max_opacity * (sin(u_time * 0.5 + offset * 0.01) + max_opacity) * 0.5;
+
+  // Add spatial variation to opacity
+  float x_pos = get_x() * 0.001; // Scale factor for x position
+  float time = u_time * 0.5;
+  float opacity = min_opacity + max_opacity * (sin(time + x_pos + offset * 0.01) + max_opacity) * 0.5;
   opacity = clamp(opacity, min_opacity, max_opacity);
 
   return sum * opacity;
@@ -250,92 +261,29 @@ vec3 calc_color(float lightness) {
 }
 
 void main() {
-  // Calculate wave parameters
-  float WAVE1_Y = 0.45 * u_h;
-  float WAVE1_HEIGHT = 0.195 * u_h;
-  float WAVE1_SPEED = 1.0;
-  float WAVE1_OFFSET = 112.5 * 48.75;
-
-  float WAVE2_Y = 0.9 * u_h;
-  float WAVE2_HEIGHT = 0.144 * u_h;
-  float WAVE2_SPEED = 1.2;
-  float WAVE2_OFFSET = 225.0 * 36.00;
-
-  float WAVE3_Y = 0.65 * u_h;
-  float WAVE3_HEIGHT = 0.165 * u_h;
-  float WAVE3_SPEED = 0.8;
-  float WAVE3_OFFSET = 337.5 * 42.50;
-
-  float WAVE4_Y = 0.35 * u_h;
-  float WAVE4_HEIGHT = 0.185 * u_h;
-  float WAVE4_SPEED = 1.1;
-  float WAVE4_OFFSET = 450.0 * 39.25;
-
-  float WAVE5_Y = 0.75 * u_h;
-  float WAVE5_HEIGHT = 0.155 * u_h;
-  float WAVE5_SPEED = 0.9;
-  float WAVE5_OFFSET = 562.5 * 45.75;
-
-  float WAVE6_Y = 0.55 * u_h;
-  float WAVE6_HEIGHT = 0.175 * u_h;
-  float WAVE6_SPEED = 1.3;
-  float WAVE6_OFFSET = 675.0 * 33.50;
-
-  float WAVE7_Y = 0.85 * u_h;
-  float WAVE7_HEIGHT = 0.135 * u_h;
-  float WAVE7_SPEED = 0.7;
-  float WAVE7_OFFSET = 787.5 * 48.25;
-
-  float WAVE8_Y = 0.25 * u_h;
-  float WAVE8_HEIGHT = 0.205 * u_h;
-  float WAVE8_SPEED = 1.4;
-  float WAVE8_OFFSET = 900.0 * 30.75;
-
   // Start with a dark background
   float lightness = 0.0;
 
-  // Process each wave
-  float wave_lightness, wave_alpha_value;
+  // Process waves using a loop
+  const int NUM_WAVES = 6;
+  for(int i = 0; i < NUM_WAVES; i++) {
+    float t = float(i) / float(NUM_WAVES - 1);
 
-  // Wave 1
-  wave_lightness = 0.9; // Bright wave lines
-  wave_alpha_value = wave_alpha(WAVE1_Y, WAVE1_HEIGHT, WAVE1_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+    // Calculate wave parameters
+    float wave_y = mix(0.05, 0.85, t) * u_h;
+    float wave_height = mix(0.09, 0.13, sin(t * PI * 0.5)) * u_h;
+    float wave_speed = mix(0.7, 1.4, sin(t * PI * 0.375));
+    float wave_offset = (112.5 + float(i) * 112.5) * mix(30.0, 48.0, sin(t * PI * 0.5));
 
-  // Wave 2
-  wave_lightness = 0.9;
-  wave_alpha_value = wave_alpha(WAVE2_Y, WAVE2_HEIGHT, WAVE2_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+    // Process wave
+    float wave_lightness = 0.9;
+    float wave_alpha_value = wave_alpha(wave_y, wave_height, wave_offset);
+    lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+  }
 
-  // Wave 3
-  wave_lightness = 0.9;
-  wave_alpha_value = wave_alpha(WAVE3_Y, WAVE3_HEIGHT, WAVE3_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
-
-  // Wave 4
-  wave_lightness = 0.9;
-  wave_alpha_value = wave_alpha(WAVE4_Y, WAVE4_HEIGHT, WAVE4_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
-
-  // Wave 5
-  wave_lightness = 0.9;
-  wave_alpha_value = wave_alpha(WAVE5_Y, WAVE5_HEIGHT, WAVE5_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
-
-  // Wave 6
-  wave_lightness = 0.9;
-  wave_alpha_value = wave_alpha(WAVE6_Y, WAVE6_HEIGHT, WAVE6_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
-
-  // Wave 7
-  wave_lightness = 0.9;
-  wave_alpha_value = wave_alpha(WAVE7_Y, WAVE7_HEIGHT, WAVE7_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
-
-  // Wave 8
-  wave_lightness = 0.9;
-  wave_alpha_value = wave_alpha(WAVE8_Y, WAVE8_HEIGHT, WAVE8_OFFSET);
-  lightness = lerp(lightness, wave_lightness, wave_alpha_value);
-
-  gl_FragColor = vec4(calc_color(lightness), 1.0);
+  // Blend wave color with a #060815 background
+  vec3 backgroundColor = vec3(0.0235, 0.0314, 0.0824); // #060815
+  vec3 waveColor = calc_color(lightness);
+  vec3 finalColor = mix(backgroundColor, waveColor, lightness);
+  gl_FragColor = vec4(finalColor, 1.0);
 }

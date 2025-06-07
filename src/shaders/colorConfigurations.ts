@@ -123,4 +123,11 @@ export const colorConfigurations = {
       "hsla(21, 88%, 55%, 1)", // cinnamon rufous
     ],
   },
+  electric_wave: {
+    gradient: [
+      "hsl(182deg, 97%, 56%)", // Electric blue
+      "hsl(260deg 100% 60%)", // Soft purple
+      "hsl(182deg, 97%, 56%)", // Electric blue
+    ],
+  },
 };
