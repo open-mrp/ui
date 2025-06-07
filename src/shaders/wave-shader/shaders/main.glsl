@@ -188,7 +188,7 @@ float wave_y_noise(float offset) {
   const float S = 0.075;
   const float F = 0.026;
 
-  float time = u_time + offset;
+  float time = u_time * 0.5 + offset;
   float x = get_x() * 0.000845;
   float y = time * S;
   float x_shift = time * 0.026;
@@ -235,9 +235,11 @@ float wave_alpha(float Y, float wave_height, float offset) {
     sum += wave_alpha_part(dist, blur_fac, t) * PART;
   }
 
-  // Increase opacity for more visible lines
-  float opacity = 0.8 + 0.2 * (sin(u_time * 0.5 + offset * 0.01) + 1.0) * 0.5;
-  opacity = clamp(opacity, 0.8, 1.0);
+  float min_opacity = 0.1;
+  float max_opacity = 1.0;
+  // Increase opacity variation to allow waves to completely disappear
+  float opacity = min_opacity + max_opacity * (sin(u_time * 0.5 + offset * 0.01) + max_opacity) * 0.5;
+  opacity = clamp(opacity, min_opacity, max_opacity);
 
   return sum * opacity;
 }
