@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.9.1
+
+### Patch Changes
+
+- a92ee1a: fix for some animation and title issues
+
 ## 0.9.0
 
 ### Minor Changes
