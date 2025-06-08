@@ -22,13 +22,8 @@ type Story = StoryObj<typeof meta>;
 // Shader decorator
 const shaderDecorator = (Story: any) => (
   <div className="inline-block p-32 rounded-lg overflow-hidden relative">
-    <div className="absolute inset-0 z-0">
-      <WaveShader
-        colorConfiguration="electric_wave"
-        height={400}
-        width={400}
-        animate={true}
-      />
+    <div className="absolute inset-0 z-1">
+      <WaveShader height={400} width={400} animate={true} />
     </div>
     <div className="relative">
       <Story />
@@ -39,13 +34,7 @@ const shaderDecorator = (Story: any) => (
 const skewedShaderDecorator = (Story: any) => (
   <div className="inline-block p-32 rounded-lg overflow-hidden relative">
     <div className="absolute inset-0 z-1">
-      <WaveShader
-        // colorConfiguration="electric_wave"
-        height={400}
-        width={400}
-        animate={true}
-        skew="bottom"
-      />
+      <WaveShader height={400} width={400} animate={true} skew="bottom" />
     </div>
     <div className="relative">
       <Story baseZIndex={1} />
