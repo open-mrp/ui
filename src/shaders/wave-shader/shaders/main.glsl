@@ -7,7 +7,7 @@ uniform sampler2D u_gradient;
 uniform int u_num_waves; // Number of waves to render
 
 const float PI = 3.14159;
-const int MAX_WAVES = 18; // Maximum possible waves
+const int MAX_WAVES = 20; // Maximum possible waves
 
 float get_x() {
   return 900.0 + gl_FragCoord.x - u_w / 2.0;
@@ -151,7 +151,7 @@ float ease_in(float x) {
   return 1.0 - cos((x * PI) * 0.5);
 }
 
-float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
+float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset, float x_pos) {
   float exp = mix(0.9, 1.2, t);
   float v = pow(blur_fac, exp);
   v = ease_in(v);
@@ -162,7 +162,6 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float base_line_width = 4.0;
   float max_separation = 12.0;
 
-  float x_pos = get_x() * 0.001;
   float time = u_time * 0.5;
 
   float noise2 = simplex_noise(vec2(x_pos * 0.5 - time * 0.25 + wave_offset, time * 0.15 + wave_offset * 1.3)) * 0.5 + 0.5;
@@ -182,6 +181,10 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float line2_dist = dist - separation2;
   float line3_dist = dist + separation3;
 
+  float distAbs = abs(dist);
+  float line2Abs = abs(line2_dist);
+  float line3Abs = abs(line3_dist);
+
   // Calculate wave opacity for this part
   float min_opacity = 0.1;
   float max_opacity = 1.0;
@@ -193,10 +196,9 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float blur_factor = smoothstep(blur_threshold, min_opacity, wave_opacity);
   float line_width = mix(base_line_width, base_line_width * 2.0, blur_factor);
 
-  float distAbs = abs(dist);
   float alpha1 = 1.0 - smoothstep(0.0, line_width, distAbs);
-  float alpha2 = 1.0 - smoothstep(0.0, line_width, abs(line2_dist));
-  float alpha3 = 1.0 - smoothstep(0.0, line_width, abs(line3_dist));
+  float alpha2 = 1.0 - smoothstep(0.0, line_width, line2Abs);
+  float alpha3 = 1.0 - smoothstep(0.0, line_width, line3Abs);
 
   float alpha = max(max(alpha1, alpha2), alpha3);
   alpha *= alpha; // square
@@ -284,17 +286,20 @@ float wave_alpha(float Y, float wave_height, float offset) {
   float dist = wave_y - gl_FragCoord.y;
   float blur_fac = calc_blur(offset);
 
+  // Cache x-coordinate once and reuse in the part loop
+  float x_pos = get_x() * 0.001;
+
   const float PART = 1.0 / 7.0;
   float sum = 0.0;
+  float t = 0.0;
   for(int i = 0; i < 7; i++) {
-    float t = 7 == 1 ? 0.5 : PART * float(i);
-    sum += wave_alpha_part(dist, blur_fac, t, offset) * PART;
+    sum += wave_alpha_part(dist, blur_fac, t, offset, x_pos) * PART;
+    t += PART;
   }
 
   float min_opacity = 0.1;
   float max_opacity = 1.0;
 
-  float x_pos = get_x() * 0.001;
   float time = u_time * 0.5;
   float opacity = min_opacity + max_opacity * (sin(time + x_pos + offset * 0.01) + max_opacity) * 0.5;
   opacity = clamp(opacity, min_opacity, max_opacity);

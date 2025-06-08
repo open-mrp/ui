@@ -54,7 +54,7 @@ const meta = {
       description: "Seed for deterministic pattern generation",
     },
     numWaves: {
-      control: { type: "range", min: 1, max: 18, step: 1 },
+      control: { type: "range", min: 1, max: 20, step: 1 },
       description: "Number of waves to render",
     },
   },
