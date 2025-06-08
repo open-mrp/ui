@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.9.2
+
+### Patch Changes
+
+- d3dd0e4: fix for home title
+
 ## 0.9.1
 
 ### Patch Changes
