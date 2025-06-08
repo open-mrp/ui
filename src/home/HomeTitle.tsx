@@ -4,17 +4,16 @@ import HomeTextLayer from "./HomeTextLayer";
 
 const styles = {
   title: {
-    fontSize: "5.8rem",
-    fontWeight: 650,
-    lineHeight: "1.1",
-    letterSpacing: "-0.03em",
-    padding: "0px",
+    fontWeight: 600,
+    lineHeight: "1.2",
+    letterSpacing: "-0.02em",
+    pb: "0.1em",
     margin: "0px",
   },
   description: {
-    fontSize: "1.5rem",
-    fontWeight: 400,
-    letterSpacing: "0.01em",
+    fontSize: "1.1rem",
+    fontWeight: 500,
+    lineHeight: 1.6,
     padding: "0px",
     margin: "0px",
   },
@@ -39,8 +38,10 @@ export default function HomeTitle({
             ...styles.title,
             position: "relative",
             mixBlendMode: "soft-light",
+            color: "#FFFFFF",
             zIndex: baseZIndex + 1,
           }}
+          className="text-[2rem] sm:text-[3.5rem] lg:text-[4.5rem] xl:text-[5rem]"
         >
           {title}
         </HomeTextLayer>
@@ -48,11 +49,13 @@ export default function HomeTitle({
           style={{
             ...styles.title,
             position: "absolute",
-            opacity: 0.6,
+            opacity: 0.2,
             mixBlendMode: "revert",
             pointerEvents: "none",
+            color: "#FFFFFF",
             zIndex: baseZIndex + 1,
           }}
+          className="text-[2rem] sm:text-[3.5rem] lg:text-[4.5rem] xl:text-[5rem]"
         >
           {title}
         </HomeTextLayer>
@@ -61,10 +64,11 @@ export default function HomeTitle({
             ...styles.title,
             position: "absolute",
             mixBlendMode: "revert",
-            color: "var(--tw-text-color)",
+            color: "#000000",
             pointerEvents: "none",
             zIndex: baseZIndex,
           }}
+          className="text-[2rem] sm:text-[3.5rem] lg:text-[4.5rem] xl:text-[5rem]"
         >
           {title}
         </HomeTextLayer>
@@ -75,6 +79,7 @@ export default function HomeTitle({
             ...styles.description,
             position: "relative",
             mixBlendMode: "soft-light",
+            color: "#FFFFFF",
             zIndex: baseZIndex + 1,
           }}
         >
@@ -84,9 +89,10 @@ export default function HomeTitle({
           style={{
             ...styles.description,
             position: "absolute",
-            opacity: 0.6,
+            opacity: 0.3,
             mixBlendMode: "revert",
             pointerEvents: "none",
+            color: "#FFFFFF",
             zIndex: baseZIndex + 1,
           }}
         >
@@ -97,7 +103,7 @@ export default function HomeTitle({
             ...styles.description,
             position: "absolute",
             mixBlendMode: "revert",
-            color: "var(--tw-text-color)",
+            color: "#000000",
             pointerEvents: "none",
             zIndex: baseZIndex,
           }}
