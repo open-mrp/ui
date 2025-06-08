@@ -53,6 +53,10 @@ const meta = {
       control: "number",
       description: "Seed for deterministic pattern generation",
     },
+    numWaves: {
+      control: { type: "range", min: 1, max: 18, step: 1 },
+      description: "Number of waves to render",
+    },
   },
 } satisfies Meta<typeof WaveShader>;
 
@@ -66,7 +70,6 @@ export const Default: Story = {
     colorConfiguration: "default",
     height: 400,
     minWidth: 300,
-    verticalScale: 0.5,
   },
 };
 

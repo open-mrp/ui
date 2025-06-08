@@ -5,10 +5,9 @@ uniform float u_h;
 uniform float u_w;
 uniform sampler2D u_gradient;
 uniform int u_num_waves; // Number of waves to render
-uniform float u_vertical_scale; // Scale factor for vertical space (0.0 to 1.0)
 
 const float PI = 3.14159;
-const int MAX_WAVES = 10; // Maximum possible waves
+const int MAX_WAVES = 18; // Maximum possible waves
 
 float get_x() {
   return 900.0 + gl_FragCoord.x - u_w / 2.0;
@@ -316,24 +315,22 @@ void main() {
   // Start with a dark background
   float lightness = 0.0;
 
-  // Calculate the scaled height and center offset
-  float scaled_height = u_h * u_vertical_scale;
-  float height_offset = (u_h - scaled_height) * 0.5;
-
   // Process waves using a loop
   for(int i = 0; i < MAX_WAVES; i++) {
     if(i >= u_num_waves)
       break; // Stop after rendering requested number of waves
 
-    // Calculate wave parameters - now using full height range
-    float t = float(i) / float(u_num_waves - 1); // Use actual number of waves for distribution
+    // Calculate wave position using space-between distribution
+    float margin = u_h * 0.02; // 2% margin from top and bottom
+    float available_height = u_h - (2.0 * margin);
+    float spacing = available_height / float(u_num_waves - 1);
+    float wave_y = margin + (float(i) * spacing);
 
-    // Calculate wave position with vertical scale
-    float base_y = mix(0.02, 0.98, t);
-    float wave_y = base_y * scaled_height + height_offset;
+    // Calculate t for wave speed and offset
+    float t = float(i) / float(u_num_waves - 1);
 
-    // Scale wave height proportionally
-    float wave_height = mix(0.09, 0.13, sin(t * PI * 0.5)) * scaled_height;
+    // Scale wave height based on canvas height
+    float wave_height = u_h * 0.11; // 11% of canvas height
 
     float wave_speed = mix(0.7, 1.4, sin(t * PI * 0.375));
     float wave_offset = (112.5 + float(i) * 112.5) * mix(30.0, 48.0, sin(t * PI * 0.5));
@@ -353,9 +350,6 @@ void main() {
   vec3 backgroundColor = vec3(0.0235, 0.0314, 0.0824); // #060815
   vec3 waveColor = calc_color(lightness);
   vec3 finalColor = mix(backgroundColor, waveColor, lightness);
-
-  // Debug: Add a tint based on vertical scale to verify it's working
-  finalColor = mix(finalColor, vec3(1.0, 0.0, 0.0), u_vertical_scale * 0.1);
 
   gl_FragColor = vec4(finalColor, 1.0);
 }

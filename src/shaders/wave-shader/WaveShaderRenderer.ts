@@ -35,8 +35,7 @@ export class WaveShaderRenderer {
     fragmentShader: string,
     colorConfig: ColorConfiguration,
     seed: number | undefined,
-    numWaves: number,
-    verticalScale: number
+    numWaves: number
   ) {
     const gl = canvas.getContext("webgl", { premultipliedAlpha: false });
     if (!gl) {
@@ -80,7 +79,6 @@ export class WaveShaderRenderer {
 
     // Set initial uniform values
     gl.uniform1i(this.getUniformLocation("u_num_waves"), numWaves);
-    gl.uniform1f(this.getUniformLocation("u_vertical_scale"), verticalScale);
   }
 
   public setColorConfig(colorConfig: ColorConfiguration) {

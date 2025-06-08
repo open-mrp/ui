@@ -19,7 +19,6 @@ export function WaveShader({
   height: initialHeight = 275,
   seed,
   numWaves = 10,
-  verticalScale = 1.0,
 }: WaveShaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [shader, setShader] = useState<FragmentShader | null>(null);
@@ -77,8 +76,7 @@ export function WaveShader({
       shader.shader,
       colorConfigurations[colorConfiguration],
       seed,
-      numWaves,
-      verticalScale
+      numWaves
     );
     for (const [key, value] of Object.entries(shader.uniforms)) {
       pendingUniformWrites.current.push([key, value.value]);
@@ -138,7 +136,6 @@ export function WaveShader({
     shader,
     vertexShader,
     numWaves,
-    verticalScale,
   ]);
 
   return (
