@@ -165,25 +165,20 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float x_pos = get_x() * 0.001;
   float time = u_time * 0.5;
 
-  float noise1 = simplex_noise(vec2(x_pos * 0.6 + time * 0.2 + wave_offset, time * 0.1 + wave_offset)) * 0.5 + 0.5;
   float noise2 = simplex_noise(vec2(x_pos * 0.5 - time * 0.25 + wave_offset, time * 0.15 + wave_offset * 1.3)) * 0.5 + 0.5;
   float noise3 = simplex_noise(vec2(x_pos * 0.55 + time * 0.22 + wave_offset, time * 0.12 + wave_offset * 2.1)) * 0.5 + 0.5;
 
   float threshold = 0.7;
-  noise1 = smoothstep(threshold, 1.0, noise1);
   noise2 = smoothstep(threshold, 1.0, noise2);
   noise3 = smoothstep(threshold, 1.0, noise3);
 
-  float separation1 = max_separation * noise1;
   float separation2 = max_separation * noise2;
   float separation3 = max_separation * noise3;
 
   float time_phase = sin(time * 0.2 + wave_offset) * 0.5 + 0.5;
-  separation1 *= time_phase;
   separation2 *= (1.0 - time_phase);
   separation3 *= time_phase * 0.5 + 0.5;
 
-  float line1_dist = dist;
   float line2_dist = dist - separation2;
   float line3_dist = dist + separation3;
 
@@ -198,12 +193,13 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float blur_factor = smoothstep(blur_threshold, min_opacity, wave_opacity);
   float line_width = mix(base_line_width, base_line_width * 2.0, blur_factor);
 
-  float alpha1 = 1.0 - smoothstep(0.0, line_width, abs(line1_dist));
+  float distAbs = abs(dist);
+  float alpha1 = 1.0 - smoothstep(0.0, line_width, distAbs);
   float alpha2 = 1.0 - smoothstep(0.0, line_width, abs(line2_dist));
   float alpha3 = 1.0 - smoothstep(0.0, line_width, abs(line3_dist));
 
   float alpha = max(max(alpha1, alpha2), alpha3);
-  alpha = pow(alpha, 2.0);
+  alpha *= alpha; // square
 
   // Calculate average separation between lines
   float avg_separation = (abs(separation2) + abs(separation3)) * 0.5;
@@ -217,7 +213,7 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset) {
   float glow_width = mix(base_glow_width * 1.5, base_glow_width, wave_opacity);
   float glow_intensity = mix(base_glow_intensity * 0.8, base_glow_intensity, wave_opacity);
 
-  float glow_alpha = 1.0 - smoothstep(0.0, glow_width, abs(dist));
+  float glow_alpha = 1.0 - smoothstep(0.0, glow_width, distAbs);
   glow_alpha = pow(glow_alpha, 0.6);
   glow_alpha *= glow_intensity * (1.0 + separation_factor * 0.6);
 
@@ -312,6 +308,13 @@ vec3 calc_color(float lightness) {
 }
 
 void main() {
+  // Pre-compute some values that are invariant across the wave loop
+  float y_coord = gl_FragCoord.y;
+  float margin = u_h * 0.02;              // 2 % margin from top and bottom
+  float available_height = u_h - (2.0 * margin);
+  float spacing = available_height / max(float(u_num_waves - 1), 1.0);
+  float wave_height = u_h * 0.11;              // 11 % of canvas height
+
   // Start with a dark background
   float lightness = 0.0;
 
@@ -320,29 +323,24 @@ void main() {
     if(i >= u_num_waves)
       break; // Stop after rendering requested number of waves
 
-    // Calculate wave position using space-between distribution
-    float margin = u_h * 0.02; // 2% margin from top and bottom
-    float available_height = u_h - (2.0 * margin);
-    float spacing = available_height / float(u_num_waves - 1);
+    // Compute the y-position of this wave
     float wave_y = margin + (float(i) * spacing);
 
-    // Calculate t for wave speed and offset
-    float t = float(i) / float(u_num_waves - 1);
+    // Calculate t for parameterisation along 0-1
+    float t = float(i) / max(float(u_num_waves - 1), 1.0);
 
-    // Scale wave height based on canvas height
-    float wave_height = u_h * 0.11; // 11% of canvas height
-
-    float wave_speed = mix(0.7, 1.4, sin(t * PI * 0.375));
+    // Pre-compute the offset for this wave
     float wave_offset = (112.5 + float(i) * 112.5) * mix(30.0, 48.0, sin(t * PI * 0.5));
 
     // Process wave
     float wave_lightness = 0.9;
     float wave_alpha_value = wave_alpha(wave_y, wave_height, wave_offset);
 
-    // Reduce opacity for every other wave using step function
+    // Reduce opacity for every other wave using step function (kept from original)
     float opacity_multiplier = 1.0 - 0.5 * step(0.5, fract(float(i) * 0.5));
     wave_alpha_value *= opacity_multiplier;
 
+    // Accumulate lightness
     lightness = lerp(lightness, wave_lightness, wave_alpha_value);
   }
 
