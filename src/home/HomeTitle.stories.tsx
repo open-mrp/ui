@@ -22,17 +22,33 @@ type Story = StoryObj<typeof meta>;
 // Shader decorator
 const shaderDecorator = (Story: any) => (
   <div className="inline-block p-32 rounded-lg overflow-hidden relative">
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 z-0">
       <WaveShader
         colorConfiguration="electric_wave"
         height={400}
         width={400}
         animate={true}
-        verticalScale={0.7}
       />
     </div>
     <div className="relative">
       <Story />
+    </div>
+  </div>
+);
+
+const skewedShaderDecorator = (Story: any) => (
+  <div className="inline-block p-32 rounded-lg overflow-hidden relative">
+    <div className="absolute inset-0 z-1">
+      <WaveShader
+        // colorConfiguration="electric_wave"
+        height={400}
+        width={400}
+        animate={true}
+        skew="bottom"
+      />
+    </div>
+    <div className="relative">
+      <Story baseZIndex={1} />
     </div>
   </div>
 );
@@ -44,6 +60,14 @@ export const Default: Story = {
     description: "A showcase of my work and experiences",
   },
   decorators: [shaderDecorator],
+};
+
+export const Skewed: Story = {
+  args: {
+    title: "Welcome to My Portfolio",
+    description: "A showcase of my work and experiences",
+  },
+  decorators: [skewedShaderDecorator],
 };
 
 // Long text story

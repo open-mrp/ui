@@ -73,74 +73,10 @@ export const Default: Story = {
   },
 };
 
-// Color Configurations
-export const Fire: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "fire",
-  },
-};
-
-export const RedToPurple: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "red_to_purple",
-  },
-};
-
-export const BlueToYellow: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "blue_to_yellow",
-  },
-};
-
-export const RedToBlue: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "red_to_blue",
-  },
-};
-
 export const Sunset: Story = {
   args: {
     ...Default.args,
     colorConfiguration: "sunset",
-  },
-};
-
-export const BlueToPurple: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "blue_to_purple",
-  },
-};
-
-export const BlueToPink: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "blue_to_pink",
-  },
-};
-
-export const Crazy: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "crazy",
-  },
-};
-
-export const Dusk: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "dusk",
-  },
-};
-
-export const ElectricWave: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "electric_wave",
   },
 };
 
