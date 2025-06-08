@@ -53,6 +53,10 @@ const meta = {
       control: "number",
       description: "Seed for deterministic pattern generation",
     },
+    numWaves: {
+      control: { type: "range", min: 1, max: 20, step: 1 },
+      description: "Number of waves to render",
+    },
   },
 } satisfies Meta<typeof WaveShader>;
 
@@ -66,36 +70,6 @@ export const Default: Story = {
     colorConfiguration: "default",
     height: 400,
     minWidth: 300,
-    verticalScale: 0.5,
-  },
-};
-
-// Color Configurations
-export const Fire: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "fire",
-  },
-};
-
-export const RedToPurple: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "red_to_purple",
-  },
-};
-
-export const BlueToYellow: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "blue_to_yellow",
-  },
-};
-
-export const RedToBlue: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "red_to_blue",
   },
 };
 
@@ -103,41 +77,6 @@ export const Sunset: Story = {
   args: {
     ...Default.args,
     colorConfiguration: "sunset",
-  },
-};
-
-export const BlueToPurple: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "blue_to_purple",
-  },
-};
-
-export const BlueToPink: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "blue_to_pink",
-  },
-};
-
-export const Crazy: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "crazy",
-  },
-};
-
-export const Dusk: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "dusk",
-  },
-};
-
-export const ElectricWave: Story = {
-  args: {
-    ...Default.args,
-    colorConfiguration: "electric_wave",
   },
 };
 
