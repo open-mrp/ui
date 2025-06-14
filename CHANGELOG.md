@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.9.3
+
+### Patch Changes
+
+- 94bd008: minor fix to styling of darkmode toggle
+
 ## 0.9.2
 
 ### Patch Changes
