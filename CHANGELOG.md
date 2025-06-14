@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.9.4
+
+### Patch Changes
+
+- 361286c: minor fix to darkmode button
+
 ## 0.9.3
 
 ### Patch Changes
