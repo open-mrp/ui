@@ -5,10 +5,9 @@ import MoonIcon from "@/icons/MoonIcon";
 import SunIcon from "@/icons/SunIcon";
 import Button, { ButtonProps } from "./Button";
 
-export interface DarkModeButtonProps {
+export interface DarkModeButtonProps extends ButtonProps {
   variant?: "icon" | "outlined";
   className?: string;
-  props?: ButtonProps;
 }
 
 export default function DarkModeButton({
