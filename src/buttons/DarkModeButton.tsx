@@ -21,7 +21,6 @@ export default function DarkModeButton({
       <Button
         className={className}
         variant="icon"
-        color="gray"
         onClick={toggleDarkMode}
         aria-label="Toggle dark mode"
       >
@@ -31,12 +30,7 @@ export default function DarkModeButton({
   }
 
   return (
-    <Button
-      className={className}
-      variant="outlined"
-      color="gray"
-      onClick={toggleDarkMode}
-    >
+    <Button className={className} variant="outlined" onClick={toggleDarkMode}>
       {isDark ? "Light Mode" : "Dark Mode"}
     </Button>
   );
