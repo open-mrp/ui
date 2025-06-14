@@ -246,7 +246,7 @@ const buttonVariants = cva(BASE_STYLES, {
 
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: ButtonVariant;
   size?: ComponentSize;
   color?: keyof typeof colorVariants;
