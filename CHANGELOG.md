@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.9.5
+
+### Patch Changes
+
+- 1d1e34a: minor fix to button props
+
 ## 0.9.4
 
 ### Patch Changes
