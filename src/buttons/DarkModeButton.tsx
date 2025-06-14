@@ -3,16 +3,18 @@
 import { useDarkMode } from "@/hooks/useDarkMode";
 import MoonIcon from "@/icons/MoonIcon";
 import SunIcon from "@/icons/SunIcon";
-import Button from "./Button";
+import Button, { ButtonProps } from "./Button";
 
 export interface DarkModeButtonProps {
   variant?: "icon" | "outlined";
   className?: string;
+  props?: ButtonProps;
 }
 
 export default function DarkModeButton({
   variant = "icon",
   className,
+  ...props
 }: DarkModeButtonProps) {
   const { isDark, toggleDarkMode } = useDarkMode();
 
@@ -23,6 +25,7 @@ export default function DarkModeButton({
         variant="icon"
         onClick={toggleDarkMode}
         aria-label="Toggle dark mode"
+        {...props}
       >
         {isDark ? <SunIcon /> : <MoonIcon />}
       </Button>
@@ -30,7 +33,12 @@ export default function DarkModeButton({
   }
 
   return (
-    <Button className={className} variant="outlined" onClick={toggleDarkMode}>
+    <Button
+      className={className}
+      variant="outlined"
+      onClick={toggleDarkMode}
+      {...props}
+    >
       {isDark ? "Light Mode" : "Dark Mode"}
     </Button>
   );
