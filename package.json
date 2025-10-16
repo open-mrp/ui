@@ -33,7 +33,7 @@
     "check-changes": "changeset status || exit 1",
     "test": "jest",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build:storybook": "storybook build",
     "yalc-publish": "bun run build && yalc publish"
   },
   "devDependencies": {
