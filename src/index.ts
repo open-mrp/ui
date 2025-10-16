@@ -8,3 +8,4 @@ export * from "./markdown";
 export * from "./navigation";
 export * from "./shaders";
 export * from "./signifiers";
+export * from "./tables";
