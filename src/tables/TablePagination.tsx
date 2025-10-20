@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/navigation/Select";
 import { cn } from "@/utils/cn";
 import * as React from "react";
 import {
@@ -19,6 +26,10 @@ export interface TablePaginationProps extends React.ComponentProps<"div"> {
   maxVisiblePages?: number;
   showFirstLast?: boolean;
   showPrevNext?: boolean;
+  itemsPerPage?: number;
+  onItemsPerPageChange?: (itemsPerPage: number) => void;
+  itemsPerPageOptions?: number[];
+  showItemsPerPageSelector?: boolean;
 }
 
 /**
@@ -32,6 +43,10 @@ function TablePagination({
   maxVisiblePages = 5,
   showFirstLast = true,
   showPrevNext = true,
+  itemsPerPage = 10,
+  onItemsPerPageChange,
+  itemsPerPageOptions = [10, 20, 50, 100],
+  showItemsPerPageSelector = true,
   ...props
 }: TablePaginationProps) {
   // Generate page numbers to display
@@ -63,116 +78,148 @@ function TablePagination({
     }
   };
 
-  if (totalPages <= 1) {
+  const handleItemsPerPageChange = (value: string) => {
+    const newItemsPerPage = parseInt(value, 10);
+    if (onItemsPerPageChange && newItemsPerPage !== itemsPerPage) {
+      onItemsPerPageChange(newItemsPerPage);
+    }
+  };
+
+  if (totalPages <= 1 && !showItemsPerPageSelector) {
     return null;
   }
 
   return (
     <div
-      className={cn("flex items-center justify-center", className)}
+      className={cn("flex items-center justify-between w-full", className)}
       {...props}
     >
-      <Pagination>
-        <PaginationContent>
-          {/* Previous button */}
-          {showPrevNext && (
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handlePageClick(currentPage - 1);
-                }}
-                className={
-                  currentPage <= 1 ? "pointer-events-none opacity-50" : ""
-                }
-              />
-            </PaginationItem>
-          )}
+      {/* Items per page selector */}
+      {showItemsPerPageSelector && onItemsPerPageChange && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Items per page:</span>
+          <Select
+            value={itemsPerPage.toString()}
+            onValueChange={handleItemsPerPageChange}
+          >
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {itemsPerPageOptions.map((option) => (
+                <SelectItem key={option} value={option.toString()}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-          {/* First page */}
-          {showFirstLast && currentPage > 1 && !visiblePages.includes(1) && (
-            <PaginationItem>
-              <PaginationLink
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handlePageClick(1);
-                }}
-                isActive={currentPage === 1}
-              >
-                1
-              </PaginationLink>
-            </PaginationItem>
-          )}
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            {/* Previous button */}
+            {showPrevNext && (
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageClick(currentPage - 1);
+                  }}
+                  className={
+                    currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                  }
+                />
+              </PaginationItem>
+            )}
 
-          {/* First ellipsis */}
-          {showFirstEllipsis && (
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
-
-          {/* Page numbers */}
-          {visiblePages.map((page) => (
-            <PaginationItem key={page}>
-              <PaginationLink
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handlePageClick(page);
-                }}
-                isActive={page === currentPage}
-              >
-                {page}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-
-          {/* Last ellipsis */}
-          {showLastEllipsis && (
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
-
-          {/* Last page */}
-          {showFirstLast &&
-            currentPage < totalPages &&
-            !visiblePages.includes(totalPages) && (
+            {/* First page */}
+            {showFirstLast && currentPage > 1 && !visiblePages.includes(1) && (
               <PaginationItem>
                 <PaginationLink
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    handlePageClick(totalPages);
+                    handlePageClick(1);
                   }}
-                  isActive={currentPage === totalPages}
+                  isActive={currentPage === 1}
                 >
-                  {totalPages}
+                  1
                 </PaginationLink>
               </PaginationItem>
             )}
 
-          {/* Next button */}
-          {showPrevNext && (
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handlePageClick(currentPage + 1);
-                }}
-                className={
-                  currentPage >= totalPages
-                    ? "pointer-events-none opacity-50"
-                    : ""
-                }
-              />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
+            {/* First ellipsis */}
+            {showFirstEllipsis && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+
+            {/* Page numbers */}
+            {visiblePages.map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageClick(page);
+                  }}
+                  isActive={page === currentPage}
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            {/* Last ellipsis */}
+            {showLastEllipsis && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+
+            {/* Last page */}
+            {showFirstLast &&
+              currentPage < totalPages &&
+              !visiblePages.includes(totalPages) && (
+                <PaginationItem>
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handlePageClick(totalPages);
+                    }}
+                    isActive={currentPage === totalPages}
+                  >
+                    {totalPages}
+                  </PaginationLink>
+                </PaginationItem>
+              )}
+
+            {/* Next button */}
+            {showPrevNext && (
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageClick(currentPage + 1);
+                  }}
+                  className={
+                    currentPage >= totalPages
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

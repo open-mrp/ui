@@ -10,6 +10,8 @@ import {
   PaginationPrevious,
 } from "./Pagination";
 import {
+  DraggableTableHead,
+  SortableTableHead,
   Table,
   TableBody,
   TableCaption,
@@ -18,6 +20,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  type SortDirection,
 } from "./TableComponents";
 import { TablePagination } from "./TablePagination";
 
@@ -329,22 +332,129 @@ const generateSampleData = (count: number) => {
   }));
 };
 
+// Sorting utility functions
+const sortData = <T extends Record<string, any>>(
+  data: T[],
+  sortKey: keyof T,
+  sortDirection: SortDirection
+): T[] => {
+  if (!sortDirection) return data;
+
+  return [...data].sort((a, b) => {
+    const aValue = a[sortKey];
+    const bValue = b[sortKey];
+
+    // Handle different data types
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      const comparison = aValue.localeCompare(bValue);
+      return sortDirection === "asc" ? comparison : -comparison;
+    }
+
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      const comparison = aValue - bValue;
+      return sortDirection === "asc" ? comparison : -comparison;
+    }
+
+    if (
+      aValue &&
+      bValue &&
+      typeof aValue === "object" &&
+      typeof bValue === "object" &&
+      "getTime" in aValue &&
+      "getTime" in bValue
+    ) {
+      const comparison =
+        (aValue as Date).getTime() - (bValue as Date).getTime();
+      return sortDirection === "asc" ? comparison : -comparison;
+    }
+
+    // Fallback to string comparison
+    const aStr = String(aValue);
+    const bStr = String(bValue);
+    const comparison = aStr.localeCompare(bStr);
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
+};
+
+// Column reordering utility functions
+const reorderColumns = <T extends Record<string, any>>(
+  columns: T[],
+  fromIndex: number,
+  toIndex: number
+): T[] => {
+  const result = Array.from(columns);
+  const [removed] = result.splice(fromIndex, 1);
+  result.splice(toIndex, 0, removed);
+  return result;
+};
+
+const reorderDataColumns = <T extends Record<string, any>>(
+  data: T[],
+  columnOrder: string[]
+): T[] => {
+  return data.map((row) => {
+    const reorderedRow: Partial<T> = {};
+    columnOrder.forEach((key) => {
+      if (key in row) {
+        reorderedRow[key as keyof T] = row[key as keyof T];
+      }
+    });
+    return reorderedRow as T;
+  });
+};
+
 export const PaginatedTable: Story = {
   render: () => {
     const [currentPage, setCurrentPage] = React.useState(1);
-    const [itemsPerPage] = React.useState(10);
+    const [itemsPerPage, setItemsPerPage] = React.useState(10);
+    const [sortKey, setSortKey] = React.useState<
+      keyof ReturnType<typeof generateSampleData>[0] | null
+    >(null);
+    const [sortDirection, setSortDirection] =
+      React.useState<SortDirection>(null);
 
     // Generate 100 sample records
     const allData = generateSampleData(100);
-    const totalPages = Math.ceil(allData.length / itemsPerPage);
+
+    // Sort data if sorting is applied
+    const sortedData =
+      sortKey && sortDirection
+        ? sortData(allData, sortKey, sortDirection)
+        : allData;
+
+    const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
     // Calculate current page data
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentData = allData.slice(startIndex, endIndex);
+    const currentData = sortedData.slice(startIndex, endIndex);
 
     const handlePageChange = (page: number) => {
       setCurrentPage(page);
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); // Reset to first page when changing items per page
+    };
+
+    const handleSort = (key: string) => {
+      const typedKey = key as keyof ReturnType<typeof generateSampleData>[0];
+
+      if (sortKey === typedKey) {
+        // Cycle through: asc -> desc -> null
+        if (sortDirection === "asc") {
+          setSortDirection("desc");
+        } else if (sortDirection === "desc") {
+          setSortDirection(null);
+          setSortKey(null);
+        }
+      } else {
+        // New column, start with ascending
+        setSortKey(typedKey);
+        setSortDirection("asc");
+      }
+      setCurrentPage(1); // Reset to first page when sorting
     };
 
     return (
@@ -409,17 +519,15 @@ export const PaginatedTable: Story = {
           </Table>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            {allData.length} total employees
-          </div>
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            maxVisiblePages={5}
-          />
-        </div>
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          itemsPerPageOptions={[5, 10, 20, 50]}
+          maxVisiblePages={5}
+        />
       </div>
     );
   },
@@ -428,7 +536,7 @@ export const PaginatedTable: Story = {
 export const LargePaginatedTable: Story = {
   render: () => {
     const [currentPage, setCurrentPage] = React.useState(1);
-    const [itemsPerPage] = React.useState(20);
+    const [itemsPerPage, setItemsPerPage] = React.useState(20);
 
     // Generate 1000 sample records for a large dataset
     const allData = generateSampleData(1000);
@@ -441,6 +549,11 @@ export const LargePaginatedTable: Story = {
 
     const handlePageChange = (page: number) => {
       setCurrentPage(page);
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); // Reset to first page when changing items per page
     };
 
     return (
@@ -505,17 +618,482 @@ export const LargePaginatedTable: Story = {
           </Table>
         </div>
 
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          itemsPerPageOptions={[10, 20, 50, 100]}
+          maxVisiblePages={7}
+        />
+      </div>
+    );
+  },
+};
+
+export const TableWithItemsPerPageSelector: Story = {
+  render: () => {
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = React.useState(10);
+
+    // Generate 1000 sample records to demonstrate pagination
+    const allData = generateSampleData(1000);
+    const totalPages = Math.ceil(allData.length / itemsPerPage);
+
+    // Calculate current page data
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = allData.slice(startIndex, endIndex);
+
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); // Reset to first page when changing items per page
+    };
+
+    return (
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            {allData.length} total records
+          <div>
+            <h2 className="text-2xl font-bold">Employee Directory</h2>
+            <p className="text-muted-foreground">
+              Showing {startIndex + 1}-{Math.min(endIndex, allData.length)} of{" "}
+              {allData.length} employees
+            </p>
           </div>
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            maxVisiblePages={7}
-          />
         </div>
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Join Date</TableHead>
+                <TableHead className="text-right">Salary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentData.map((employee) => (
+                <TableRow key={employee.id}>
+                  <TableCell className="font-medium">{employee.id}</TableCell>
+                  <TableCell>{employee.name}</TableCell>
+                  <TableCell>{employee.email}</TableCell>
+                  <TableCell>{employee.department}</TableCell>
+                  <TableCell>{employee.role}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        employee.status === "Active"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : employee.status === "Inactive"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          : employee.status === "Pending"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                      }`}
+                    >
+                      {employee.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>{employee.joinDate}</TableCell>
+                  <TableCell className="text-right">
+                    {employee.salary}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          itemsPerPageOptions={[5, 10, 20, 50, 100]}
+          maxVisiblePages={5}
+        />
+      </div>
+    );
+  },
+};
+
+export const SortableTable: Story = {
+  render: () => {
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = React.useState(10);
+    const [sortKey, setSortKey] = React.useState<
+      keyof ReturnType<typeof generateSampleData>[0] | null
+    >(null);
+    const [sortDirection, setSortDirection] =
+      React.useState<SortDirection>(null);
+
+    // Generate 100 sample records
+    const allData = generateSampleData(100);
+
+    // Sort data if sorting is applied
+    const sortedData =
+      sortKey && sortDirection
+        ? sortData(allData, sortKey, sortDirection)
+        : allData;
+
+    const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+
+    // Calculate current page data
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = sortedData.slice(startIndex, endIndex);
+
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); // Reset to first page when changing items per page
+    };
+
+    const handleSort = (key: string) => {
+      const typedKey = key as keyof ReturnType<typeof generateSampleData>[0];
+
+      if (sortKey === typedKey) {
+        // Cycle through: asc -> desc -> null
+        if (sortDirection === "asc") {
+          setSortDirection("desc");
+        } else if (sortDirection === "desc") {
+          setSortDirection(null);
+          setSortKey(null);
+        }
+      } else {
+        // New column, start with ascending
+        setSortKey(typedKey);
+        setSortDirection("asc");
+      }
+      setCurrentPage(1); // Reset to first page when sorting
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Sortable Employee Directory</h2>
+            <p className="text-muted-foreground">
+              Click column headers to sort. Showing {startIndex + 1}-
+              {Math.min(endIndex, sortedData.length)} of {sortedData.length}{" "}
+              employees
+            </p>
+            {/* {sortKey && sortDirection && (
+              <p className="text-sm text-blue-600 dark:text-blue-400">
+                Sorted by {sortKey} (
+                {sortDirection === "asc" ? "ascending" : "descending"})
+              </p>
+            )} */}
+          </div>
+        </div>
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <SortableTableHead
+                  className="w-[100px]"
+                  sortKey="id"
+                  sortDirection={sortKey === "id" ? sortDirection : null}
+                  onSort={handleSort}
+                >
+                  ID
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="name"
+                  sortDirection={sortKey === "name" ? sortDirection : null}
+                  onSort={handleSort}
+                >
+                  Name
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="email"
+                  sortDirection={sortKey === "email" ? sortDirection : null}
+                  onSort={handleSort}
+                >
+                  Email
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="department"
+                  sortDirection={
+                    sortKey === "department" ? sortDirection : null
+                  }
+                  onSort={handleSort}
+                >
+                  Department
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="role"
+                  sortDirection={sortKey === "role" ? sortDirection : null}
+                  onSort={handleSort}
+                >
+                  Role
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="status"
+                  sortDirection={sortKey === "status" ? sortDirection : null}
+                  onSort={handleSort}
+                >
+                  Status
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="joinDate"
+                  sortDirection={sortKey === "joinDate" ? sortDirection : null}
+                  onSort={handleSort}
+                >
+                  Join Date
+                </SortableTableHead>
+                <SortableTableHead
+                  className="text-right"
+                  sortKey="salary"
+                  sortDirection={sortKey === "salary" ? sortDirection : null}
+                  onSort={handleSort}
+                >
+                  Salary
+                </SortableTableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentData.map((employee) => (
+                <TableRow key={employee.id}>
+                  <TableCell className="font-medium">{employee.id}</TableCell>
+                  <TableCell>{employee.name}</TableCell>
+                  <TableCell>{employee.email}</TableCell>
+                  <TableCell>{employee.department}</TableCell>
+                  <TableCell>{employee.role}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        employee.status === "Active"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : employee.status === "Inactive"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          : employee.status === "Pending"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                      }`}
+                    >
+                      {employee.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>{employee.joinDate}</TableCell>
+                  <TableCell className="text-right">
+                    {employee.salary}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          itemsPerPageOptions={[5, 10, 20, 50]}
+          maxVisiblePages={5}
+        />
+      </div>
+    );
+  },
+};
+export const DraggableTable: Story = {
+  render: () => {
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = React.useState(10);
+    const [sortKey, setSortKey] = React.useState<
+      keyof ReturnType<typeof generateSampleData>[0] | null
+    >(null);
+    const [sortDirection, setSortDirection] =
+      React.useState<SortDirection>(null);
+
+    // Define column configuration with order
+    const [columnOrder, setColumnOrder] = React.useState([
+      "id",
+      "name",
+      "email",
+      "department",
+      "role",
+      "status",
+      "joinDate",
+      "salary",
+    ]);
+
+    // Generate 100 sample records
+    const allData = generateSampleData(100);
+
+    // Sort data if sorting is applied
+    const sortedData =
+      sortKey && sortDirection
+        ? sortData(allData, sortKey, sortDirection)
+        : allData;
+
+    const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+
+    // Calculate current page data
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = sortedData.slice(startIndex, endIndex);
+
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); // Reset to first page when changing items per page
+    };
+
+    const handleSort = (key: string) => {
+      const typedKey = key as keyof ReturnType<typeof generateSampleData>[0];
+
+      if (sortKey === typedKey) {
+        // Cycle through: asc -> desc -> null
+        if (sortDirection === "asc") {
+          setSortDirection("desc");
+        } else if (sortDirection === "desc") {
+          setSortDirection(null);
+          setSortKey(null);
+        }
+      } else {
+        // New column, start with ascending
+        setSortKey(typedKey);
+        setSortDirection("asc");
+      }
+      setCurrentPage(1); // Reset to first page when sorting
+    };
+
+    const handleColumnReorder = (fromColumnId: string, toColumnId: string) => {
+      const fromIndex = columnOrder.indexOf(fromColumnId);
+      const toIndex = columnOrder.indexOf(toColumnId);
+
+      if (fromIndex !== -1 && toIndex !== -1) {
+        const newColumnOrder = [...columnOrder];
+        const [removed] = newColumnOrder.splice(fromIndex, 1);
+        newColumnOrder.splice(toIndex, 0, removed);
+        setColumnOrder(newColumnOrder);
+      }
+    };
+
+    // Column configuration
+    const columnConfig = {
+      id: { label: "ID", className: "w-[100px]" },
+      name: { label: "Name", className: "" },
+      email: { label: "Email", className: "" },
+      department: { label: "Department", className: "" },
+      role: { label: "Role", className: "" },
+      status: { label: "Status", className: "" },
+      joinDate: { label: "Join Date", className: "" },
+      salary: { label: "Salary", className: "text-right" },
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Draggable Employee Directory</h2>
+            <p className="text-muted-foreground">
+              Drag column headers to reorder. Click to sort. Showing{" "}
+              {startIndex + 1}-{Math.min(endIndex, sortedData.length)} of{" "}
+              {sortedData.length} employees
+            </p>
+            {sortKey && sortDirection && (
+              <p className="text-sm text-blue-600 dark:text-blue-400">
+                Sorted by {sortKey} (
+                {sortDirection === "asc" ? "ascending" : "descending"})
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {columnOrder.map((columnId) => {
+                  const config =
+                    columnConfig[columnId as keyof typeof columnConfig];
+                  return (
+                    <DraggableTableHead
+                      key={columnId}
+                      className={config.className}
+                      columnId={columnId}
+                      sortKey={columnId}
+                      sortDirection={
+                        sortKey === columnId ? sortDirection : null
+                      }
+                      onSort={handleSort}
+                      onColumnReorder={handleColumnReorder}
+                    >
+                      {config.label}
+                    </DraggableTableHead>
+                  );
+                })}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currentData.map((employee) => (
+                <TableRow key={employee.id}>
+                  {columnOrder.map((columnId) => {
+                    const config =
+                      columnConfig[columnId as keyof typeof columnConfig];
+                    const value = employee[columnId as keyof typeof employee];
+
+                    return (
+                      <TableCell key={columnId} className={config.className}>
+                        {columnId === "status" ? (
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              value === "Active"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                : value === "Inactive"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                : value === "Pending"
+                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                                : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                            }`}
+                          >
+                            {value}
+                          </span>
+                        ) : columnId === "id" ? (
+                          <span className="font-medium">{value}</span>
+                        ) : (
+                          value
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          itemsPerPageOptions={[5, 10, 20, 50]}
+          maxVisiblePages={5}
+        />
       </div>
     );
   },

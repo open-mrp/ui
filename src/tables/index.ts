@@ -1,4 +1,6 @@
 export {
+  DraggableTableHead,
+  SortableTableHead,
   Table,
   TableBody,
   TableCaption,
@@ -7,6 +9,9 @@ export {
   TableHead,
   TableHeader,
   TableRow,
+  type DraggableTableHeadProps,
+  type SortableTableHeadProps,
+  type SortDirection,
 } from "./TableComponents";
 
 export {
