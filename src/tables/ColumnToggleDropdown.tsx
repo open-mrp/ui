@@ -6,9 +6,15 @@ import {
   EyeOffIcon,
   SettingsIcon,
 } from "lucide-react";
-import * as React from "react";
 
 import { cn } from "@/utils/cn";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../navigation/DropdownMenu";
 
 export interface ColumnConfig {
   id: string;
@@ -30,91 +36,77 @@ export function ColumnToggleDropdown({
   onResetColumns,
   className,
 }: ColumnToggleDropdownProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   const visibleColumns = columns.filter((col) => col.isVisible).length;
   const totalColumns = columns.length;
 
   return (
-    <div className={cn("relative", className)} ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm border rounded-md hover:bg-muted transition-colors"
-        title="Column settings"
-      >
-        <SettingsIcon className="size-4" />
-        <span>
-          Columns ({visibleColumns}/{totalColumns})
-        </span>
-        <ChevronDownIcon
-          className={cn("size-3 transition-transform", isOpen && "rotate-180")}
-        />
-      </button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className={cn(
+            "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-background hover:bg-accent dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-9",
+            className
+          )}
+          title="Column settings"
+        >
+          <div className="flex items-center gap-2">
+            <SettingsIcon className="size-4" />
+            <span>
+              Columns ({visibleColumns}/{totalColumns})
+            </span>
+          </div>
+          <ChevronDownIcon className="size-4 opacity-50" />
+        </button>
+      </DropdownMenuTrigger>
 
-      {isOpen && (
-        <div className="absolute right-0 top-full mt-1 w-64 bg-background border rounded-md shadow-lg z-50">
-          <div className="p-3">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium">Column Visibility</h3>
-              {onResetColumns && (
-                <button
-                  onClick={onResetColumns}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Reset
-                </button>
+      <DropdownMenuContent align="end" className="w-64">
+        <DropdownMenuLabel className="flex items-center justify-between">
+          <span>Column Visibility</span>
+          {onResetColumns && (
+            <button
+              onClick={onResetColumns}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring/50 rounded px-1 py-0.5"
+            >
+              Reset
+            </button>
+          )}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <div className="max-h-48 overflow-y-auto">
+          {columns.map((column) => (
+            <div
+              key={column.id}
+              className={cn(
+                "flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-accent/50 transition-colors cursor-pointer",
+                column.isRequired && "opacity-50"
+              )}
+              onClick={() => !column.isRequired && onToggleColumn(column.id)}
+            >
+              <input
+                type="checkbox"
+                checked={column.isVisible}
+                onChange={() => onToggleColumn(column.id)}
+                disabled={column.isRequired}
+                className="rounded border-input size-4"
+              />
+              <span
+                className={cn(
+                  "flex-1",
+                  column.isRequired && "text-muted-foreground"
+                )}
+              >
+                {column.label}
+                {column.isRequired && " (required)"}
+              </span>
+              {column.isVisible ? (
+                <EyeIcon className="size-4 text-foreground" />
+              ) : (
+                <EyeOffIcon className="size-4 text-muted-foreground" />
               )}
             </div>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {columns.map((column) => (
-                <label
-                  key={column.id}
-                  className="flex items-center gap-2 p-2 hover:bg-muted rounded cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={column.isVisible}
-                    onChange={() => onToggleColumn(column.id)}
-                    disabled={column.isRequired}
-                    className="rounded border-input"
-                  />
-                  <span
-                    className={cn(
-                      "text-sm flex-1",
-                      column.isRequired && "text-muted-foreground"
-                    )}
-                  >
-                    {column.label}
-                    {column.isRequired && " (required)"}
-                  </span>
-                  {column.isVisible ? (
-                    <EyeIcon className="size-3 text-foreground" />
-                  ) : (
-                    <EyeOffIcon className="size-3 text-muted-foreground" />
-                  )}
-                </label>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
-      )}
-    </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

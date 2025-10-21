@@ -7,28 +7,28 @@ export {
   TableFooter,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "./TableComponents";
 
 // Sortable table head
 export {
   SortableTableHead,
   type SortableTableHeadProps,
-  type SortDirection,
+  type SortDirection
 } from "./SortableTableHead";
 
 // Toggleable table head
 export {
   ToggleableTableHead,
   type DraggableTableHeadProps,
-  type ToggleableTableHeadProps,
+  type ToggleableTableHeadProps
 } from "./ToggleableTableHead";
 
 // Column configuration
 export {
   ColumnToggleDropdown,
   type ColumnConfig,
-  type ColumnToggleDropdownProps,
+  type ColumnToggleDropdownProps
 } from "./ColumnToggleDropdown";
 
 export {
@@ -38,7 +38,7 @@ export {
   PaginationItem,
   PaginationLink,
   PaginationNext,
-  PaginationPrevious,
+  PaginationPrevious
 } from "./Pagination";
 
 export { TablePagination } from "./TablePagination";
