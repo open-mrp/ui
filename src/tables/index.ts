@@ -1,4 +1,5 @@
 export {
+  ColumnToggleDropdown,
   DraggableTableHead,
   SortableTableHead,
   Table,
@@ -9,9 +10,13 @@ export {
   TableHead,
   TableHeader,
   TableRow,
+  ToggleableTableHead,
+  type ColumnConfig,
+  type ColumnToggleDropdownProps,
   type DraggableTableHeadProps,
-  type SortableTableHeadProps,
   type SortDirection,
+  type SortableTableHeadProps,
+  type ToggleableTableHeadProps,
 } from "./TableComponents";
 
 export {
