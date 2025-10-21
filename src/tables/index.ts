@@ -1,6 +1,5 @@
+// Base table components
 export {
-  ColumnToggleDropdown,
-  SortableTableHead,
   Table,
   TableBody,
   TableCaption,
@@ -9,14 +8,28 @@ export {
   TableHead,
   TableHeader,
   TableRow,
-  ToggleableTableHead,
-  type ColumnConfig,
-  type ColumnToggleDropdownProps,
-  type DraggableTableHeadProps,
+} from "./TableComponents";
+
+// Sortable table head
+export {
+  SortableTableHead,
   type SortableTableHeadProps,
   type SortDirection,
+} from "./SortableTableHead";
+
+// Toggleable table head
+export {
+  ToggleableTableHead,
+  type DraggableTableHeadProps,
   type ToggleableTableHeadProps,
-} from "./TableComponents";
+} from "./ToggleableTableHead";
+
+// Column configuration
+export {
+  ColumnToggleDropdown,
+  type ColumnConfig,
+  type ColumnToggleDropdownProps,
+} from "./ColumnToggleDropdown";
 
 export {
   Pagination,
