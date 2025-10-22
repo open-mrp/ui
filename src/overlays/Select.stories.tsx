@@ -15,7 +15,7 @@ import {
 
 const meta = {
   component: Select,
-  title: "Navigation/Select",
+  title: "Overlays/Select",
   tags: ["autodocs"],
   decorators: [
     (Story) => (

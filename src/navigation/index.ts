@@ -15,23 +15,6 @@ export {
   type NavSubSectionProps,
 } from "./NavSubSection";
 export {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./Select";
-export {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./Sheet";
-export {
   default as Sidenav,
   type NavSection,
   type SidenavProps,

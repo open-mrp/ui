@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/navigation/Select";
+} from "@/overlays/Select";
 import { cn } from "@/utils/cn";
 import * as React from "react";
 import {
