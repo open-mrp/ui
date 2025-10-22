@@ -34,7 +34,7 @@
     "test": "jest",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
-    "yalc-publish": "bun run build && yalc publish"
+    "yalc:publish": "bun run build && yalc publish"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.2",
@@ -86,6 +86,7 @@
     "@xyflow/react": "^12.6.4"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
