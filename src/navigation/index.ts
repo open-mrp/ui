@@ -19,4 +19,5 @@ export {
   type NavSection,
   type SidenavProps,
 } from "./Sidenav";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
 export { type NavLink, type NavSubSectionData } from "./types";

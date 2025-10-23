@@ -6,5 +6,7 @@ export * from "./hooks";
 export * from "./icons";
 export * from "./markdown";
 export * from "./navigation";
+export * from "./overlays";
 export * from "./shaders";
 export * from "./signifiers";
+export * from "./tables";
