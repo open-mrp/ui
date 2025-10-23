@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.10.0
+
+### Minor Changes
+
+- 8a776de: added custom tables (sortiable, movable, plain), added pagination, added popup overlay sheet (side bar), added select, added tabs,
+
 ## 0.9.5
 
 ### Patch Changes
