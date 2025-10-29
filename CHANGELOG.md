@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.11.0
+
+### Minor Changes
+
+- 172cb65: added popover component and storyy
+
 ## 0.10.0
 
 ### Minor Changes
