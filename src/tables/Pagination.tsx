@@ -8,15 +8,23 @@ import * as React from "react";
 import { Button, buttonVariants } from "@/buttons/ShadButton";
 import { cn } from "@/utils/cn";
 
-function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
+const PaginationContext = React.createContext<{ buttonClassName?: string }>({});
+
+function Pagination({
+  className,
+  buttonClassName,
+  ...props
+}: React.ComponentProps<"nav"> & { buttonClassName?: string }) {
   return (
-    <nav
-      role="navigation"
-      aria-label="pagination"
-      data-slot="pagination"
-      className={cn("mx-auto flex w-full justify-center", className)}
-      {...props}
-    />
+    <PaginationContext.Provider value={{ buttonClassName }}>
+      <nav
+        role="navigation"
+        aria-label="pagination"
+        data-slot="pagination"
+        className={cn("mx-auto flex w-full justify-center", className)}
+        {...props}
+      />
+    </PaginationContext.Provider>
   );
 }
 
@@ -50,6 +58,8 @@ function PaginationLink({
   size = "icon",
   ...props
 }: PaginationLinkProps) {
+  const { buttonClassName } = React.useContext(PaginationContext);
+
   return (
     <a
       aria-current={isActive ? "page" : undefined}
@@ -61,6 +71,7 @@ function PaginationLink({
           size,
         }),
         "cursor-pointer",
+        buttonClassName,
         className
       )}
       {...props}

@@ -150,6 +150,174 @@ export const PaginationComponents: Story = {
             </PaginationContent>
           </Pagination>
         </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-4">
+            Pagination with Custom Button Styling (Primary Color)
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Use the buttonClassName prop to apply consistent styling to all
+            pagination buttons. This example shows primary-colored borders.
+          </p>
+          <Pagination buttonClassName="!border !border-primary hover:!border-primary/80">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Previous");
+                  }}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 1");
+                  }}
+                  isActive
+                  size="icon"
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 2");
+                  }}
+                  size="icon"
+                >
+                  2
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 3");
+                  }}
+                  size="icon"
+                >
+                  3
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 10");
+                  }}
+                  size="icon"
+                >
+                  10
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Next");
+                  }}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-4">
+            Pagination with Input-like Styling
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Match the styling of input components like Select and
+            ColumnToggleDropdown.
+          </p>
+          <Pagination buttonClassName="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Previous");
+                  }}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 1");
+                  }}
+                  isActive
+                  size="icon"
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 2");
+                  }}
+                  size="icon"
+                >
+                  2
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 3");
+                  }}
+                  size="icon"
+                >
+                  3
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Page 10");
+                  }}
+                  size="icon"
+                >
+                  10
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log("Next");
+                  }}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     );
   },
