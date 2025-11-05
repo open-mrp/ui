@@ -1,7 +1,7 @@
 {
   "name": "@augno/ui",
   "description": "A collection of react components and other user interface utilities for Augno.",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "author": "Augno, Inc.",
   "type": "module",
   "main": "dist/cjs/index.js",

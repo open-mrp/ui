@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.11.1
+
+### Patch Changes
+
+- 67bb67d: pagination styling fix
+
 ## 0.11.0
 
 ### Minor Changes
