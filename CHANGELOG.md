@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.12.0
+
+### Minor Changes
+
+- 53fe249: darkmode
+
 ## 0.11.1
 
 ### Patch Changes
