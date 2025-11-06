@@ -21,7 +21,7 @@ import { TablePagination } from "./TablePagination";
 import { generateSampleData } from "./TableStories.utils";
 
 const meta: Meta<typeof Table> = {
-  title: "Components/Table/Pagination",
+  title: "Table/Pagination",
   component: Table,
   parameters: {
     layout: "padded",

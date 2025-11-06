@@ -27,7 +27,7 @@ import {
 } from "./DropdownMenu";
 
 const meta: Meta<typeof DropdownMenu> = {
-  title: "Components/Navigation/DropdownMenu",
+  title: "Overlays/DropdownMenu",
   component: DropdownMenu,
   parameters: {
     layout: "centered",

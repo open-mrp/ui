@@ -13,7 +13,7 @@ import {
 import { invoices } from "./TableStories.utils";
 
 const meta: Meta<typeof Table> = {
-  title: "Components/Table/Base",
+  title: "Table/Base",
   component: Table,
   parameters: {
     layout: "padded",
