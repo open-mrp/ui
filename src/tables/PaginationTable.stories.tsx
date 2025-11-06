@@ -79,7 +79,6 @@ export const PaginationComponents: Story = {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Previous");
@@ -88,7 +87,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 1");
@@ -101,7 +99,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 2");
@@ -113,7 +110,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 3");
@@ -128,7 +124,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 10");
@@ -140,7 +135,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationNext
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Next");
@@ -155,7 +149,7 @@ export const PaginationComponents: Story = {
           <h3 className="text-lg font-semibold mb-4">
             Pagination with Custom Button Styling (Primary Color)
           </h3>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
             Use the buttonClassName prop to apply consistent styling to all
             pagination buttons. This example shows primary-colored borders.
           </p>
@@ -163,7 +157,6 @@ export const PaginationComponents: Story = {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Previous");
@@ -172,7 +165,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 1");
@@ -185,7 +177,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 2");
@@ -197,7 +188,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 3");
@@ -212,7 +202,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 10");
@@ -224,7 +213,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationNext
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Next");
@@ -239,7 +227,7 @@ export const PaginationComponents: Story = {
           <h3 className="text-lg font-semibold mb-4">
             Pagination with Input-like Styling
           </h3>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
             Match the styling of input components like Select and
             ColumnToggleDropdown.
           </p>
@@ -247,7 +235,6 @@ export const PaginationComponents: Story = {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Previous");
@@ -256,7 +243,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 1");
@@ -269,7 +255,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 2");
@@ -281,7 +266,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 3");
@@ -296,7 +280,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Page 10");
@@ -308,7 +291,6 @@ export const PaginationComponents: Story = {
               </PaginationItem>
               <PaginationItem>
                 <PaginationNext
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     console.log("Next");
@@ -351,62 +333,58 @@ export const PaginatedTable: Story = {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">Employee Directory</h2>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 dark:text-gray-300">
               Showing {startIndex + 1}-{Math.min(endIndex, allData.length)} of{" "}
               {allData.length} employees
             </p>
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </div>
         </div>
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Join Date</TableHead>
-                <TableHead className="text-right">Salary</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Join Date</TableHead>
+              <TableHead className="text-right">Salary</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentData.map((employee) => (
+              <TableRow key={employee.id}>
+                <TableCell className="font-medium">{employee.id}</TableCell>
+                <TableCell>{employee.name}</TableCell>
+                <TableCell>{employee.email}</TableCell>
+                <TableCell>{employee.department}</TableCell>
+                <TableCell>{employee.role}</TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      employee.status === "Active"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : employee.status === "Inactive"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                        : employee.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                    }`}
+                  >
+                    {employee.status}
+                  </span>
+                </TableCell>
+                <TableCell>{employee.joinDate}</TableCell>
+                <TableCell className="text-right">{employee.salary}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentData.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell className="font-medium">{employee.id}</TableCell>
-                  <TableCell>{employee.name}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        employee.status === "Active"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                          : employee.status === "Inactive"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                          : employee.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                      }`}
-                    >
-                      {employee.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{employee.joinDate}</TableCell>
-                  <TableCell className="text-right">
-                    {employee.salary}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
 
         <TablePagination
           currentPage={currentPage}
@@ -450,62 +428,58 @@ export const LargePaginatedTable: Story = {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">Large Dataset Table</h2>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 dark:text-gray-300">
               Showing {startIndex + 1}-{Math.min(endIndex, allData.length)} of{" "}
               {allData.length} records
             </p>
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </div>
         </div>
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Join Date</TableHead>
-                <TableHead className="text-right">Salary</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[80px]">ID</TableHead>
+              <TableHead className="min-w-[200px]">Name</TableHead>
+              <TableHead className="min-w-[240px]">Email</TableHead>
+              <TableHead className="min-w-[180px]">Department</TableHead>
+              <TableHead className="min-w-[160px]">Role</TableHead>
+              <TableHead className="min-w-[140px]">Status</TableHead>
+              <TableHead className="min-w-[140px]">Join Date</TableHead>
+              <TableHead className="text-right min-w-[140px]">Salary</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentData.map((employee) => (
+              <TableRow key={employee.id}>
+                <TableCell className="font-medium">{employee.id}</TableCell>
+                <TableCell>{employee.name}</TableCell>
+                <TableCell>{employee.email}</TableCell>
+                <TableCell>{employee.department}</TableCell>
+                <TableCell>{employee.role}</TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      employee.status === "Active"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : employee.status === "Inactive"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                        : employee.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                    }`}
+                  >
+                    {employee.status}
+                  </span>
+                </TableCell>
+                <TableCell>{employee.joinDate}</TableCell>
+                <TableCell className="text-right">{employee.salary}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentData.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell className="font-medium">{employee.id}</TableCell>
-                  <TableCell>{employee.name}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        employee.status === "Active"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                          : employee.status === "Inactive"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                          : employee.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                      }`}
-                    >
-                      {employee.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{employee.joinDate}</TableCell>
-                  <TableCell className="text-right">
-                    {employee.salary}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
 
         <TablePagination
           currentPage={currentPage}
@@ -549,59 +523,55 @@ export const TableWithItemsPerPageSelector: Story = {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">Employee Directory</h2>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 dark:text-gray-300">
               Showing {startIndex + 1}-{Math.min(endIndex, allData.length)} of{" "}
               {allData.length} employees
             </p>
           </div>
         </div>
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Join Date</TableHead>
-                <TableHead className="text-right">Salary</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[80px]">ID</TableHead>
+              <TableHead className="min-w-[200px]">Name</TableHead>
+              <TableHead className="min-w-[240px]">Email</TableHead>
+              <TableHead className="min-w-[180px]">Department</TableHead>
+              <TableHead className="min-w-[160px]">Role</TableHead>
+              <TableHead className="min-w-[140px]">Status</TableHead>
+              <TableHead className="min-w-[140px]">Join Date</TableHead>
+              <TableHead className="text-right min-w-[140px]">Salary</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentData.map((employee) => (
+              <TableRow key={employee.id}>
+                <TableCell className="font-medium">{employee.id}</TableCell>
+                <TableCell>{employee.name}</TableCell>
+                <TableCell>{employee.email}</TableCell>
+                <TableCell>{employee.department}</TableCell>
+                <TableCell>{employee.role}</TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      employee.status === "Active"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : employee.status === "Inactive"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                        : employee.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                    }`}
+                  >
+                    {employee.status}
+                  </span>
+                </TableCell>
+                <TableCell>{employee.joinDate}</TableCell>
+                <TableCell className="text-right">{employee.salary}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentData.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell className="font-medium">{employee.id}</TableCell>
-                  <TableCell>{employee.name}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        employee.status === "Active"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                          : employee.status === "Inactive"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                          : employee.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                      }`}
-                    >
-                      {employee.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{employee.joinDate}</TableCell>
-                  <TableCell className="text-right">
-                    {employee.salary}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
 
         <TablePagination
           currentPage={currentPage}
@@ -611,6 +581,9 @@ export const TableWithItemsPerPageSelector: Story = {
           onItemsPerPageChange={handleItemsPerPageChange}
           itemsPerPageOptions={[5, 10, 20, 50, 100]}
           maxVisiblePages={5}
+          className="text-gray-900 dark:text-blue-200 outline-gray-800 dark:outline-amber-200"
+          buttonClassName="text-gray-900 dark:text-blue-200 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
+          selectClassName="text-gray-900 dark:text-blue-200  hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
         />
       </div>
     );

@@ -44,7 +44,7 @@ export function ColumnToggleDropdown({
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-background hover:bg-accent dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-9",
+            "border-gray-300 text-gray-900 data-[placeholder]:text-gray-500 [&_svg:not([class*='text-'])]:text-gray-500 focus-visible:border-stone-500 focus-visible:ring-stone-500/50 aria-invalid:ring-red-500/20 dark:aria-invalid:ring-red-500/40 aria-invalid:border-red-500 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:border-gray-600 dark:focus-visible:border-stone-400 dark:focus-visible:ring-stone-400/50 flex w-fit items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-9",
             className
           )}
           title="Column settings"
@@ -65,7 +65,7 @@ export function ColumnToggleDropdown({
           {onResetColumns && (
             <button
               onClick={onResetColumns}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring/50 rounded px-1 py-0.5"
+              className="text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500/50 dark:focus:ring-stone-400/50 rounded px-1 py-0.5"
             >
               Reset
             </button>
@@ -77,7 +77,7 @@ export function ColumnToggleDropdown({
             <div
               key={column.id}
               className={cn(
-                "flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-accent/50 transition-colors cursor-pointer",
+                "flex items-center gap-2 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer",
                 column.isRequired && "opacity-50"
               )}
               onClick={() => !column.isRequired && onToggleColumn(column.id)}
@@ -87,21 +87,21 @@ export function ColumnToggleDropdown({
                 checked={column.isVisible}
                 onChange={() => onToggleColumn(column.id)}
                 disabled={column.isRequired}
-                className="rounded border-input size-4"
+                className="rounded border-gray-300 dark:border-gray-600 size-4"
               />
               <span
                 className={cn(
                   "flex-1",
-                  column.isRequired && "text-muted-foreground"
+                  column.isRequired && "text-gray-500 dark:text-gray-400"
                 )}
               >
                 {column.label}
                 {column.isRequired && " (required)"}
               </span>
               {column.isVisible ? (
-                <EyeIcon className="size-4 text-foreground" />
+                <EyeIcon className="size-4 text-gray-900 dark:text-gray-100" />
               ) : (
-                <EyeOffIcon className="size-4 text-muted-foreground" />
+                <EyeOffIcon className="size-4 text-gray-500 dark:text-gray-400" />
               )}
             </div>
           ))}

@@ -19,7 +19,7 @@ describe("Button", () => {
     );
     const button = screen.getByRole("button", { name: /variant test/i });
     expect(button).toHaveClass("border");
-    expect(button).toHaveClass("border-blue-500");
+    expect(button).toHaveClass("border-stone-500");
   });
 
   test("applies custom color classes", () => {

@@ -26,11 +26,11 @@ const colorVariants = {
     icon: "text-secondary-500 hover:bg-secondary-500/5 disabled:text-gray-600 disabled:hover:bg-transparent disabled:hover:cursor-auto",
   },
   blue: {
-    contained: "bg-blue-500 text-white hover:bg-blue-600",
+    contained: "bg-stone-500 text-white hover:bg-stone-600",
     outlined:
-      "border-blue-500 text-blue-500 hover:bg-blue-500/5 hover:border-blue-500",
-    text: "text-blue-500 hover:bg-blue-500/5",
-    icon: "text-blue-500 hover:bg-blue-500/5",
+      "border-stone-500 text-stone-500 hover:bg-stone-500/5 hover:border-stone-500",
+    text: "text-stone-500 hover:bg-stone-500/5",
+    icon: "text-stone-500 hover:bg-stone-500/5",
   },
   green: {
     contained: "bg-green-500 text-white hover:bg-green-600",
