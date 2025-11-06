@@ -22,6 +22,8 @@ import {
 export interface TablePaginationProps extends React.ComponentProps<"div"> {
   currentPage: number;
   totalPages: number;
+  buttonClassName?: string;
+  selectClassName?: string;
   onPageChange: (page: number) => void;
   maxVisiblePages?: number;
   showFirstLast?: boolean;
@@ -37,6 +39,8 @@ export interface TablePaginationProps extends React.ComponentProps<"div"> {
  */
 function TablePagination({
   className,
+  buttonClassName,
+  selectClassName,
   currentPage,
   totalPages,
   onPageChange,
@@ -49,6 +53,20 @@ function TablePagination({
   showItemsPerPageSelector = true,
   ...props
 }: TablePaginationProps) {
+  const sharedButtonClasses = cn(
+    "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:focus-visible:ring-gray-500 transition-colors",
+    buttonClassName
+  );
+
+  const selectTriggerClasses = cn(
+    "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-0 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:focus-visible:ring-gray-500 transition-colors",
+    selectClassName
+  );
+  const selectContentClasses = cn(
+    "border border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100",
+    selectClassName
+  );
+
   // Generate page numbers to display
   const getVisiblePages = (): number[] => {
     if (totalPages <= maxVisiblePages) {
@@ -91,23 +109,32 @@ function TablePagination({
 
   return (
     <div
-      className={cn("flex items-center justify-between w-full", className)}
+      className={cn(
+        "flex items-center justify-between w-full text-gray-700 dark:text-slate-200",
+        className
+      )}
       {...props}
     >
       {/* Items per page selector */}
       {showItemsPerPageSelector && onItemsPerPageChange && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Items per page:</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            Items per page:
+          </span>
           <Select
             value={itemsPerPage.toString()}
             onValueChange={handleItemsPerPageChange}
           >
-            <SelectTrigger className="w-20">
+            <SelectTrigger className={cn("w-20", selectTriggerClasses)}>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={selectContentClasses}>
               {itemsPerPageOptions.map((option) => (
-                <SelectItem key={option} value={option.toString()}>
+                <SelectItem
+                  key={option}
+                  value={option.toString()}
+                  // className={selectClassName}
+                >
                   {option}
                 </SelectItem>
               ))}
@@ -118,19 +145,20 @@ function TablePagination({
 
       {/* Pagination controls */}
       {totalPages > 1 && (
-        <Pagination>
+        <Pagination buttonClassName={sharedButtonClasses}>
           <PaginationContent>
             {/* Previous button */}
             {showPrevNext && (
               <PaginationItem>
                 <PaginationPrevious
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     handlePageClick(currentPage - 1);
                   }}
                   className={
-                    currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                    currentPage <= 1
+                      ? "pointer-events-none opacity-50"
+                      : undefined
                   }
                 />
               </PaginationItem>
@@ -140,7 +168,6 @@ function TablePagination({
             {showFirstLast && currentPage > 1 && !visiblePages.includes(1) && (
               <PaginationItem>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     handlePageClick(1);
@@ -163,7 +190,6 @@ function TablePagination({
             {visiblePages.map((page) => (
               <PaginationItem key={page}>
                 <PaginationLink
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     handlePageClick(page);
@@ -188,7 +214,6 @@ function TablePagination({
               !visiblePages.includes(totalPages) && (
                 <PaginationItem>
                   <PaginationLink
-                    href="#"
                     onClick={(e) => {
                       e.preventDefault();
                       handlePageClick(totalPages);
@@ -204,7 +229,6 @@ function TablePagination({
             {showPrevNext && (
               <PaginationItem>
                 <PaginationNext
-                  href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     handlePageClick(currentPage + 1);
@@ -212,7 +236,7 @@ function TablePagination({
                   className={
                     currentPage >= totalPages
                       ? "pointer-events-none opacity-50"
-                      : ""
+                      : undefined
                   }
                 />
               </PaginationItem>

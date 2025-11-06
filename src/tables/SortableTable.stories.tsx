@@ -83,7 +83,7 @@ export const SortableTable: Story = {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">Sortable Employee Directory</h2>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 dark:text-gray-300">
               Click column headers to sort. Showing {startIndex + 1}-
               {Math.min(endIndex, sortedData.length)} of {sortedData.length}{" "}
               employees
@@ -97,104 +97,105 @@ export const SortableTable: Story = {
           </div>
         </div>
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <SortableTableHead
-                  className="w-[100px]"
-                  sortKey="id"
-                  sortDirection={sortKey === "id" ? sortDirection : null}
-                  onSort={handleSort}
-                >
-                  ID
-                </SortableTableHead>
-                <SortableTableHead
-                  sortKey="name"
-                  sortDirection={sortKey === "name" ? sortDirection : null}
-                  onSort={handleSort}
-                >
-                  Name
-                </SortableTableHead>
-                <SortableTableHead
-                  sortKey="email"
-                  sortDirection={sortKey === "email" ? sortDirection : null}
-                  onSort={handleSort}
-                >
-                  Email
-                </SortableTableHead>
-                <SortableTableHead
-                  sortKey="department"
-                  sortDirection={
-                    sortKey === "department" ? sortDirection : null
-                  }
-                  onSort={handleSort}
-                >
-                  Department
-                </SortableTableHead>
-                <SortableTableHead
-                  sortKey="role"
-                  sortDirection={sortKey === "role" ? sortDirection : null}
-                  onSort={handleSort}
-                >
-                  Role
-                </SortableTableHead>
-                <SortableTableHead
-                  sortKey="status"
-                  sortDirection={sortKey === "status" ? sortDirection : null}
-                  onSort={handleSort}
-                >
-                  Status
-                </SortableTableHead>
-                <SortableTableHead
-                  sortKey="joinDate"
-                  sortDirection={sortKey === "joinDate" ? sortDirection : null}
-                  onSort={handleSort}
-                >
-                  Join Date
-                </SortableTableHead>
-                <SortableTableHead
-                  className="text-right"
-                  sortKey="salary"
-                  sortDirection={sortKey === "salary" ? sortDirection : null}
-                  onSort={handleSort}
-                >
-                  Salary
-                </SortableTableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <SortableTableHead
+                sortKey="id"
+                sortable
+                sortDirection={sortKey === "id" ? sortDirection : null}
+                onSort={handleSort}
+              >
+                ID
+              </SortableTableHead>
+              <SortableTableHead
+                sortKey="name"
+                sortable
+                sortDirection={sortKey === "name" ? sortDirection : null}
+                onSort={handleSort}
+              >
+                Name
+              </SortableTableHead>
+              <SortableTableHead
+                sortKey="email"
+                sortable
+                sortDirection={sortKey === "email" ? sortDirection : null}
+                onSort={handleSort}
+              >
+                Email
+              </SortableTableHead>
+              <SortableTableHead
+                sortKey="department"
+                sortable
+                sortDirection={sortKey === "department" ? sortDirection : null}
+                onSort={handleSort}
+              >
+                Department
+              </SortableTableHead>
+              <SortableTableHead
+                sortKey="role"
+                sortable
+                sortDirection={sortKey === "role" ? sortDirection : null}
+                onSort={handleSort}
+              >
+                Role
+              </SortableTableHead>
+              <SortableTableHead
+                sortKey="status"
+                sortable
+                sortDirection={sortKey === "status" ? sortDirection : null}
+                onSort={handleSort}
+              >
+                Status
+              </SortableTableHead>
+              <SortableTableHead
+                sortKey="joinDate"
+                sortable
+                sortDirection={sortKey === "joinDate" ? sortDirection : null}
+                onSort={handleSort}
+              >
+                Join Date
+              </SortableTableHead>
+              <SortableTableHead
+                sortKey="salary"
+                sortable
+                sortDirection={sortKey === "salary" ? sortDirection : null}
+                onSort={handleSort}
+                className="text-right"
+              >
+                Salary
+              </SortableTableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortedData.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell className="font-medium">{row.id}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.department}</TableCell>
+                <TableCell>{row.role}</TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      row.status === "Active"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : row.status === "Inactive"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                        : row.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                    }`}
+                  >
+                    {row.status}
+                  </span>
+                </TableCell>
+                <TableCell>{row.joinDate}</TableCell>
+                <TableCell className="text-right">{row.salary}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentData.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell className="font-medium">{employee.id}</TableCell>
-                  <TableCell>{employee.name}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        employee.status === "Active"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                          : employee.status === "Inactive"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                          : employee.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                      }`}
-                    >
-                      {employee.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{employee.joinDate}</TableCell>
-                  <TableCell className="text-right">
-                    {employee.salary}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
 
         <TablePagination
           currentPage={currentPage}

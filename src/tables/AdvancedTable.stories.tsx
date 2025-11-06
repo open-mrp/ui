@@ -140,7 +140,7 @@ export const ToggleableTable: Story = {
             <h2 className="text-2xl font-bold">
               Advanced Table with Column Controls
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 dark:text-gray-300">
               Drag to reorder, click to sort, toggle visibility. Showing{" "}
               {startIndex + 1}-{Math.min(endIndex, sortedData.length)} of{" "}
               {sortedData.length} employees
@@ -159,89 +159,83 @@ export const ToggleableTable: Story = {
           />
         </div>
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {visibleColumns.map((columnId) => {
+                const config = columnConfig.find((col) => col.id === columnId);
+                if (!config) return null;
+
+                return (
+                  <ToggleableTableHead
+                    key={columnId}
+                    className={
+                      columnId === "id"
+                        ? "w-[100px]"
+                        : columnId === "salary"
+                        ? "text-right"
+                        : ""
+                    }
+                    columnId={columnId}
+                    sortKey={columnId}
+                    sortDirection={sortKey === columnId ? sortDirection : null}
+                    onSort={handleSort}
+                    onColumnReorder={handleColumnReorder}
+                    isVisible={config.isVisible}
+                    showDragHandle={true}
+                  >
+                    {config.label}
+                  </ToggleableTableHead>
+                );
+              })}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentData.map((employee) => (
+              <TableRow key={employee.id}>
                 {visibleColumns.map((columnId) => {
                   const config = columnConfig.find(
                     (col) => col.id === columnId
                   );
                   if (!config) return null;
 
+                  const value = employee[columnId as keyof typeof employee];
+
                   return (
-                    <ToggleableTableHead
+                    <TableCell
                       key={columnId}
                       className={
                         columnId === "id"
-                          ? "w-[100px]"
+                          ? "font-medium"
                           : columnId === "salary"
                           ? "text-right"
                           : ""
                       }
-                      columnId={columnId}
-                      sortKey={columnId}
-                      sortDirection={
-                        sortKey === columnId ? sortDirection : null
-                      }
-                      onSort={handleSort}
-                      onColumnReorder={handleColumnReorder}
-                      isVisible={config.isVisible}
-                      showDragHandle={true}
                     >
-                      {config.label}
-                    </ToggleableTableHead>
+                      {columnId === "status" ? (
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            value === "Active"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              : value === "Inactive"
+                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                              : value === "Pending"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                          }`}
+                        >
+                          {value}
+                        </span>
+                      ) : (
+                        value
+                      )}
+                    </TableCell>
                   );
                 })}
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentData.map((employee) => (
-                <TableRow key={employee.id}>
-                  {visibleColumns.map((columnId) => {
-                    const config = columnConfig.find(
-                      (col) => col.id === columnId
-                    );
-                    if (!config) return null;
-
-                    const value = employee[columnId as keyof typeof employee];
-
-                    return (
-                      <TableCell
-                        key={columnId}
-                        className={
-                          columnId === "id"
-                            ? "font-medium"
-                            : columnId === "salary"
-                            ? "text-right"
-                            : ""
-                        }
-                      >
-                        {columnId === "status" ? (
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              value === "Active"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                                : value === "Inactive"
-                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                                : value === "Pending"
-                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                                : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                            }`}
-                          >
-                            {value}
-                          </span>
-                        ) : (
-                          value
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
 
         <TablePagination
           currentPage={currentPage}

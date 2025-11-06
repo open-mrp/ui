@@ -46,7 +46,7 @@ export default function Footer({
                 {renderLink({
                   href: link.link.href,
                   children: (
-                    <span className="text-blue-500 ml-1 !text-xs">
+                    <span className="text-stone-500 ml-1 !text-xs">
                       {link.link.text}
                     </span>
                   ),

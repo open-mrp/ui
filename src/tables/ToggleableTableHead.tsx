@@ -73,11 +73,12 @@ export function ToggleableTableHead({
     <th
       data-slot="toggleable-table-head"
       className={cn(
-        "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        sortable && "cursor-pointer hover:bg-muted/50 transition-colors",
+        "text-gray-900 dark:text-gray-100 h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        sortable &&
+          "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors",
         isDragging && "opacity-50",
         (isDragOver || isDragOverSelf) &&
-          "bg-blue-50 dark:bg-blue-900/20 border-l-2 border-blue-500",
+          "bg-stone-50 dark:bg-stone-900/20 border-l-2 border-stone-500 dark:border-stone-400",
         !isVisible && "opacity-50",
         className
       )}
@@ -92,7 +93,7 @@ export function ToggleableTableHead({
       <div className="flex items-center gap-1">
         {showDragHandle && (
           <div className="flex items-center">
-            <GripVerticalIcon className="size-3 text-muted-foreground cursor-grab active:cursor-grabbing" />
+            <GripVerticalIcon className="size-3 text-gray-500 dark:text-gray-400 cursor-grab active:cursor-grabbing" />
           </div>
         )}
         <div className="flex items-center gap-1 flex-1">
@@ -101,13 +102,13 @@ export function ToggleableTableHead({
         {sortable && sortKey && (
           <div className="flex items-center">
             {sortDirection === "asc" ? (
-              <ChevronUpIcon className="size-3 text-foreground transition-colors" />
+              <ChevronUpIcon className="size-3 text-gray-900 dark:text-gray-100 transition-colors" />
             ) : sortDirection === "desc" ? (
-              <ChevronDownIcon className="size-3 text-foreground transition-colors" />
+              <ChevronDownIcon className="size-3 text-gray-900 dark:text-gray-100 transition-colors" />
             ) : (
               <div className="flex flex-col">
-                {/* <ChevronUpIcon className="size-3 text-muted-foreground transition-colors" /> */}
-                {/* <ChevronDownIcon className="size-3 -mt-1 text-muted-foreground transition-colors" /> */}
+                {/* <ChevronUpIcon className="size-3 text-gray-500 dark:text-gray-400 transition-colors" /> */}
+                {/* <ChevronDownIcon className="size-3 -mt-1 text-gray-500 dark:text-gray-400 transition-colors" /> */}
               </div>
             )}
           </div>

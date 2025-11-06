@@ -191,6 +191,8 @@ blockquote h4 {
   font-weight: 500;
 }
 
+@variant dark (.dark &);
+
 @theme {
   --color-black: #000;
   --color-white: #fff;
