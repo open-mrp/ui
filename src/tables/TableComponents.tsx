@@ -4,28 +4,39 @@ import * as React from "react";
 
 import { cn } from "@/utils/cn";
 
-type TableProps = React.ComponentProps<"table"> & {
-  containerClassName?: string;
-};
-
-function Table({ className, containerClassName, ...props }: TableProps) {
+function TableContainer({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="table-container"
       className={cn(
-        "relative w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800",
-        containerClassName
+        "relative w-full overflow-x-auto rounded-lg border shadow-sm",
+        "bg-white border-gray-200",
+        "dark:bg-gray-800 dark:border-gray-700",
+        className
       )}
+      {...props}
     >
-      <table
-        data-slot="table"
-        className={cn(
-          "w-full caption-bottom text-sm text-gray-900 dark:text-gray-100",
-          className
-        )}
-        {...props}
-      />
+      {children}
     </div>
+  );
+}
+
+function Table({ className, ...props }: React.ComponentProps<"table">) {
+  return (
+    <table
+      data-slot="table"
+      className={cn(
+        "w-full caption-bottom text-sm",
+        "text-gray-900",
+        "dark:text-gray-100",
+        className
+      )}
+      {...props}
+    />
   );
 }
 
@@ -34,7 +45,11 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
     <thead
       data-slot="table-header"
       className={cn(
-        "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 [&_tr]:border-b [&_tr]:border-gray-200 dark:[&_tr]:border-gray-600",
+        "[&_tr]:border-b",
+        "bg-gray-100 text-gray-700",
+        "[&_tr]:border-gray-200",
+        "dark:bg-gray-700 dark:text-gray-200",
+        "dark:[&_tr]:border-gray-600",
         className
       )}
       {...props}
@@ -47,7 +62,9 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
     <tbody
       data-slot="table-body"
       className={cn(
-        "bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100 [&_tr:last-child]:border-0",
+        "[&_tr:last-child]:border-0",
+        "bg-white text-gray-900",
+        "dark:bg-gray-800 dark:text-gray-100",
         className
       )}
       {...props}
@@ -60,7 +77,9 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        "bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100 border-t border-gray-200 dark:border-gray-600 font-medium [&>tr]:last:border-b-0",
+        "border-t font-medium [&>tr]:last:border-b-0",
+        "bg-gray-100 text-gray-900 border-gray-200",
+        "dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600",
         className
       )}
       {...props}
@@ -73,7 +92,11 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=selected]:bg-gray-100 dark:data-[state=selected]:bg-gray-700 border-b border-gray-200 dark:border-gray-600 transition-colors",
+        "border-b transition-colors",
+        "border-gray-200",
+        "hover:bg-gray-100",
+        "dark:border-gray-600",
+        "dark:hover:bg-gray-700",
         className
       )}
       {...props}
@@ -86,7 +109,9 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "text-gray-700 dark:text-gray-100 h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "text-gray-700",
+        "dark:text-gray-100",
         className
       )}
       {...props}
@@ -114,7 +139,12 @@ function TableCaption({
   return (
     <caption
       data-slot="table-caption"
-      className={cn("text-gray-600 dark:text-gray-300 mt-4 text-sm", className)}
+      className={cn(
+        "mt-4 text-sm",
+        "text-gray-600",
+        "dark:text-gray-300",
+        className
+      )}
       {...props}
     />
   );
@@ -125,6 +155,7 @@ export {
   TableBody,
   TableCaption,
   TableCell,
+  TableContainer,
   TableFooter,
   TableHead,
   TableHeader,

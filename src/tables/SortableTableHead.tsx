@@ -34,9 +34,8 @@ export function SortableTableHead({
     <th
       data-slot="sortable-table-head"
       className={cn(
-        "text-gray-900 dark:text-gray-100 h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        sortable &&
-          "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors",
+        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        sortable && "cursor-pointer transition-colors",
         className
       )}
       onClick={handleClick}
@@ -47,13 +46,13 @@ export function SortableTableHead({
         {sortable && sortKey && (
           <div className="flex items-center">
             {sortDirection === "asc" ? (
-              <ChevronUpIcon className="size-3 text-gray-900 dark:text-gray-100 transition-colors" />
+              <ChevronUpIcon className="size-3 transition-colors" />
             ) : sortDirection === "desc" ? (
-              <ChevronDownIcon className="size-3 text-gray-900 dark:text-gray-100 transition-colors" />
+              <ChevronDownIcon className="size-3 transition-colors" />
             ) : (
               <div className="flex flex-col">
-                {/* <ChevronUpIcon className="size-3 text-gray-500 dark:text-gray-400 transition-colors" />
-                <ChevronDownIcon className="size-3 -mt-1 text-gray-500 dark:text-gray-400 transition-colors" /> */}
+                {/* <ChevronUpIcon className="size-3 transition-colors" />
+                <ChevronDownIcon className="size-3 -mt-1 transition-colors" /> */}
               </div>
             )}
           </div>
