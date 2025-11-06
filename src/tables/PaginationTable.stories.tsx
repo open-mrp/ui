@@ -1,23 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import * as React from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./index";
-import {
+  ItemsPerPageSelector,
   Pagination,
   PaginationContent,
+  PaginationControls,
   PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "./Pagination";
-import { TablePagination } from "./TablePagination";
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./index";
 import { generateSampleData } from "./TableStories.utils";
 
 const meta: Meta<typeof Table> = {
@@ -40,35 +40,41 @@ export const PaginationComponents: Story = {
       <div className="space-y-8">
         <div>
           <h3 className="text-lg font-semibold mb-4">Table Pagination</h3>
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={10}
-            onPageChange={setCurrentPage}
-            maxVisiblePages={5}
-          />
+          <div className="flex items-center justify-between w-full">
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={10}
+              onPageChange={setCurrentPage}
+              maxVisiblePages={5}
+            />
+          </div>
         </div>
 
         <div>
           <h3 className="text-lg font-semibold mb-4">
             Large Dataset Pagination
           </h3>
-          <TablePagination
-            currentPage={15}
-            totalPages={50}
-            onPageChange={(page) => console.log("Page changed to:", page)}
-            maxVisiblePages={7}
-          />
+          <div className="flex items-center justify-between w-full">
+            <PaginationControls
+              currentPage={15}
+              totalPages={50}
+              onPageChange={(page) => console.log("Page changed to:", page)}
+              maxVisiblePages={7}
+            />
+          </div>
         </div>
 
         <div>
           <h3 className="text-lg font-semibold mb-4">Compact Pagination</h3>
-          <TablePagination
-            currentPage={2}
-            totalPages={5}
-            onPageChange={(page) => console.log("Page changed to:", page)}
-            showFirstLast={false}
-            maxVisiblePages={3}
-          />
+          <div className="flex items-center justify-between w-full">
+            <PaginationControls
+              currentPage={2}
+              totalPages={5}
+              onPageChange={(page) => console.log("Page changed to:", page)}
+              showFirstLast={false}
+              maxVisiblePages={3}
+            />
+          </div>
         </div>
 
         <div>
@@ -150,10 +156,10 @@ export const PaginationComponents: Story = {
             Pagination with Custom Button Styling (Primary Color)
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            Use the buttonClassName prop to apply consistent styling to all
-            pagination buttons. This example shows primary-colored borders.
+            Apply consistent styling to all pagination buttons using className.
+            This example shows primary-colored borders.
           </p>
-          <Pagination buttonClassName="!border !border-primary hover:!border-primary/80">
+          <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
@@ -161,6 +167,7 @@ export const PaginationComponents: Story = {
                     e.preventDefault();
                     console.log("Previous");
                   }}
+                  className="!border !border-primary hover:!border-primary/80"
                 />
               </PaginationItem>
               <PaginationItem>
@@ -171,6 +178,7 @@ export const PaginationComponents: Story = {
                   }}
                   isActive
                   size="icon"
+                  className="!border !border-primary hover:!border-primary/80"
                 >
                   1
                 </PaginationLink>
@@ -182,6 +190,7 @@ export const PaginationComponents: Story = {
                     console.log("Page 2");
                   }}
                   size="icon"
+                  className="!border !border-primary hover:!border-primary/80"
                 >
                   2
                 </PaginationLink>
@@ -193,6 +202,7 @@ export const PaginationComponents: Story = {
                     console.log("Page 3");
                   }}
                   size="icon"
+                  className="!border !border-primary hover:!border-primary/80"
                 >
                   3
                 </PaginationLink>
@@ -207,6 +217,7 @@ export const PaginationComponents: Story = {
                     console.log("Page 10");
                   }}
                   size="icon"
+                  className="!border !border-primary hover:!border-primary/80"
                 >
                   10
                 </PaginationLink>
@@ -217,6 +228,7 @@ export const PaginationComponents: Story = {
                     e.preventDefault();
                     console.log("Next");
                   }}
+                  className="!border !border-primary hover:!border-primary/80"
                 />
               </PaginationItem>
             </PaginationContent>
@@ -231,7 +243,7 @@ export const PaginationComponents: Story = {
             Match the styling of input components like Select and
             ColumnToggleDropdown.
           </p>
-          <Pagination buttonClassName="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50">
+          <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
@@ -239,6 +251,7 @@ export const PaginationComponents: Story = {
                     e.preventDefault();
                     console.log("Previous");
                   }}
+                  className="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50"
                 />
               </PaginationItem>
               <PaginationItem>
@@ -249,6 +262,7 @@ export const PaginationComponents: Story = {
                   }}
                   isActive
                   size="icon"
+                  className="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50"
                 >
                   1
                 </PaginationLink>
@@ -260,6 +274,7 @@ export const PaginationComponents: Story = {
                     console.log("Page 2");
                   }}
                   size="icon"
+                  className="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50"
                 >
                   2
                 </PaginationLink>
@@ -271,6 +286,7 @@ export const PaginationComponents: Story = {
                     console.log("Page 3");
                   }}
                   size="icon"
+                  className="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50"
                 >
                   3
                 </PaginationLink>
@@ -285,6 +301,7 @@ export const PaginationComponents: Story = {
                     console.log("Page 10");
                   }}
                   size="icon"
+                  className="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50"
                 >
                   10
                 </PaginationLink>
@@ -295,6 +312,7 @@ export const PaginationComponents: Story = {
                     e.preventDefault();
                     console.log("Next");
                   }}
+                  className="!border !border-input bg-background hover:bg-accent dark:!bg-input/30 dark:!border-input dark:hover:!bg-input/50"
                 />
               </PaginationItem>
             </PaginationContent>
@@ -386,15 +404,19 @@ export const PaginatedTable: Story = {
           </TableBody>
         </Table>
 
-        <TablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          itemsPerPageOptions={[5, 10, 20, 50]}
-          maxVisiblePages={5}
-        />
+        <div className="flex items-center justify-between w-full">
+          <ItemsPerPageSelector
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[5, 10, 20, 50]}
+          />
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            maxVisiblePages={5}
+          />
+        </div>
       </div>
     );
   },
@@ -481,15 +503,19 @@ export const LargePaginatedTable: Story = {
           </TableBody>
         </Table>
 
-        <TablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          itemsPerPageOptions={[10, 20, 50, 100]}
-          maxVisiblePages={7}
-        />
+        <div className="flex items-center justify-between w-full">
+          <ItemsPerPageSelector
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[10, 20, 50, 100]}
+          />
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            maxVisiblePages={7}
+          />
+        </div>
       </div>
     );
   },
@@ -573,18 +599,132 @@ export const TableWithItemsPerPageSelector: Story = {
           </TableBody>
         </Table>
 
-        <TablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          itemsPerPageOptions={[5, 10, 20, 50, 100]}
-          maxVisiblePages={5}
-          className="text-gray-900 dark:text-blue-200 outline-gray-800 dark:outline-amber-200"
-          buttonClassName="text-gray-900 dark:text-blue-200 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
-          selectClassName="text-gray-900 dark:text-blue-200  hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
-        />
+        <div className="flex items-center justify-between w-full">
+          <ItemsPerPageSelector
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[5, 10, 20, 50, 100]}
+            className="text-gray-900 dark:text-blue-200"
+          />
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            maxVisiblePages={5}
+            className="text-gray-900 dark:text-blue-200"
+          />
+        </div>
+      </div>
+    );
+  },
+};
+
+export const CustomStyledPaginatedTable: Story = {
+  render: () => {
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = React.useState(10);
+
+    const allData = generateSampleData(100);
+    const totalPages = Math.ceil(allData.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = allData.slice(startIndex, endIndex);
+
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1);
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">
+              Custom Styled Paginated Table
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              Custom amber color scheme applied to table and pagination
+            </p>
+          </div>
+        </div>
+
+        <TableContainer className="bg-amber-50/30 dark:bg-amber-950/50 border-2 border-amber-300 dark:border-amber-600 shadow-xl rounded-xl">
+          <Table>
+            <TableHeader className="bg-amber-100 dark:bg-amber-900/40">
+              <TableRow className="border-amber-200 dark:border-amber-700">
+                <TableHead className="w-[100px] text-amber-900 dark:text-amber-100">
+                  ID
+                </TableHead>
+                <TableHead className="text-amber-900 dark:text-amber-100">
+                  Name
+                </TableHead>
+                <TableHead className="text-amber-900 dark:text-amber-100">
+                  Email
+                </TableHead>
+                <TableHead className="text-amber-900 dark:text-amber-100">
+                  Department
+                </TableHead>
+                <TableHead className="text-amber-900 dark:text-amber-100">
+                  Status
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="bg-amber-50/20 dark:bg-amber-950/30">
+              {currentData.map((employee, index) => (
+                <TableRow
+                  key={employee.id}
+                  className={`border-amber-200 dark:border-amber-700 ${
+                    index % 2 === 0
+                      ? "bg-amber-100/50 dark:bg-amber-900/20"
+                      : "bg-amber-100/30 dark:bg-amber-900/40"
+                  } hover:bg-amber-100 dark:hover:bg-amber-900/30`}
+                >
+                  <TableCell className="font-medium">{employee.id}</TableCell>
+                  <TableCell>{employee.name}</TableCell>
+                  <TableCell>{employee.email}</TableCell>
+                  <TableCell>{employee.department}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        employee.status === "Active"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : employee.status === "Inactive"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          : employee.status === "Pending"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                      }`}
+                    >
+                      {employee.status}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <div className="flex items-center justify-between w-full">
+          <div className="[&>div>span]:text-amber-900 [&>div>span]:dark:text-amber-100 [&_button[data-slot='select-trigger']]:border-amber-300 [&_button[data-slot='select-trigger']]:dark:border-amber-600 [&_button[data-slot='select-trigger']]:bg-amber-50 [&_button[data-slot='select-trigger']]:dark:bg-amber-900/30 [&_button[data-slot='select-trigger']]:text-amber-900 [&_button[data-slot='select-trigger']]:dark:text-amber-100 [&_button[data-slot='select-trigger']:hover]:bg-amber-100 [&_button[data-slot='select-trigger']:hover]:dark:bg-amber-900/50">
+            <ItemsPerPageSelector
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              itemsPerPageOptions={[5, 10, 20, 50]}
+            />
+          </div>
+          <div className="[&_button[data-slot='pagination-link']]:border-amber-300 [&_button[data-slot='pagination-link']]:dark:border-amber-600 [&_button[data-slot='pagination-link']]:bg-amber-50 [&_button[data-slot='pagination-link']]:dark:bg-amber-900/30 [&_button[data-slot='pagination-link']]:text-amber-900 [&_button[data-slot='pagination-link']]:dark:text-amber-100 [&_button[data-slot='pagination-link']:hover]:bg-amber-100 [&_button[data-slot='pagination-link']:hover]:dark:bg-amber-900/50 [&_span[data-slot='pagination-ellipsis']]:text-amber-900 [&_span[data-slot='pagination-ellipsis']]:dark:text-amber-100">
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              maxVisiblePages={5}
+            />
+          </div>
+        </div>
       </div>
     );
   },
