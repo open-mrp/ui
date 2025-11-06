@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.12.2
+
+### Patch Changes
+
+- dd568d7: hotfix of overlay stylings
+
 ## 0.12.1
 
 ### Patch Changes
