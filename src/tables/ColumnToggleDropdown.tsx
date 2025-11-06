@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../navigation/DropdownMenu";
+} from "../overlays/DropdownMenu";
 
 export interface ColumnConfig {
   id: string;

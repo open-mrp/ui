@@ -13,7 +13,7 @@ import { TablePagination } from "./TablePagination";
 import { generateSampleData, sortData } from "./TableStories.utils";
 
 const meta: Meta<typeof Table> = {
-  title: "Components/Table/Sortable",
+  title: "Table/Sortable",
   component: Table,
   parameters: {
     layout: "padded",
