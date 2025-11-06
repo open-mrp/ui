@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.13.0
+
+### Minor Changes
+
+- d54480c: overhaul to tables for customn styling. removing columntoggledropdown
+
 ## 0.12.2
 
 ### Patch Changes
