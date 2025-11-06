@@ -1,5 +1,12 @@
 # @augno/ui
 
+## 0.12.1
+
+### Patch Changes
+
+- abdbbb5: fix export of dropdown menu
+  fix organization of storybooks
+
 ## 0.12.0
 
 ### Minor Changes
