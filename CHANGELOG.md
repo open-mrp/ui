@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.14.0
+
+### Minor Changes
+
+- 7e3b0db: tooltip
+
 ## 0.13.0
 
 ### Minor Changes
