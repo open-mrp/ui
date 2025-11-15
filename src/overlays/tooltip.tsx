@@ -3,11 +3,13 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
 
+// https://wradix-ui.com/primitives/docs/components/tooltip
+
 import { cn } from "@/utils/cn";
 
 function TooltipProvider({
-  delayDuration = 0,
-  skipDelayDuration = 0,
+  delayDuration = 400,
+  skipDelayDuration = 300,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
   return (
