@@ -684,6 +684,38 @@ export const CompleteCustomization: Story = {
         <div className="space-y-4">
           <div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+              delayDuration prop - Delay duration
+            </p>
+            <TooltipProvider delayDuration={300}>
+              <TooltipPrimitive.Root>
+                <TooltipTrigger asChild>
+                  <Button variant="outline">Delay 300ms</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>This tooltip has a 300ms delay</p>
+                </TooltipContent>
+              </TooltipPrimitive.Root>
+            </TooltipProvider>
+          </div>
+          <div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+              skipDelayDuration prop - Skip delay duration
+            </p>
+            <TooltipProvider delayDuration={300} skipDelayDuration={200}>
+              <TooltipPrimitive.Root>
+                <TooltipTrigger asChild>
+                  <Button variant="outline">Skip 200ms</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    This tooltip has a 300ms delay but skips the first 200ms
+                  </p>
+                </TooltipContent>
+              </TooltipPrimitive.Root>
+            </TooltipProvider>
+          </div>
+          <div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
               disableHoverableContent: true - Content cannot be hovered
             </p>
             <TooltipProvider delayDuration={300} disableHoverableContent={true}>
