@@ -1,5 +1,0 @@
----
-"@augno/ui": minor
----
-
-tooltip
