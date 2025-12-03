@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.14.3
+
+### Patch Changes
+
+- 56386e3: fix: safe use of localstorage
+
 ## 0.14.2
 
 ### Patch Changes
