@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.14.2
+
+### Patch Changes
+
+- 5a3fb84: fix: improve perf of animation
+
 ## 0.14.1
 
 ### Patch Changes
