@@ -164,15 +164,17 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset, fl
 
   float time = u_time * 0.5;
 
-  float noise2 = simplex_noise(vec2(x_pos * 0.5 - time * 0.25 + wave_offset, time * 0.15 + wave_offset * 1.3)) * 0.5 + 0.5;
-  float noise3 = simplex_noise(vec2(x_pos * 0.55 + time * 0.22 + wave_offset, time * 0.12 + wave_offset * 2.1)) * 0.5 + 0.5;
+  // Single noise sample drives both secondary lines to reduce GPU work
+  float n = simplex_noise(vec2(
+    x_pos * 0.5 - time * 0.25 + wave_offset * 0.5,
+    time * 0.15 + wave_offset * 0.9
+  )) * 0.5 + 0.5;
 
-  float threshold = 0.7;
-  noise2 = smoothstep(threshold, 1.0, noise2);
-  noise3 = smoothstep(threshold, 1.0, noise3);
+  // Sharpen extremes a bit to retain variation
+  n = smoothstep(0.55, 1.0, n);
 
-  float separation2 = max_separation * noise2;
-  float separation3 = max_separation * noise3;
+  float separation2 = max_separation * n;
+  float separation3 = max_separation * (1.0 - n);
 
   float time_phase = sin(time * 0.2 + wave_offset) * 0.5 + 0.5;
   separation2 *= (1.0 - time_phase);
@@ -252,10 +254,9 @@ float wave_y_noise(float offset) {
   float x_shift = time * F;
 
   float sum = 0.0;
-  sum += simplex_noise(vec2(x * 1.30 + x_shift, y * 0.54)) * 0.85;
-  sum += simplex_noise(vec2(x * 1.00 + x_shift, y * 0.68)) * 1.15;
-  sum += simplex_noise(vec2(x * 0.70 + x_shift, y * 0.59)) * 0.60;
-  sum += simplex_noise(vec2(x * 0.40 + x_shift, y * 0.48)) * 0.40;
+  sum += simplex_noise(vec2(x * 1.30 + x_shift, y * 0.54)) * 0.90;
+  sum += simplex_noise(vec2(x * 0.90 + x_shift, y * 0.68)) * 0.80;
+  sum += simplex_noise(vec2(x * 0.55 + x_shift, y * 0.59)) * 0.55;
   return sum;
 }
 
@@ -274,8 +275,8 @@ float calc_blur(float offset) {
 
   float x = get_x() * L;
   float blur_fac = calc_blur_bias();
-  blur_fac += simplex_noise(vec2(x * 0.60 + time * F * 1.0, time * S * 0.7)) * 0.5;
-  blur_fac += simplex_noise(vec2(x * 1.30 + time * F * -0.8, time * S * 1.0)) * 0.4;
+  // Single noise octave for blur modulation to cut work roughly in half
+  blur_fac += simplex_noise(vec2(x * 0.80 + time * F * 0.6, time * S)) * 0.7;
   blur_fac = (blur_fac + 1.0) * 0.5;
   blur_fac = clamp(blur_fac, 0.0, 1.0);
   return blur_fac;
@@ -289,10 +290,11 @@ float wave_alpha(float Y, float wave_height, float offset) {
   // Cache x-coordinate once and reuse in the part loop
   float x_pos = get_x() * 0.001;
 
-  const float PART = 1.0 / 7.0;
+  // Fewer parts = significantly fewer noise samples per fragment
+  const float PART = 1.0 / 5.0;
   float sum = 0.0;
   float t = 0.0;
-  for(int i = 0; i < 7; i++) {
+  for(int i = 0; i < 5; i++) {
     sum += wave_alpha_part(dist, blur_fac, t, offset, x_pos) * PART;
     t += PART;
   }
