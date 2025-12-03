@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
 import {
   ColorConfiguration,
@@ -77,6 +77,7 @@ export const Sunset: Story = {
   args: {
     ...Default.args,
     colorConfiguration: "sunset",
+    numWaves: 20
   },
 };
 
