@@ -30,16 +30,29 @@ const getBrowserStorage = (): StorageLike | null => {
 
     try {
         const maybeWindow = globalThis as typeof globalThis & {
-            localStorage?: StorageLike;
+            localStorage?: unknown;
         };
 
-        if (!maybeWindow.localStorage) return null;
+        const candidate = maybeWindow.localStorage as
+            | (StorageLike & { [key: string]: unknown })
+            | undefined;
+
+        if (!candidate) return null;
+
+        // Guard against environments where `localStorage` exists but is not a Web Storage‑like object
+        if (
+            typeof candidate.getItem !== "function" ||
+            typeof candidate.setItem !== "function"
+        ) {
+            return null;
+        }
 
         // Touch localStorage inside try/catch in case access throws (e.g. opaque origins)
         const testKey = "__augno_theme_test__";
-        maybeWindow.localStorage.setItem(testKey, "1");
-        maybeWindow.localStorage.setItem(testKey, "0");
-        return maybeWindow.localStorage;
+        candidate.setItem(testKey, "1");
+        candidate.setItem(testKey, "0");
+
+        return candidate;
     } catch {
         return null;
     }
