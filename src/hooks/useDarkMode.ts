@@ -5,47 +5,90 @@ import { useEffect, useState } from "react";
 const DARK_MODE_KEY = "dark";
 const LIGHT_MODE_KEY = "light";
 
-// Helper to safely access localStorage
-const getLocalStorageItem = (key: string): string | null => {
-    if (typeof window === "undefined") return null;
+type StorageLike = {
+    getItem(key: string): string | null;
+    setItem(key: string, value: string): void;
+};
+
+type UseDarkModeOptions = {
+    /**
+     * Storage implementation to use for persisting theme.
+     * - Pass `null` to completely disable persistence.
+     * - Leave undefined to let the hook safely detect `localStorage` when available.
+     */
+    storage?: StorageLike | null;
+    /**
+     * Key to use when reading/writing the theme in storage.
+     * Set to `null` to avoid touching storage even if it exists.
+     */
+    storageKey?: string | null;
+};
+
+// Helper to safely obtain a browser storage instance without assuming `window` or `localStorage`
+const getBrowserStorage = (): StorageLike | null => {
+    if (typeof globalThis === "undefined") return null;
+
     try {
-        return localStorage.getItem(key);
+        const maybeWindow = globalThis as typeof globalThis & {
+            localStorage?: StorageLike;
+        };
+
+        if (!maybeWindow.localStorage) return null;
+
+        // Touch localStorage inside try/catch in case access throws (e.g. opaque origins)
+        const testKey = "__augno_theme_test__";
+        maybeWindow.localStorage.setItem(testKey, "1");
+        maybeWindow.localStorage.setItem(testKey, "0");
+        return maybeWindow.localStorage;
     } catch {
         return null;
     }
 };
 
-const setLocalStorageItem = (key: string, value: string): void => {
-    if (typeof window === "undefined") return;
+const readThemeFromStorage = (
+    storage: StorageLike | null,
+    key: string | null
+): string | null => {
+    if (!storage || !key) return null;
     try {
-        localStorage.setItem(key, value);
+        return storage.getItem(key);
     } catch {
-        // Ignore errors
+        return null;
     }
 };
 
-const hasLocalStorageKey = (key: string): boolean => {
-    if (typeof window === "undefined") return false;
+const writeThemeToStorage = (
+    storage: StorageLike | null,
+    key: string | null,
+    value: string
+): void => {
+    if (!storage || !key) return;
     try {
-        return key in localStorage;
+        storage.setItem(key, value);
     } catch {
-        return false;
+        // Ignore errors – persistence is a best-effort enhancement
     }
 };
 
-export function useDarkMode() {
+export function useDarkMode(options?: UseDarkModeOptions) {
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
-        // Check if dark mode is enabled in localStorage or system preference
-        const theme = getLocalStorageItem("theme");
+        const storage = options?.storage ?? getBrowserStorage();
+        const storageKey = options?.storageKey ?? "theme";
+
+        const theme = readThemeFromStorage(storage, storageKey);
+
+        const prefersDark =
+            typeof window !== "undefined" &&
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+
         const isDarkMode =
-            theme === DARK_MODE_KEY ||
-            (!hasLocalStorageKey("theme") &&
-                typeof window !== "undefined" &&
-                window.matchMedia("(prefers-color-scheme: dark)").matches);
+            theme === DARK_MODE_KEY || (!theme && prefersDark === true);
 
         setIsDark(isDarkMode);
+
         if (typeof document !== "undefined") {
             if (isDarkMode) {
                 document.documentElement.classList.add(DARK_MODE_KEY);
@@ -53,11 +96,12 @@ export function useDarkMode() {
                 document.documentElement.classList.remove(DARK_MODE_KEY);
             }
         }
-    }, []);
+    }, [options?.storage, options?.storageKey]);
 
     const toggleDarkMode = () => {
         const newIsDark = !isDark;
         setIsDark(newIsDark);
+
         if (typeof document !== "undefined") {
             if (newIsDark) {
                 document.documentElement.classList.add(DARK_MODE_KEY);
@@ -65,8 +109,13 @@ export function useDarkMode() {
                 document.documentElement.classList.remove(DARK_MODE_KEY);
             }
         }
-        setLocalStorageItem(
-            "theme",
+
+        const storage = options?.storage ?? getBrowserStorage();
+        const storageKey = options?.storageKey ?? "theme";
+
+        writeThemeToStorage(
+            storage,
+            storageKey,
             newIsDark ? DARK_MODE_KEY : LIGHT_MODE_KEY
         );
     };
