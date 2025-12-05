@@ -13,7 +13,7 @@ export default function PreventFlicker() {
           if (typeof globalThis !== 'undefined') {
             try {
               var g = globalThis;
-              if (g && g.localStorage) {
+              if (g && g.localStorage && typeof g.localStorage.getItem === 'function') {
                 // Access inside try/catch in case localStorage is disabled or throws
                 theme = g.localStorage.getItem('theme');
               }
