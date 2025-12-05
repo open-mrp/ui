@@ -7,8 +7,24 @@ export default function PreventFlicker() {
                 __html: `
       (function() {
         try {
-          const theme = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
-          const prefersDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = null;
+          var prefersDark = false;
+
+          if (typeof globalThis !== 'undefined') {
+            try {
+              var g = globalThis;
+              if (g && g.localStorage) {
+                // Access inside try/catch in case localStorage is disabled or throws
+                theme = g.localStorage.getItem('theme');
+              }
+            } catch {
+              theme = null;
+            }
+          }
+
+          if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+            prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          }
           
           if (typeof document !== 'undefined') {
             if (theme === 'dark' || (!theme && prefersDark)) {
@@ -18,7 +34,7 @@ export default function PreventFlicker() {
             }
           }
         } catch (e) {
-          // Ignore errors in SSR
+          // Ignore errors in non-browser / restricted environments
         }
       })();
     `,
