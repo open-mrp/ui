@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 0.14.6
+
+### Patch Changes
+
+- 3b555b7: change font to ibm plex
+
 ## 0.14.5
 
 ### Patch Changes
