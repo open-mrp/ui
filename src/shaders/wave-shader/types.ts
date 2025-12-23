@@ -11,4 +11,6 @@ export interface WaveShaderProps {
   animate?: boolean;
   seed?: number;
   numWaves?: number;
+  showPerformanceMetrics?: boolean;
+  quality?: "low" | "medium" | "high";
 }
