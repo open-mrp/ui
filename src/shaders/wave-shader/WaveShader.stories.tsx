@@ -57,6 +57,15 @@ const meta = {
       control: { type: "range", min: 1, max: 20, step: 1 },
       description: "Number of waves to render",
     },
+    quality: {
+      control: "select",
+      options: ["low", "medium", "high"],
+      description: "Rendering quality level",
+    },
+    showPerformanceMetrics: {
+      control: "boolean",
+      description: "Show FPS and performance metrics",
+    },
   },
 } satisfies Meta<typeof WaveShader>;
 
@@ -69,15 +78,15 @@ export const Default: Story = {
     animate: true,
     colorConfiguration: "default",
     height: 400,
-    minWidth: 300,
+    minWidth: 250,
   },
 };
 
 export const Sunset: Story = {
   args: {
     ...Default.args,
-    colorConfiguration: "sunset",
-    numWaves: 20
+    colorConfiguration: "default",
+    numWaves: 14,
   },
 };
 
@@ -138,5 +147,73 @@ export const CustomSeed: Story = {
   args: {
     ...Default.args,
     seed: 12345,
+  },
+};
+
+// Performance testing stories
+export const PerformanceTest: Story = {
+  args: {
+    ...Default.args,
+    showPerformanceMetrics: true,
+    numWaves: 10,
+    quality: "medium",
+  },
+};
+
+export const StressTest: Story = {
+  args: {
+    ...Default.args,
+    showPerformanceMetrics: true,
+    numWaves: 20,
+    quality: "medium",
+  },
+};
+
+export const MinimalWaves: Story = {
+  args: {
+    ...Default.args,
+    showPerformanceMetrics: true,
+    numWaves: 3,
+    quality: "high",
+  },
+};
+
+// Quality comparison stories
+export const LowQuality: Story = {
+  args: {
+    ...Default.args,
+    showPerformanceMetrics: true,
+    numWaves: 10,
+    quality: "low",
+  },
+};
+
+export const MediumQuality: Story = {
+  args: {
+    ...Default.args,
+    showPerformanceMetrics: true,
+    numWaves: 10,
+    quality: "medium",
+  },
+};
+
+export const HighQuality: Story = {
+  args: {
+    ...Default.args,
+    showPerformanceMetrics: true,
+    numWaves: 10,
+    quality: "high",
+  },
+};
+
+// Extreme performance test
+export const MaxPerformance: Story = {
+  args: {
+    showPerformanceMetrics: true,
+    numWaves: 20,
+    quality: "low",
+    animate: true,
+    height: 600,
+    minWidth: 1200,
   },
 };

@@ -1,3 +1,5 @@
+import { gradientTextureCache } from "./GradientTextureCache";
+
 const N_TIME_VALUES = 2;
 
 function timeKey(index: number) {
@@ -35,7 +37,9 @@ export class WaveShaderRenderer {
     fragmentShader: string,
     colorConfig: ColorConfiguration,
     seed: number | undefined,
-    numWaves: number
+    numWaves: number,
+    quality: number = 0.5,
+    pixelRatio: number = 1.0
   ) {
     const gl = canvas.getContext("webgl", { premultipliedAlpha: false });
     if (!gl) {
@@ -48,7 +52,11 @@ export class WaveShaderRenderer {
       fragmentShader
     );
     this.positionBuffer = gl.createBuffer();
-    this.gradientTexture = gl.createTexture();
+    // Use cached gradient texture instead of creating new one
+    this.gradientTexture = gradientTextureCache.getOrCreateTexture(
+      gl,
+      colorConfig.gradient
+    );
     this.a_position = gl.getAttribLocation(this.program, "a_position");
 
     seed ??= Math.random() * 100_000;
@@ -58,14 +66,6 @@ export class WaveShaderRenderer {
       elapsed: 0,
       timeSpeed: 1,
     }));
-
-    WaveShaderRenderer.writeGradientToTexture(
-      gl,
-      colorConfig.gradient,
-      this.gradientTexture,
-      1000,
-      2
-    );
 
     gl.vertexAttribPointer(
       this.a_position,
@@ -79,16 +79,16 @@ export class WaveShaderRenderer {
 
     // Set initial uniform values
     gl.uniform1i(this.getUniformLocation("u_num_waves"), numWaves);
+    gl.uniform1f(this.getUniformLocation("u_quality"), quality);
+    gl.uniform1f(this.getUniformLocation("u_pixel_ratio"), pixelRatio);
   }
 
   public setColorConfig(colorConfig: ColorConfiguration) {
     const { gl } = this;
-    WaveShaderRenderer.writeGradientToTexture(
+    // Use cached gradient texture
+    this.gradientTexture = gradientTextureCache.getOrCreateTexture(
       gl,
-      colorConfig.gradient,
-      this.gradientTexture,
-      1000,
-      2
+      colorConfig.gradient
     );
   }
 
@@ -157,12 +157,19 @@ export class WaveShaderRenderer {
     this.timeStates[index].timeSpeed = value;
   }
 
-  public setDimensions(width: number, height: number) {
+  public setDimensions(width: number, height: number, scale: number = 1.0) {
     const { gl } = this;
 
     const canvas = gl.canvas;
-    canvas.width = width;
-    canvas.height = height;
+    // Apply scale for resolution reduction
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+
+    // Set CSS size to maintain visual size
+    if (canvas instanceof HTMLCanvasElement) {
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+    }
 
     // Place positions into buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
@@ -194,41 +201,6 @@ export class WaveShaderRenderer {
     const { gl } = this;
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-  }
-
-  private static writeGradientToTexture(
-    gl: WebGLRenderingContext,
-    gradient: string[],
-    texture: WebGLTexture | null,
-    width: number,
-    height: number
-  ) {
-    // Create canvas
-    const canvas = document.createElement("canvas");
-    canvas.height = height;
-    canvas.width = width;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Failed to get canvas 2D context");
-
-    // Render gradient to texture
-    const linearGradient = ctx.createLinearGradient(0, 0, width, 0);
-    for (const [i, stop] of gradient.entries()) {
-      const t = i / (gradient.length - 1);
-      linearGradient.addColorStop(t, stop);
-    }
-    ctx.fillStyle = linearGradient;
-    ctx.fillRect(0, 0, width, height);
-
-    // Write canvas to texture
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
   }
 
   private static createShader(

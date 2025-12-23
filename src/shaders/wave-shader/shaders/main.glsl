@@ -5,6 +5,8 @@ uniform float u_h;
 uniform float u_w;
 uniform sampler2D u_gradient;
 uniform int u_num_waves; // Number of waves to render
+uniform float u_quality; // Quality level: 0.0 = low, 0.5 = medium, 1.0 = high
+uniform float u_pixel_ratio; // Device pixel ratio for sharp rendering
 
 const float PI = 3.14159;
 const int MAX_WAVES = 20; // Maximum possible waves
@@ -151,7 +153,7 @@ float ease_in(float x) {
   return 1.0 - cos((x * PI) * 0.5);
 }
 
-float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset, float x_pos) {
+float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset, float x_pos, float cached_noise) {
   float exp = mix(0.9, 1.2, t);
   float v = pow(blur_fac, exp);
   v = ease_in(v);
@@ -159,27 +161,27 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset, fl
   v = clamp(v, 0.008, 1.0);
   v *= 345.0;
 
-  float base_line_width = 4.0;
-  float max_separation = 12.0;
+  // Adjust line width based on pixel ratio for consistent appearance
+  // Ensure pixel ratio is at least 1.0 to avoid division issues
+  float pixel_ratio = max(1.0, u_pixel_ratio);
+  float base_line_width = 2.0 * pixel_ratio; // Scale with pixel ratio for sharp lines
+  float max_separation = 20.0 * pixel_ratio; // Increased for more dramatic separation
 
-  float time = u_time * 0.5;
+  float time = u_time * 0.3; // Slowed down from 0.5
 
-  // Single noise sample drives both secondary lines to reduce GPU work
-  float n = simplex_noise(vec2(
-    x_pos * 0.5 - time * 0.25 + wave_offset * 0.5,
-    time * 0.15 + wave_offset * 0.9
-  )) * 0.5 + 0.5;
-
-  // Sharpen extremes a bit to retain variation
-  n = smoothstep(0.55, 1.0, n);
-
-  float separation2 = max_separation * n;
-  float separation3 = max_separation * (1.0 - n);
-
-  float time_phase = sin(time * 0.2 + wave_offset) * 0.5 + 0.5;
-  separation2 *= (1.0 - time_phase);
-  separation3 *= time_phase * 0.5 + 0.5;
-
+  // Use cached noise value instead of computing new one
+  float n = cached_noise;
+  
+  // Enhanced separation calculation for more dramatic effect
+  // Use full range of noise value and add time-based modulation
+  float time_modulation = 0.5 + 0.5 * sin(time * 0.2 + wave_offset * 0.01); // Slowed from 0.3 to 0.2
+  // Add secondary oscillation for more complex movement
+  float time_modulation2 = 0.5 + 0.5 * cos(time * 0.15 - wave_offset * 0.008); // Slowed from 0.2 to 0.15
+  
+  // Create asymmetric separation for more organic movement
+  float separation2 = max_separation * n * (0.3 + 1.2 * time_modulation);
+  float separation3 = max_separation * (1.0 - n) * (0.3 + 1.0 * time_modulation2);
+  
   float line2_dist = dist - separation2;
   float line3_dist = dist + separation3;
 
@@ -187,39 +189,30 @@ float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset, fl
   float line2Abs = abs(line2_dist);
   float line3Abs = abs(line3_dist);
 
-  // Calculate wave opacity for this part
-  float min_opacity = 0.1;
-  float max_opacity = 1.0;
-  float wave_opacity = min_opacity + max_opacity * (sin(time + x_pos + wave_offset * 0.01) + max_opacity) * 0.5;
-  wave_opacity = clamp(wave_opacity, min_opacity, max_opacity);
+  // Simplified opacity calculation - slowed down
+  float wave_opacity = 0.5 + 0.5 * sin(time * 0.7 + x_pos * 0.0005 + wave_offset * 0.005);
+  
+  // Adjust line width based on separation - thinner when separated
+  float avg_separation = (abs(separation2) + abs(separation3)) * 0.5;
+  float separation_factor = smoothstep(0.0, max_separation * 0.8, avg_separation);
+  float line_width = base_line_width * (1.0 - 0.3 * separation_factor);
 
-  // Adjust line width based on wave opacity, only when below 0.7
-  float blur_threshold = 0.7;
-  float blur_factor = smoothstep(blur_threshold, min_opacity, wave_opacity);
-  float line_width = mix(base_line_width, base_line_width * 2.0, blur_factor);
-
-  float alpha1 = 1.0 - smoothstep(0.0, line_width, distAbs);
-  float alpha2 = 1.0 - smoothstep(0.0, line_width, line2Abs);
-  float alpha3 = 1.0 - smoothstep(0.0, line_width, line3Abs);
-
+  // Calculate alpha for all three lines with sharper edges
+  // Use tighter smoothstep range for crisper lines, adjusted by pixel ratio
+  float edge_sharpness = 0.3 / pixel_ratio; // Sharper edges at higher resolutions
+  float inner_edge = line_width * 0.8; // Start falloff at 80% of line width
+  float alpha1 = 1.0 - smoothstep(inner_edge, line_width, distAbs);
+  float alpha2 = 1.0 - smoothstep(inner_edge, line_width, line2Abs);
+  float alpha3 = 1.0 - smoothstep(inner_edge, line_width, line3Abs);
+  
   float alpha = max(max(alpha1, alpha2), alpha3);
   alpha *= alpha; // square
 
-  // Calculate average separation between lines
-  float avg_separation = (abs(separation2) + abs(separation3)) * 0.5;
-  float separation_factor = 1.0 - smoothstep(0.0, max_separation * 0.3, avg_separation);
-
-  // Adjust glow based on wave opacity
-  float base_glow_width = 120.0;
-  float base_glow_intensity = 0.1;
-
-  // Make glow more diffuse and less intense when opacity is low
-  float glow_width = mix(base_glow_width * 1.5, base_glow_width, wave_opacity);
-  float glow_intensity = mix(base_glow_intensity * 0.8, base_glow_intensity, wave_opacity);
-
+  // Improved glow calculation with pixel ratio adjustment
+  // Reduce glow when lines are separated for cleaner look
+  float glow_width = 60.0 * pixel_ratio * (1.0 - 0.4 * separation_factor);
   float glow_alpha = 1.0 - smoothstep(0.0, glow_width, distAbs);
-  glow_alpha = pow(glow_alpha, 0.6);
-  glow_alpha *= glow_intensity * (1.0 + separation_factor * 0.6);
+  glow_alpha = pow(glow_alpha, 2.0) * 0.12 * (1.0 + 0.3 * separation_factor); // Slightly brighter when separated
 
   return max(alpha, glow_alpha);
 }
@@ -248,20 +241,21 @@ float wave_y_noise(float offset) {
   const float S = 0.01875;
   const float F = 0.0065;
 
-  float time = u_time * 2.0 + offset;
-  float x = get_x() * 0.000845;
+  float time = u_time * 1.2 + offset; // Slowed down from 2.0 to 1.2
+  float x = get_x() * L;
   float y = time * S;
   float x_shift = time * F;
 
+  // Reduced to 2 octaves instead of 3
   float sum = 0.0;
   sum += simplex_noise(vec2(x * 1.30 + x_shift, y * 0.54)) * 0.90;
-  sum += simplex_noise(vec2(x * 0.90 + x_shift, y * 0.68)) * 0.80;
+  // sum += simplex_noise(vec2(x * 1.30 + x_shift, y * 0.54)) * 0.80;
   sum += simplex_noise(vec2(x * 0.55 + x_shift, y * 0.59)) * 0.55;
   return sum;
 }
 
 float calc_blur_bias() {
-  const float S = 0.261;
+  const float S = 0.15; // Slowed down from 0.261
   float bias_t = (sin(u_time * S) + 1.0) * 0.5;
   return lerp(-0.17, -0.04, bias_t);
 }
@@ -272,39 +266,53 @@ float calc_blur(float offset) {
   const float F = 0.03;
 
   float time = u_time + offset;
-
   float x = get_x() * L;
+  
+  // Simplified blur calculation - removed noise sampling
   float blur_fac = calc_blur_bias();
-  // Single noise octave for blur modulation to cut work roughly in half
-  blur_fac += simplex_noise(vec2(x * 0.80 + time * F * 0.6, time * S)) * 0.7;
+  // Use simple sine wave instead of noise for variation
+  blur_fac += sin(x * 2.0 + time * S) * 0.35;
   blur_fac = (blur_fac + 1.0) * 0.5;
   blur_fac = clamp(blur_fac, 0.0, 1.0);
   return blur_fac;
 }
 
-float wave_alpha(float Y, float wave_height, float offset) {
+float wave_alpha(float Y, float wave_height, float offset, float x_cached, float lod) {
   float wave_y = Y + wave_y_noise(offset) * wave_height;
   float dist = wave_y - gl_FragCoord.y;
-  float blur_fac = calc_blur(offset);
+  
+  // Use LOD to determine blur calculation
+  float blur_fac = lod > 0.5 ? calc_blur(offset) : 0.5;
 
-  // Cache x-coordinate once and reuse in the part loop
-  float x_pos = get_x() * 0.001;
+  // Use cached x-coordinate
+  float x_pos = x_cached * 0.001;
 
-  // Fewer parts = significantly fewer noise samples per fragment
-  const float PART = 1.0 / 5.0;
+  // Adjust parts based on LOD
+  int num_parts = int(mix(1.0, 3.0, lod));
+  float part_weight = 1.0 / float(num_parts);
+  
+  // Skip noise for low LOD
+  float cached_noise = 0.5;
+  if (lod > 0.3) {
+    float time = u_time * 0.3; // Slowed down from 0.5
+    cached_noise = simplex_noise(vec2(
+      x_pos * 0.5 - time * 0.15 + offset * 0.5, // Slowed from 0.25 to 0.15
+      time * 0.1 + offset * 0.9 // Slowed from 0.15 to 0.1
+    )) * 0.5 + 0.5;
+    // Enhance the noise contrast for more dramatic separation
+    cached_noise = smoothstep(0.15, 0.85, cached_noise);
+  }
+  
   float sum = 0.0;
   float t = 0.0;
-  for(int i = 0; i < 5; i++) {
-    sum += wave_alpha_part(dist, blur_fac, t, offset, x_pos) * PART;
-    t += PART;
+  for(int i = 0; i < 3; i++) {
+    if (i >= num_parts) break;
+    sum += wave_alpha_part(dist, blur_fac, t, offset, x_pos, cached_noise) * part_weight;
+    t += part_weight;
   }
 
-  float min_opacity = 0.1;
-  float max_opacity = 1.0;
-
-  float time = u_time * 0.5;
-  float opacity = min_opacity + max_opacity * (sin(time + x_pos + offset * 0.01) + max_opacity) * 0.5;
-  opacity = clamp(opacity, min_opacity, max_opacity);
+  // Simplified opacity - slowed down
+  float opacity = 0.55 + 0.45 * sin(u_time * 0.3 + x_pos + offset * 0.01);
 
   return sum * opacity;
 }
@@ -315,12 +323,14 @@ vec3 calc_color(float lightness) {
 }
 
 void main() {
-  // Pre-compute some values that are invariant across the wave loop
+  // Pre-compute ALL invariant values before the loop
   float y_coord = gl_FragCoord.y;
-  float margin = u_h * 0.02;              // 2 % margin from top and bottom
+  float x_cached = get_x(); // Cache this expensive calculation
+  float margin = u_h * 0.02;              // 2 % margin from top and bottom
   float available_height = u_h - (2.0 * margin);
   float spacing = available_height / max(float(u_num_waves - 1), 1.0);
-  float wave_height = u_h * 0.11;              // 11 % of canvas height
+  float wave_height = u_h * 0.11;              // 11 % of canvas height
+  float inv_num_waves = 1.0 / max(float(u_num_waves - 1), 1.0); // Pre-compute division
 
   // Start with a dark background
   float lightness = 0.0;
@@ -334,17 +344,23 @@ void main() {
     float wave_y = margin + (float(i) * spacing);
 
     // Calculate t for parameterisation along 0-1
-    float t = float(i) / max(float(u_num_waves - 1), 1.0);
+    float t = float(i) * inv_num_waves;
 
-    // Pre-compute the offset for this wave
-    float wave_offset = (112.5 + float(i) * 112.5) * mix(30.0, 48.0, sin(t * PI * 0.5));
+    // Pre-compute the offset for this wave - simplified calculation
+    float wave_offset = 112.5 * (1.0 + float(i)) * (39.0 + 9.0 * sin(t * PI * 0.5));
 
-    // Process wave
+    // Calculate LOD based on wave position and quality setting
+    float wave_distance = abs(wave_y - y_coord);
+    float normalized_distance = wave_distance / u_h;
+    float lod = mix(0.3, 1.0, 1.0 - normalized_distance) * (u_quality + 0.5);
+    lod = clamp(lod, 0.0, 1.0);
+
+    // Process wave - pass cached x value and LOD
     float wave_lightness = 0.9;
-    float wave_alpha_value = wave_alpha(wave_y, wave_height, wave_offset);
+    float wave_alpha_value = wave_alpha(wave_y, wave_height, wave_offset, x_cached, lod);
 
-    // Reduce opacity for every other wave using step function (kept from original)
-    float opacity_multiplier = 1.0 - 0.5 * step(0.5, fract(float(i) * 0.5));
+    // Reduce opacity for every other wave - use bit operation simulation
+    float opacity_multiplier = mix(1.0, 0.5, mod(float(i), 2.0));
     wave_alpha_value *= opacity_multiplier;
 
     // Accumulate lightness
