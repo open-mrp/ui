@@ -1,5 +1,5 @@
 {
-  "editor.tabSize": 2,
+  "editor.tabSize": 4,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
@@ -13,7 +13,4 @@
     "*.js": "${capture}.test.js, ${capture}.spec.js, ${capture}.d.js, ${capture}.stories.js",
     "*.jsx": "${capture}.test.jsx, ${capture}.spec.jsx, ${capture}.d.jsx, ${capture}.stories.jsx"
   },
-  "[shellscript]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
 }

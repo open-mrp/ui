@@ -1,2 +1,2 @@
-import "./atom-one-dark.css";
-import "./theme.css";
+import './atom-one-dark.css';
+import './theme.css';

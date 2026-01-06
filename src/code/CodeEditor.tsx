@@ -1,83 +1,93 @@
-"use client";
+'use client';
 
-import copy from "copy-to-clipboard";
-import React, { useEffect, useRef, useState } from "react";
-import { highlightCode } from "../utils/highlight";
-import CodeCopyButton from "./CodeCopyButton";
+import copy from 'copy-to-clipboard';
+import React, { useEffect, useRef, useState } from 'react';
+import { highlightCode } from '../utils/highlight';
+import CodeCopyButton from './CodeCopyButton';
 
 export interface CodeEditorProps {
-  children: React.ReactNode;
-  className?: string;
+    children: React.ReactNode;
+    className?: string;
+    /** Optional map of placeholder strings to replacement values (e.g., { "YOUR_API_KEY": "sk_test_..." }) */
+    replacements?: Record<string, string>;
 }
 
-export default function CodeEditor({ children, className }: CodeEditorProps) {
-  const codeRef = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const [language, setLanguage] = useState<string | null>(null);
-  const [highlightedCode, setHighlightedCode] = useState<string>("");
+/**
+ * Applies text replacements to a string
+ */
+function applyReplacements(text: string, replacements?: Record<string, string>): string {
+    if (!replacements) return text;
+    let result = text;
+    for (const [placeholder, value] of Object.entries(replacements)) {
+        result = result.replaceAll(placeholder, value);
+    }
+    return result;
+}
 
-  useEffect(() => {
-    // Extract language from code block classes (language-*)
-    if (codeRef.current) {
-      const codeElement = codeRef.current.querySelector("code");
-      if (codeElement && codeElement.className) {
-        const match = codeElement.className.match(/language-([^\s]+)/);
-        if (match && match[1]) {
-          const lang = match[1];
-          setLanguage(lang);
-          // Get the code content
-          const code = codeElement.textContent || "";
-          // Apply syntax highlighting
-          highlightCode(code, lang).then(setHighlightedCode);
+export default function CodeEditor({ children, className, replacements }: CodeEditorProps) {
+    const codeRef = useRef<HTMLDivElement>(null);
+    const [copied, setCopied] = useState(false);
+    const [isHovering, setIsHovering] = useState(false);
+    const [language, setLanguage] = useState<string | null>(null);
+    const [highlightedCode, setHighlightedCode] = useState<string>('');
+
+    useEffect(() => {
+        // Extract language from code block classes (language-*)
+        if (codeRef.current) {
+            const codeElement = codeRef.current.querySelector('code');
+            if (codeElement && codeElement.className) {
+                const match = codeElement.className.match(/language-([^\s]+)/);
+                if (match && match[1]) {
+                    const lang = match[1];
+                    setLanguage(lang);
+                    // Get the code content and apply replacements
+                    const rawCode = codeElement.textContent || '';
+                    const code = applyReplacements(rawCode, replacements);
+                    // Apply syntax highlighting
+                    highlightCode(code, lang).then(setHighlightedCode);
+                }
+            }
         }
-      }
-    }
-  }, [children]);
+    }, [children, replacements]);
 
-  const handleCopy = () => {
-    if (codeRef.current) {
-      const text = codeRef.current.textContent || "";
-      copy(text);
-      setCopied(true);
+    const handleCopy = () => {
+        if (codeRef.current) {
+            const rawText = codeRef.current.textContent || '';
+            // Apply replacements to copied text as well
+            const text = applyReplacements(rawText, replacements);
+            copy(text);
+            setCopied(true);
 
-      // Reset to copy icon after 1 second
-      setTimeout(() => {
-        setCopied(false);
-      }, 1000);
-    }
-  };
+            // Reset to copy icon after 1 second
+            setTimeout(() => {
+                setCopied(false);
+            }, 1000);
+        }
+    };
 
-  return (
-    <div
-      className={`bg-code-background p-4 rounded-md relative group mt-4 ${className}`}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
-      <div className="flex justify-between items-center mb-2">
+    return (
         <div
-          className="text-xs text-gray-500 uppercase"
-          style={{ height: "16px" }}
+            className={`bg-code-background p-4 rounded-md relative group mt-4 ${className}`}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
         >
-          {language}
+            <div className="flex justify-between items-center mb-2">
+                <div className="text-xs text-gray-500 uppercase" style={{ height: '16px' }}>
+                    {language}
+                </div>
+            </div>
+
+            <CodeCopyButton onCopy={handleCopy} isHovering={isHovering} copied={copied} />
+
+            <div ref={codeRef} className="w-full">
+                <pre className="text-sm overflow-x-auto w-full whitespace-pre">
+                    {highlightedCode ? (
+                        <div dangerouslySetInnerHTML={{ __html: highlightedCode }} />
+                    ) : (
+                        children
+                    )}
+                </pre>
+            </div>
         </div>
-      </div>
-
-      <CodeCopyButton
-        onCopy={handleCopy}
-        isHovering={isHovering}
-        copied={copied}
-      />
-
-      <div ref={codeRef} className="w-full">
-        <pre className="text-sm overflow-x-auto w-full whitespace-pre">
-          {highlightedCode ? (
-            <div dangerouslySetInnerHTML={{ __html: highlightedCode }} />
-          ) : (
-            children
-          )}
-        </pre>
-      </div>
-    </div>
-  );
+    );
 }

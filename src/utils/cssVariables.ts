@@ -1,3 +1,3 @@
 export const cssVariables = {
-  mobileWidth: 800,
+    mobileWidth: 800,
 };
