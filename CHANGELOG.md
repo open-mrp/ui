@@ -1,5 +1,15 @@
 # @augno/ui
 
+## 1.0.0
+
+### Major Changes
+
+- c2514c7: feat: breaking changes to many components
+
+### Patch Changes
+
+- ea948a7: chore: improve perf of wave shader
+
 ## 0.14.6
 
 ### Patch Changes
