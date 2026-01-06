@@ -1,61 +1,56 @@
-import React from "react";
+import React from 'react';
 
 export interface SupportLink {
-  icon: React.ReactNode;
-  text: string;
-  link: {
+    icon: React.ReactNode;
     text: string;
-    href: string;
-  };
+    link: {
+        text: string;
+        href: string;
+    };
 }
 
 export interface FooterProps {
-  home: {
-    icon: React.ReactNode;
-    href: string;
-  };
-  supportLinks: SupportLink[];
-  renderLink?: (props: {
-    href: string;
-    children: React.ReactNode;
-  }) => React.ReactNode;
+    home: {
+        icon: React.ReactNode;
+        href: string;
+    };
+    supportLinks: SupportLink[];
+    renderLink?: (props: { href: string; children: React.ReactNode }) => React.ReactNode;
 }
 
 export default function Footer({
-  home,
-  supportLinks,
-  renderLink = (props) => <a href={props.href}>{props.children}</a>,
+    home,
+    supportLinks,
+    renderLink = (props) => <a href={props.href}>{props.children}</a>,
 }: FooterProps) {
-  return (
-    <footer className="border-t border-[var(--text-secondary)]/20 mt-24">
-      <div className="py-8">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            {renderLink({ href: home.href, children: home.icon })}
-          </div>
-          <div className="flex flex-col items-end">
-            {supportLinks.map((link, index) => (
-              <p
-                key={index}
-                className={`flex items-center ${
-                  index > 0 ? "mt-2" : ""
-                } !text-xs`}
-              >
-                {link.icon}
-                {link.text}{" "}
-                {renderLink({
-                  href: link.link.href,
-                  children: (
-                    <span className="text-stone-500 ml-1 !text-xs">
-                      {link.link.text}
-                    </span>
-                  ),
-                })}
-              </p>
-            ))}
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
+    return (
+        <footer className="border-t border-[var(--text-secondary)]/20 mt-24">
+            <div className="py-8">
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                        {renderLink({ href: home.href, children: home.icon })}
+                    </div>
+                    <div className="flex flex-col items-end">
+                        {supportLinks.map((link, index) => (
+                            <p
+                                key={index}
+                                className={`flex items-center ${index > 0 ? 'mt-2' : ''} !text-xs`}
+                            >
+                                {link.icon}
+                                {link.text}{' '}
+                                {renderLink({
+                                    href: link.link.href,
+                                    children: (
+                                        <span className="text-stone-500 ml-1 !text-xs">
+                                            {link.link.text}
+                                        </span>
+                                    ),
+                                })}
+                            </p>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </footer>
+    );
 }

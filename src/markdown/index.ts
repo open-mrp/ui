@@ -1,19 +1,13 @@
+export { default as DocCardGroup, type DocCardGroupProps } from './DocCardGroup';
 export {
-  default as DocCardGroup,
-  type DocCardGroupProps,
-} from "./DocCardGroup";
-export { default as DocHeading, type DocHeadingProps } from "./DocHeading";
-export {
-  default as DocHeroSection,
-  type DocHeroSectionProps,
-} from "./DocHeroSection";
-export {
-  default as DocNumberedSection,
-  type DocNumberedSectionProps,
-} from "./DocNumberedSection";
-export {
-  default as DocPageHeader,
-  type DocPageHeaderProps,
-} from "./DocPageHeader";
-export { default as DocTab, type DocTabProps } from "./DocTab";
-export { default as DocTabs, type DocTabsProps } from "./DocTabs";
+    default as DocChecklist,
+    DocChecklistItem,
+    type DocChecklistItemProps,
+    type DocChecklistProps,
+} from './DocChecklist';
+export { default as DocHeading, type DocHeadingProps } from './DocHeading';
+export { default as DocHeroSection, type DocHeroSectionProps } from './DocHeroSection';
+export { default as DocNumberedSection, type DocNumberedSectionProps } from './DocNumberedSection';
+export { default as DocPageHeader, type DocPageHeaderProps } from './DocPageHeader';
+export { default as DocTab, type DocTabProps } from './DocTab';
+export { default as DocTabs, type DocTabsProps } from './DocTabs';

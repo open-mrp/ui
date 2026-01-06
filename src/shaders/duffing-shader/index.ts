@@ -1,2 +1,2 @@
-export { DuffingShader } from "./DuffingShader";
-export type { DuffingShaderProps } from "./types";
+export { DuffingShader } from './DuffingShader';
+export type { DuffingShaderProps } from './types';

@@ -5,8 +5,8 @@ uniform float u_h;
 uniform float u_w;
 uniform sampler2D u_gradient;
 uniform int u_num_waves; // Number of waves to render
-uniform float u_quality; // Quality level: 0.0 = low, 0.5 = medium, 1.0 = high
 uniform float u_pixel_ratio; // Device pixel ratio for sharp rendering
+uniform vec3 u_background_color; // Background color (RGB normalized 0-1)
 
 const float PI = 3.14159;
 const int MAX_WAVES = 20; // Maximum possible waves
@@ -141,7 +141,7 @@ float simplex_noise(vec2 v) {
 }
 
 // Various utility functions
-float smoothstep(float t) {
+float smoothstep_quintic(float t) {
   return t * t * t * (t * (6.0 * t - 15.0) + 10.0);
 }
 
@@ -149,91 +149,40 @@ float lerp(float a, float b, float t) {
   return a * (1.0 - t) + b * t;
 }
 
-float ease_in(float x) {
-  return 1.0 - cos((x * PI) * 0.5);
-}
+// Blur constants
+const float BLUR_AMOUNT = 120.0;      // Maximum blur in pixels
+const float BLUR_MIN = 1.0;          // Minimum blur (sharpest edge)
+const float BLUR_EXPONENT = 3.5;     // Exponent to bias toward sharpness
+const float BLUR_FREQUENCY = 0.0008; // Spatial frequency of blur variation
+const float BLUR_SPEED = 0.15;      // How fast blur moves along waves
 
-float wave_alpha_part(float dist, float blur_fac, float t, float wave_offset, float x_pos, float cached_noise) {
-  float exp = mix(0.9, 1.2, t);
-  float v = pow(blur_fac, exp);
-  v = ease_in(v);
-  v = smoothstep(v);
-  v = clamp(v, 0.008, 1.0);
-  v *= 345.0;
-
-  // Adjust line width based on pixel ratio for consistent appearance
-  // Ensure pixel ratio is at least 1.0 to avoid division issues
-  float pixel_ratio = max(1.0, u_pixel_ratio);
-  float base_line_width = 2.0 * pixel_ratio; // Scale with pixel ratio for sharp lines
-  float max_separation = 20.0 * pixel_ratio; // Increased for more dramatic separation
-
-  float time = u_time * 0.3; // Slowed down from 0.5
-
-  // Use cached noise value instead of computing new one
-  float n = cached_noise;
+// Calculate variable blur amount using noise
+// This creates areas of sharpness and blur that flow along the wave
+float calc_blur(float x_pos, float offset) {
+  float time = u_time + offset * 0.01;
   
-  // Enhanced separation calculation for more dramatic effect
-  // Use full range of noise value and add time-based modulation
-  float time_modulation = 0.5 + 0.5 * sin(time * 0.2 + wave_offset * 0.01); // Slowed from 0.3 to 0.2
-  // Add secondary oscillation for more complex movement
-  float time_modulation2 = 0.5 + 0.5 * cos(time * 0.15 - wave_offset * 0.008); // Slowed from 0.2 to 0.15
+  // Use noise to determine blur amount at this position
+  float noise = simplex_noise(vec2(
+    x_pos * BLUR_FREQUENCY + time * BLUR_SPEED,
+    time * BLUR_SPEED * 0.5
+  ));
   
-  // Create asymmetric separation for more organic movement
-  float separation2 = max_separation * n * (0.3 + 1.2 * time_modulation);
-  float separation3 = max_separation * (1.0 - n) * (0.3 + 1.0 * time_modulation2);
+  // Normalize from [-1, 1] to [0, 1]
+  float t = (noise + 1.0) / 2.0;
   
-  float line2_dist = dist - separation2;
-  float line3_dist = dist + separation3;
-
-  float distAbs = abs(dist);
-  float line2Abs = abs(line2_dist);
-  float line3Abs = abs(line3_dist);
-
-  // Simplified opacity calculation - slowed down
-  float wave_opacity = 0.5 + 0.5 * sin(time * 0.7 + x_pos * 0.0005 + wave_offset * 0.005);
+  // Apply exponent to bias toward sharpness
+  // This makes the wave mostly sharp with occasional blurry areas
+  t = pow(t, BLUR_EXPONENT);
   
-  // Adjust line width based on separation - thinner when separated
-  float avg_separation = (abs(separation2) + abs(separation3)) * 0.5;
-  float separation_factor = smoothstep(0.0, max_separation * 0.8, avg_separation);
-  float line_width = base_line_width * (1.0 - 0.3 * separation_factor);
-
-  // Calculate alpha for all three lines with sharper edges
-  // Use tighter smoothstep range for crisper lines, adjusted by pixel ratio
-  float edge_sharpness = 0.3 / pixel_ratio; // Sharper edges at higher resolutions
-  float inner_edge = line_width * 0.8; // Start falloff at 80% of line width
-  float alpha1 = 1.0 - smoothstep(inner_edge, line_width, distAbs);
-  float alpha2 = 1.0 - smoothstep(inner_edge, line_width, line2Abs);
-  float alpha3 = 1.0 - smoothstep(inner_edge, line_width, line3Abs);
+  // Add oscillating global blur bias for periods of overall sharpness/blur
+  // This creates a "breathing" effect across the entire canvas
+  float blur_bias = 0.5 + 0.3 * sin(u_time * 0.08 + offset * 0.005);
+  t = mix(t, t * blur_bias, 0.4);
   
-  float alpha = max(max(alpha1, alpha2), alpha3);
-  alpha *= alpha; // square
-
-  // Improved glow calculation with pixel ratio adjustment
-  // Reduce glow when lines are separated for cleaner look
-  float glow_width = 60.0 * pixel_ratio * (1.0 - 0.4 * separation_factor);
-  float glow_alpha = 1.0 - smoothstep(0.0, glow_width, distAbs);
-  glow_alpha = pow(glow_alpha, 2.0) * 0.12 * (1.0 + 0.3 * separation_factor); // Slightly brighter when separated
-
-  return max(alpha, glow_alpha);
-}
-
-float background_noise(float offset) {
-  const float S = 0.064;
-  const float L = 0.00085;
-  const float L1 = 1.5, L2 = 0.9, L3 = 0.6;
-  const float LY1 = 1.00, LY2 = 0.85, LY3 = 0.70;
-  const float F = 0.04;
-  const float Y_SCALE = 1.0 / 0.27;
-
-  float x = get_x() * L;
-  float y = gl_FragCoord.y * L * Y_SCALE;
-  float time = u_time + offset;
-  float x_shift = time * F;
-  float sum = 0.5;
-  sum += simplex_noise(vec3(x * L1 + x_shift * 1.1, y * L1 * LY1, time * S)) * 0.30;
-  sum += simplex_noise(vec3(x * L2 + -x_shift * 0.6, y * L2 * LY2, time * S)) * 0.25;
-  sum += simplex_noise(vec3(x * L3 + x_shift * 0.8, y * L3 * LY3, time * S)) * 0.20;
-  return sum;
+  // Mix between minimum blur (sharp) and maximum blur
+  float blur = mix(BLUR_MIN, BLUR_AMOUNT, t);
+  
+  return blur;
 }
 
 float wave_y_noise(float offset) {
@@ -254,67 +203,45 @@ float wave_y_noise(float offset) {
   return sum;
 }
 
-float calc_blur_bias() {
-  const float S = 0.15; // Slowed down from 0.261
-  float bias_t = (sin(u_time * S) + 1.0) * 0.5;
-  return lerp(-0.17, -0.04, bias_t);
-}
-
-float calc_blur(float offset) {
-  const float L = 0.0011;
-  const float S = 0.07;
-  const float F = 0.03;
-
-  float time = u_time + offset;
-  float x = get_x() * L;
+// Area fill alpha calculation - fills below the wave with variable blur effect
+// Based on Alex Harri's gradient technique: https://alexharri.com/blog/webgl-gradients
+float wave_area_alpha(float wave_y_position, float wave_height, float offset, float x_cached) {
+  // Calculate the actual wave y position with noise applied
+  float wave_y = wave_y_position + wave_y_noise(offset) * wave_height;
+  float pixel_y = gl_FragCoord.y;
   
-  // Simplified blur calculation - removed noise sampling
-  float blur_fac = calc_blur_bias();
-  // Use simple sine wave instead of noise for variation
-  blur_fac += sin(x * 2.0 + time * S) * 0.35;
-  blur_fac = (blur_fac + 1.0) * 0.5;
-  blur_fac = clamp(blur_fac, 0.0, 1.0);
-  return blur_fac;
-}
-
-float wave_alpha(float Y, float wave_height, float offset, float x_cached, float lod) {
-  float wave_y = Y + wave_y_noise(offset) * wave_height;
-  float dist = wave_y - gl_FragCoord.y;
+  // Calculate signed distance from wave line (negative = below wave, positive = above)
+  float dist = pixel_y - wave_y;
   
-  // Use LOD to determine blur calculation
-  float blur_fac = lod > 0.5 ? calc_blur(offset) : 0.5;
-
-  // Use cached x-coordinate
+  // Calculate variable blur at this position
+  float blur = calc_blur(x_cached, offset);
+  
+  // Calculate alpha based on distance and blur
+  // This creates the smooth, variable blur effect along the wave
+  // When blur is small, the edge is sharp; when blur is large, the edge is soft
+  float alpha = clamp(0.5 - dist / blur, 0.0, 1.0);
+  
+  // Apply quintic smoothstep for even smoother transitions
+  alpha = smoothstep_quintic(alpha);
+  
+  // Calculate fade based on distance below wave for gradient fill
+  // Fade from 1.0 at wave line to 0.0 at bottom of canvas
+  float distance_below = max(wave_y - pixel_y, 0.0);
+  float fade_distance = max(wave_y, 1.0); // Distance from wave to bottom (y=0)
+  float fill_fade = 1.0 - (distance_below / fade_distance);
+  
+  // Apply a power curve for more dramatic gradient (brighter near wave, faster fade)
+  fill_fade = pow(clamp(fill_fade, 0.0, 1.0), 1.2);
+  
+  // Combine edge blur with fill fade
+  alpha *= fill_fade;
+  
+  // Add subtle time-based variation for organic feel
   float x_pos = x_cached * 0.001;
-
-  // Adjust parts based on LOD
-  int num_parts = int(mix(1.0, 3.0, lod));
-  float part_weight = 1.0 / float(num_parts);
+  float time_variation = 0.88 + 0.12 * sin(u_time * 0.15 + x_pos + offset * 0.01);
+  alpha *= time_variation;
   
-  // Skip noise for low LOD
-  float cached_noise = 0.5;
-  if (lod > 0.3) {
-    float time = u_time * 0.3; // Slowed down from 0.5
-    cached_noise = simplex_noise(vec2(
-      x_pos * 0.5 - time * 0.15 + offset * 0.5, // Slowed from 0.25 to 0.15
-      time * 0.1 + offset * 0.9 // Slowed from 0.15 to 0.1
-    )) * 0.5 + 0.5;
-    // Enhance the noise contrast for more dramatic separation
-    cached_noise = smoothstep(0.15, 0.85, cached_noise);
-  }
-  
-  float sum = 0.0;
-  float t = 0.0;
-  for(int i = 0; i < 3; i++) {
-    if (i >= num_parts) break;
-    sum += wave_alpha_part(dist, blur_fac, t, offset, x_pos, cached_noise) * part_weight;
-    t += part_weight;
-  }
-
-  // Simplified opacity - slowed down
-  float opacity = 0.55 + 0.45 * sin(u_time * 0.3 + x_pos + offset * 0.01);
-
-  return sum * opacity;
+  return clamp(alpha, 0.0, 1.0);
 }
 
 vec3 calc_color(float lightness) {
@@ -332,10 +259,10 @@ void main() {
   float wave_height = u_h * 0.11;              // 11 % of canvas height
   float inv_num_waves = 1.0 / max(float(u_num_waves - 1), 1.0); // Pre-compute division
 
-  // Start with a dark background
+  // Start with a dark background - accumulate lightness like original strands
   float lightness = 0.0;
 
-  // Process waves using a loop
+  // Process waves using a loop (same order as original)
   for(int i = 0; i < MAX_WAVES; i++) {
     if(i >= u_num_waves)
       break; // Stop after rendering requested number of waves
@@ -349,28 +276,27 @@ void main() {
     // Pre-compute the offset for this wave - simplified calculation
     float wave_offset = 112.5 * (1.0 + float(i)) * (39.0 + 9.0 * sin(t * PI * 0.5));
 
-    // Calculate LOD based on wave position and quality setting
-    float wave_distance = abs(wave_y - y_coord);
-    float normalized_distance = wave_distance / u_h;
-    float lod = mix(0.3, 1.0, 1.0 - normalized_distance) * (u_quality + 0.5);
-    lod = clamp(lod, 0.0, 1.0);
+    // Calculate area fill alpha with gradient fade
+    float area_alpha = wave_area_alpha(wave_y, wave_height, wave_offset, x_cached);
 
-    // Process wave - pass cached x value and LOD
-    float wave_lightness = 0.9;
-    float wave_alpha_value = wave_alpha(wave_y, wave_height, wave_offset, x_cached, lod);
-
-    // Reduce opacity for every other wave - use bit operation simulation
+    // Reduce opacity for every other wave - same as original
     float opacity_multiplier = mix(1.0, 0.5, mod(float(i), 2.0));
-    wave_alpha_value *= opacity_multiplier;
+    area_alpha *= opacity_multiplier;
 
-    // Accumulate lightness
-    lightness = lerp(lightness, wave_lightness, wave_alpha_value);
+    // Scale down the alpha contribution so lightness accumulates more gradually
+    // This prevents saturation and uses the full gradient spectrum
+    float scaled_alpha = area_alpha * 0.4;
+    
+    // Accumulate lightness - more overlap = higher lightness = further along gradient
+    lightness += scaled_alpha;
   }
 
-  // Blend wave color with a #060815 background
-  vec3 backgroundColor = vec3(0.0235, 0.0314, 0.0824); // #060815
+  // Clamp lightness to valid range
+  lightness = clamp(lightness, 0.0, 1.0);
+
+  // Blend wave color with background - same as original
   vec3 waveColor = calc_color(lightness);
-  vec3 finalColor = mix(backgroundColor, waveColor, lightness);
+  vec3 finalColor = mix(u_background_color, waveColor, lightness);
 
   gl_FragColor = vec4(finalColor, 1.0);
 }

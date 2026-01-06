@@ -1,38 +1,38 @@
 name: CI
 run-name: |
-  ${{ github.event_name == 'push'
-    && format('Testing the commit "{0}" by {1}', github.event.head_commit.message, github.actor)
-    || format('Testing the PR "{0}" by {1}', github.event.pull_request.title, github.actor) }}
+    ${{ github.event_name == 'push'
+      && format('Testing the commit "{0}" by {1}', github.event.head_commit.message, github.actor)
+      || format('Testing the PR "{0}" by {1}', github.event.pull_request.title, github.actor) }}
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize]
+    pull_request:
+        branches: [main]
+        types: [opened, synchronize]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build and Test
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
- 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+    build:
+        name: Build and Test
+        timeout-minutes: 15
+        runs-on: ubuntu-latest
 
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 2
 
-      - name: Install Dependencies
-        run: bun install
+            - name: Install Bun
+              uses: oven-sh/setup-bun@v2
 
-      - name: Build
-        run: bun run build
+            - name: Install Dependencies
+              run: bun install
 
-      - name: Test
-        run: bun run test
+            - name: Build
+              run: bun run build
+
+            - name: Test
+              run: bun run test
