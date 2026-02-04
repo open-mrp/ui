@@ -29,19 +29,20 @@ export default function Sidenav({
     return (
         <nav
             className={cn(
-                `bg-gray-900 px-2 max-sm:hidden relative transition-all duration-300 ease-in-out`,
+                'px-2 max-sm:hidden relative transition-all duration-300 ease-in-out',
                 className,
             )}
             style={{
                 height,
                 width: isCollapsed ? '48px' : '256px',
                 minWidth: isCollapsed ? '48px' : '256px',
+                backgroundColor: 'var(--sidenav-background)',
             }}
         >
             {/* Toggle button - absolutely positioned */}
             <button
                 onClick={toggleCollapsed}
-                className="absolute z-20 p-2 rounded-md backdrop-blur-sm hover:bg-gray-800 text-gray-400 hover:text-gray-100 cursor-pointer transition-all duration-300 ease-in-out"
+                className="absolute z-20 p-2 rounded-md backdrop-blur-sm cursor-pointer transition-all duration-300 ease-in-out text-[var(--sidenav-toggle-color)] hover:text-[var(--sidenav-toggle-hover-color)] hover:bg-[var(--sidenav-toggle-hover-bg)]"
                 style={{
                     top: '12px',
                     right: isCollapsed ? '50%' : '8px',
@@ -103,11 +104,13 @@ export default function Sidenav({
                         <div
                             key={section.title}
                             className={`pb-2 ${
-                                index < sections.length - 1 ? 'border-b border-gray-700' : ''
+                                index < sections.length - 1
+                                    ? 'border-b border-[var(--sidenav-border)]'
+                                    : ''
                             }`}
                         >
                             <h3
-                                className="mx-2 text-gray-100 my-3 flex items-center whitespace-nowrap font-ibm-plex-mono"
+                                className="mx-2 my-3 flex items-center whitespace-nowrap font-ibm-plex-mono text-[var(--sidenav-title-color)]"
                                 style={{
                                     fontSize: '0.75rem',
                                     fontWeight: 400,

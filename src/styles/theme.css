@@ -81,6 +81,20 @@
 
     --font-primary: 'Inter', Arial, Helvetica, sans-serif;
 
+    /* Sidenav theme - consumers can override in :root / .dark */
+    --sidenav-background: #111827;
+    --sidenav-border: #374151;
+    --sidenav-title-color: #f3f4f6;
+    --sidenav-item-color: #9ca3af;
+    --sidenav-item-hover-color: #d1d5db;
+    --sidenav-item-hover-bg: #1f2937;
+    --sidenav-item-active-color: var(--color-primary-500);
+    --sidenav-item-active-bg: #1f2937;
+    --sidenav-toggle-color: #9ca3af;
+    --sidenav-toggle-hover-color: #f3f4f6;
+    --sidenav-toggle-hover-bg: #1f2937;
+    --sidenav-active-indicator: var(--color-primary-500);
+
     /* --breakpoint-sm: 425px;
     --breakpoint-md: 768px;
     --breakpoint-lg: 1024px;
