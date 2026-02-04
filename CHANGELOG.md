@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.0.1
+
+### Patch Changes
+
+- 85fb2ca: fix: sidenav theming
+
 ## 1.0.0
 
 ### Major Changes
