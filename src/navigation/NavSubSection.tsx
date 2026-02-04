@@ -150,13 +150,15 @@ const ActiveIndicator: React.FC<{
         >
             {showPing && (
                 <div
-                    className="absolute w-3.5 h-3.5 -left-0.25 -top-0.25 rounded-full bg-primary-500/50 animate-ping"
+                    className="absolute w-3.5 h-3.5 -left-0.25 -top-0.25 rounded-full animate-ping"
+                    style={{ backgroundColor: 'color-mix(in srgb, var(--sidenav-active-indicator) 50%, transparent)' }}
                     aria-hidden="true"
                 />
             )}
             <div
-                className="relative w-3 h-3 rounded-full bg-primary-500 z-20 transition-transform ease-out"
+                className="relative w-3 h-3 rounded-full z-20 transition-transform ease-out"
                 style={{
+                    backgroundColor: 'var(--sidenav-active-indicator)',
                     opacity: position.scale,
                     transform: `scale(${position.scale})`,
                     transitionDuration: `${ANIMATION_CONSTANTS.INDICATOR_TRANS_TIME}ms`,
@@ -220,12 +222,12 @@ export default function NavSubSection({
         <div className={className}>
             <button
                 onClick={toggleOpen}
-                className={`flex w-full items-center justify-between rounded-md px-2 py-1 text-sm cursor-pointer text-left transition-colors gap-2
-          ${
-              hasActive
-                  ? 'font-medium hover:bg-gray-800 text-gray-200'
-                  : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800'
-          }`}
+                className="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm cursor-pointer text-left transition-colors gap-2 font-medium hover:bg-[var(--sidenav-item-hover-bg)] hover:text-[var(--sidenav-item-hover-color)]"
+                style={{
+                    color: hasActive
+                        ? 'var(--sidenav-item-active-color)'
+                        : 'var(--sidenav-item-color)',
+                }}
                 aria-expanded={isOpen}
                 aria-controls={`subsection-${subSection.title}`}
             >
@@ -236,7 +238,7 @@ export default function NavSubSection({
             <div className="ml-2 relative">
                 {/* Border line */}
                 <div
-                    className={`absolute top-0 w-0 border-l-3 border-gray-700 transition-transform duration-${
+                    className={`absolute top-0 w-0 border-l-3 border-[var(--sidenav-border)] transition-transform duration-${
                         ANIMATION_CONSTANTS.OPEN_TIME
                     } origin-top
             ${isOpen ? 'scale-y-100' : 'scale-y-0'}`}

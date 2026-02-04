@@ -12,15 +12,16 @@ export interface NavItemProps {
 }
 
 export default function NavItem({ href, children, active, onClick, renderLink }: NavItemProps) {
-    const className = `py-1 text-sm px-2 rounded-md block !no-underline ${
+    const className = `py-1 text-sm px-2 rounded-md block !no-underline pr-3 ${
         active
-            ? 'font-medium bg-gray-800'
-            : '!text-gray-400 hover:!text-gray-300 hover:bg-gray-800 pr-3'
+            ? 'font-medium'
+            : 'hover:!text-[var(--sidenav-item-hover-color)] hover:!bg-[var(--sidenav-item-hover-bg)]'
     }`;
 
-    const style = {
+    const style: React.CSSProperties = {
         cursor: active ? 'default' : 'pointer',
-        color: active ? 'var(--color-primary-500)' : 'var(--color-gray-400)',
+        color: active ? 'var(--sidenav-item-active-color)' : 'var(--sidenav-item-color)',
+        backgroundColor: active ? 'var(--sidenav-item-active-bg)' : undefined,
     };
 
     if (renderLink) {

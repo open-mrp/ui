@@ -244,9 +244,30 @@ export const WithSubsections: Story = {
     },
 };
 
-// Navigation with custom styling
-export const CustomStyling: Story = {
-    render: (args) => <SidenavWithState {...args} />,
+// Navigation with custom theme via CSS variables
+export const CustomTheme: Story = {
+    render: (args) => (
+        <div
+            style={
+                {
+                    ['--sidenav-background']: '#1e3a5f',
+                    ['--sidenav-border']: '#2d4a6f',
+                    ['--sidenav-title-color']: '#e2e8f0',
+                    ['--sidenav-item-color']: '#94a3b8',
+                    ['--sidenav-item-hover-color']: '#cbd5e1',
+                    ['--sidenav-item-hover-bg']: '#334155',
+                    ['--sidenav-item-active-color']: '#38bdf8',
+                    ['--sidenav-item-active-bg']: '#334155',
+                    ['--sidenav-toggle-color']: '#94a3b8',
+                    ['--sidenav-toggle-hover-color']: '#f1f5f9',
+                    ['--sidenav-toggle-hover-bg']: '#334155',
+                    ['--sidenav-active-indicator']: '#38bdf8',
+                } as React.CSSProperties
+            }
+        >
+            <SidenavWithState {...args} />
+        </div>
+    ),
     args: {
         sections: [
             {
@@ -258,6 +279,5 @@ export const CustomStyling: Story = {
                 ],
             },
         ],
-        className: 'bg-gray-800',
     },
 };
