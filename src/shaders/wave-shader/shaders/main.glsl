@@ -10,6 +10,7 @@ uniform vec3 u_background_color; // Background color (RGB normalized 0-1)
 
 const float PI = 3.14159;
 const int MAX_WAVES = 20; // Maximum possible waves
+const float MAX_NOISE_AMP = 1.45; // Max of wave_y_noise (0.90 + 0.55 octave amplitudes)
 
 float get_x() {
   return 900.0 + gl_FragCoord.x - u_w / 2.0;
@@ -272,6 +273,12 @@ void main() {
 
     // Calculate t for parameterisation along 0-1
     float t = float(i) * inv_num_waves;
+
+    // Early out: if pixel is above this wave's maximum possible extent
+    // (base + max noise displacement + max blur radius), alpha is guaranteed 0
+    if(y_coord > wave_y + MAX_NOISE_AMP * wave_height + BLUR_AMOUNT * 0.5) {
+      continue;
+    }
 
     // Pre-compute the offset for this wave - simplified calculation
     float wave_offset = 112.5 * (1.0 + float(i)) * (39.0 + 9.0 * sin(t * PI * 0.5));
