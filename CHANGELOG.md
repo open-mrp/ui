@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.0.2
+
+### Patch Changes
+
+- 7f7ac5b: performance enhancements
+
 ## 1.0.1
 
 ### Patch Changes
