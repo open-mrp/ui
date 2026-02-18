@@ -10,6 +10,7 @@ uniform vec3 u_background_color; // Background color (RGB normalized 0-1)
 
 const float PI = 3.14159;
 const int MAX_WAVES = 20; // Maximum possible waves
+const float MAX_NOISE_AMP = 1.45; // Max of wave_y_noise (0.90 + 0.55 octave amplitudes)
 
 float get_x() {
   return 900.0 + gl_FragCoord.x - u_w / 2.0;
@@ -255,8 +256,16 @@ void main() {
   float x_cached = get_x(); // Cache this expensive calculation
   float margin = u_h * 0.02;              // 2 % margin from top and bottom
   float available_height = u_h - (2.0 * margin);
-  float spacing = available_height / max(float(u_num_waves - 1), 1.0);
   float wave_height = u_h * 0.11;              // 11 % of canvas height
+
+  // Raise the bottom wave for fewer-wave configs so its downward fill is
+  // visible, while keeping the full spread from margin-to-margin at 8 waves.
+  // Waves still span upward to the top margin, preserving the depth gradient
+  // (closer/lower waves lighter, further/upper waves darker).
+  float min_base = u_h * 0.4;
+  float base_y = mix(min_base, margin, clamp(float(u_num_waves - 1) / 7.0, 0.0, 1.0));
+  float spacing = (u_h - margin - base_y) / max(float(u_num_waves - 1), 1.0);
+
   float inv_num_waves = 1.0 / max(float(u_num_waves - 1), 1.0); // Pre-compute division
 
   // Start with a dark background - accumulate lightness like original strands
@@ -268,10 +277,16 @@ void main() {
       break; // Stop after rendering requested number of waves
 
     // Compute the y-position of this wave
-    float wave_y = margin + (float(i) * spacing);
+    float wave_y = base_y + (float(i) * spacing);
 
     // Calculate t for parameterisation along 0-1
     float t = float(i) * inv_num_waves;
+
+    // Early out: if pixel is above this wave's maximum possible extent
+    // (base + max noise displacement + max blur radius), alpha is guaranteed 0
+    if(y_coord > wave_y + MAX_NOISE_AMP * wave_height + BLUR_AMOUNT * 0.5) {
+      continue;
+    }
 
     // Pre-compute the offset for this wave - simplified calculation
     float wave_offset = 112.5 * (1.0 + float(i)) * (39.0 + 9.0 * sin(t * PI * 0.5));
@@ -283,9 +298,11 @@ void main() {
     float opacity_multiplier = mix(1.0, 0.5, mod(float(i), 2.0));
     area_alpha *= opacity_multiplier;
 
-    // Scale down the alpha contribution so lightness accumulates more gradually
-    // This prevents saturation and uses the full gradient spectrum
-    float scaled_alpha = area_alpha * 0.4;
+    // Scale alpha contribution with wave count. sqrt curve gives a gentler
+    // boost than linear inverse — enough to compensate for fewer overlapping
+    // waves without oversaturating now that waves are grouped closer together.
+    // At 8 waves this equals 0.4 (the original tuning).
+    float scaled_alpha = area_alpha * 0.4 * sqrt(8.0 / float(u_num_waves));
     
     // Accumulate lightness - more overlap = higher lightness = further along gradient
     lightness += scaled_alpha;
@@ -293,6 +310,8 @@ void main() {
 
   // Clamp lightness to valid range
   lightness = clamp(lightness, 0.0, 1.0);
+
+
 
   // Blend wave color with background - same as original
   vec3 waveColor = calc_color(lightness);
