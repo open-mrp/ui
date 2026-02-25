@@ -81,16 +81,78 @@ def fibonacci(n: int) -> List[int]:
     """
     sequence = []
     a, b = 0, 1
-    
+
     for _ in range(n):
         sequence.append(a)
         a, b = b, a + b
-    
+
     return sequence
 
 # Using the function
 result = fibonacci(10)
 print(f"First 10 Fibonacci numbers: {result}")`}
+            </code>
+        ),
+    },
+};
+
+export const NestedBlocks: Story = {
+    name: 'Nested Blocks (Folding)',
+    args: {
+        children: (
+            <code className="language-typescript">
+                {`import { useState, useEffect } from 'react';
+
+interface ApiResponse<T> {
+  data: T;
+  error: string | null;
+  loading: boolean;
+}
+
+function useFetch<T>(url: string): ApiResponse<T> {
+  const [state, setState] = useState<ApiResponse<T>>({
+    data: null as T,
+    error: null,
+    loading: true,
+  });
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchData() {
+      try {
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(\`HTTP \${response.status}\`);
+        }
+
+        const data = await response.json();
+        setState({ data, error: null, loading: false });
+      } catch (err) {
+        if (err instanceof Error) {
+          setState({
+            data: null as T,
+            error: err.message,
+            loading: false,
+          });
+        }
+      }
+    }
+
+    fetchData();
+    return () => controller.abort();
+  }, [url]);
+
+  return state;
+}
+
+export default useFetch;`}
             </code>
         ),
     },
