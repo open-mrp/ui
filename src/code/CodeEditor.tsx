@@ -4,7 +4,7 @@ import copy from 'copy-to-clipboard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { highlightCode } from '../utils/highlight';
 import CodeCopyButton from './CodeCopyButton';
-import { findFoldRegions } from './findFoldRegions';
+import { findFoldRegions, type FoldRegion } from './findFoldRegions';
 import { splitHighlightedLines } from './splitHighlightedLines';
 
 export interface CodeEditorProps {
@@ -35,10 +35,13 @@ export default function CodeEditor({ children, className, replacements }: CodeEd
     const [rawCode, setRawCode] = useState('');
     const [foldedLines, setFoldedLines] = useState<Set<number>>(new Set());
 
-    const foldRegions = useMemo(() => findFoldRegions(rawCode), [rawCode]);
+    const foldRegions = useMemo(
+        () => findFoldRegions(rawCode, language ?? undefined),
+        [rawCode, language],
+    );
 
     const foldableLineMap = useMemo(() => {
-        const map = new Map<number, { startLine: number; endLine: number }>();
+        const map = new Map<number, FoldRegion>();
         for (const region of foldRegions) {
             if (!map.has(region.startLine)) {
                 map.set(region.startLine, region);
@@ -78,32 +81,20 @@ export default function CodeEditor({ children, className, replacements }: CodeEd
         });
     }, []);
 
-    const visibleLines = useMemo(() => {
-        if (highlightedLines.length === 0) return [];
+    const rawLines = useMemo(() => rawCode.split('\n'), [rawCode]);
 
-        const hiddenLines = new Set<number>();
+    const hiddenLines = useMemo(() => {
+        const hidden = new Set<number>();
         for (const startLine of foldedLines) {
             const region = foldableLineMap.get(startLine);
             if (region) {
                 for (let i = startLine + 1; i <= region.endLine; i++) {
-                    hiddenLines.add(i);
+                    hidden.add(i);
                 }
             }
         }
-
-        const result: { index: number; html: string; isFoldStart: boolean; isFolded: boolean }[] =
-            [];
-        for (let i = 0; i < highlightedLines.length; i++) {
-            if (hiddenLines.has(i)) continue;
-            result.push({
-                index: i,
-                html: highlightedLines[i],
-                isFoldStart: foldableLineMap.has(i),
-                isFolded: foldedLines.has(i),
-            });
-        }
-        return result;
-    }, [highlightedLines, foldedLines, foldableLineMap]);
+        return hidden;
+    }, [foldedLines, foldableLineMap]);
 
     const handleCopy = () => {
         const text = rawCode || codeRef.current?.textContent || '';
@@ -134,43 +125,71 @@ export default function CodeEditor({ children, className, replacements }: CodeEd
             <div className="w-full">
                 {highlightedLines.length > 0 ? (
                     <pre className="text-sm overflow-x-auto w-full whitespace-pre !leading-relaxed">
-                        {visibleLines.map((line) => (
-                            <div key={line.index} className="flex">
-                                <span
-                                    className="inline-flex items-center justify-center w-5 shrink-0 select-none"
-                                    aria-hidden="true"
+                        {highlightedLines.map((html, i) => {
+                            const hidden = hiddenLines.has(i);
+                            const isFoldStart = foldableLineMap.has(i);
+                            const isFolded = foldedLines.has(i);
+
+                            return (
+                                <div
+                                    key={i}
+                                    className="grid transition-[grid-template-rows] duration-200 ease-in-out"
+                                    style={{
+                                        gridTemplateRows: hidden ? '0fr' : '1fr',
+                                    }}
                                 >
-                                    {line.isFoldStart && (
-                                        <button
-                                            onClick={() => toggleFold(line.index)}
-                                            className="text-gray-600 hover:text-gray-400 leading-none p-0 bg-transparent border-none cursor-pointer transition-transform duration-150"
-                                            style={{ fontSize: '0.5rem' }}
-                                            aria-label={
-                                                line.isFolded
-                                                    ? 'Expand code block'
-                                                    : 'Collapse code block'
-                                            }
-                                        >
-                                            <svg
-                                                className={`w-3 h-3 transition-transform duration-150 ${line.isFolded ? '' : 'rotate-90'}`}
-                                                viewBox="0 0 8 8"
-                                                fill="currentColor"
+                                    <div
+                                        className="overflow-hidden transition-opacity duration-200 ease-in-out"
+                                        style={{ opacity: hidden ? 0 : 1 }}
+                                    >
+                                        <div className="flex">
+                                            <span
+                                                className="inline-flex items-center justify-center w-5 shrink-0 select-none"
+                                                aria-hidden="true"
                                             >
-                                                <path d="M2 1 L6 4 L2 7 Z" />
-                                            </svg>
-                                        </button>
-                                    )}
-                                </span>
-                                <span className="flex-1 min-w-0">
-                                    <span dangerouslySetInnerHTML={{ __html: line.html }} />
-                                    {line.isFolded && (
-                                        <span className="text-gray-500 ml-1 text-xs bg-gray-700/50 px-1.5 py-0.5 rounded">
-                                            &hellip;
-                                        </span>
-                                    )}
-                                </span>
-                            </div>
-                        ))}
+                                                {isFoldStart && (
+                                                    <button
+                                                        onClick={() => toggleFold(i)}
+                                                        className="text-gray-600 hover:text-gray-400 leading-none p-0 bg-transparent border-none cursor-pointer"
+                                                        style={{ fontSize: '0.5rem' }}
+                                                        aria-label={
+                                                            isFolded
+                                                                ? 'Expand code block'
+                                                                : 'Collapse code block'
+                                                        }
+                                                    >
+                                                        <svg
+                                                            className={`w-3 h-3 transition-transform duration-150 ${isFolded ? '' : 'rotate-90'}`}
+                                                            viewBox="0 0 8 8"
+                                                            fill="currentColor"
+                                                        >
+                                                            <path d="M2 1 L6 4 L2 7 Z" />
+                                                        </svg>
+                                                    </button>
+                                                )}
+                                            </span>
+                                            <span className="flex-1 min-w-0">
+                                                <span
+                                                    dangerouslySetInnerHTML={{ __html: html }}
+                                                />
+                                                {isFolded && (() => {
+                                                    const region = foldableLineMap.get(i);
+                                                    const endText =
+                                                        region?.type === 'bracket'
+                                                            ? ` ${rawLines[region.endLine]?.trim()}`
+                                                            : '';
+                                                    return (
+                                                        <span className="text-gray-300 ml-2 bg-gray-600/40 px-2 py-0.5 rounded-sm border border-gray-500/30 animate-in fade-in duration-200">
+                                                            &hellip;{endText}
+                                                        </span>
+                                                    );
+                                                })()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </pre>
                 ) : (
                     <pre className="text-sm overflow-x-auto w-full whitespace-pre">{children}</pre>
