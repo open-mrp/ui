@@ -124,7 +124,7 @@ export default function CodeEditor({ children, className, replacements }: CodeEd
 
             <div className="w-full">
                 {highlightedLines.length > 0 ? (
-                    <pre className="text-sm overflow-x-auto w-full whitespace-pre !leading-relaxed">
+                    <pre className="hljs text-sm overflow-x-auto w-full whitespace-pre !leading-relaxed">
                         {highlightedLines.map((html, i) => {
                             const hidden = hiddenLines.has(i);
                             const isFoldStart = foldableLineMap.has(i);
