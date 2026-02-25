@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.2
+
+### Patch Changes
+
+- f5d3a0c: fix: code editor text color issue
+
 ## 1.1.1
 
 ### Patch Changes
