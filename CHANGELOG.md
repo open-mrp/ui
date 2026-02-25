@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.0
+
+### Minor Changes
+
+- 4b166a3: feat: collapsable code
+
 ## 1.0.2
 
 ### Patch Changes
