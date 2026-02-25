@@ -14,7 +14,7 @@ export interface DocNumberedSectionProps {
     isOptional?: boolean;
 }
 
-export default function DocNumberedSection({
+const DocNumberedSection = React.memo(function DocNumberedSection({
     children,
     number,
     title,
@@ -54,4 +54,6 @@ export default function DocNumberedSection({
             </div>
         </div>
     );
-}
+});
+
+export default DocNumberedSection;
