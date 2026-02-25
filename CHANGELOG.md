@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.1
+
+### Patch Changes
+
+- ae50bad: fix: issue with code editor collapse
+
 ## 1.1.0
 
 ### Minor Changes
