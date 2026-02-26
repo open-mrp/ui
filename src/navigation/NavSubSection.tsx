@@ -222,7 +222,7 @@ export default function NavSubSection({
         <div className={className}>
             <button
                 onClick={toggleOpen}
-                className="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm cursor-pointer text-left transition-colors gap-2 font-medium hover:bg-[var(--sidenav-item-hover-bg)] hover:text-[var(--sidenav-item-hover-color)]"
+                className="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm cursor-pointer text-left transition-colors gap-2 hover:bg-[var(--sidenav-item-hover-bg)] hover:text-[var(--sidenav-item-hover-color)]"
                 style={{
                     color: hasActive
                         ? 'var(--sidenav-item-active-color)'
