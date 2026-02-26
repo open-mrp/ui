@@ -1,9 +1,8 @@
 'use client';
 
 import ChevronDownIcon from '@/icons/ChevronDownIcon';
-import ChevronUpIcon from '@/icons/ChevronUpIcon';
 import { cn } from '@/utils/cn';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DocHeading from './DocHeading';
 
 export interface DocNumberedSectionProps {
@@ -14,7 +13,7 @@ export interface DocNumberedSectionProps {
     isOptional?: boolean;
 }
 
-const DocNumberedSection = React.memo(function DocNumberedSection({
+function DocNumberedSection({
     children,
     number,
     title,
@@ -38,11 +37,12 @@ const DocNumberedSection = React.memo(function DocNumberedSection({
                     {title}
                 </DocHeading>
                 <div className="flex items-center justify-center min-w-[32px] h-[32px]">
-                    {isOpen ? (
-                        <ChevronUpIcon className="w-6 h-6 text-[var(--text-secondary)]" />
-                    ) : (
-                        <ChevronDownIcon className="w-6 h-6 text-[var(--text-secondary)]" />
-                    )}
+                    <ChevronDownIcon
+                        className={cn(
+                            'w-6 h-6 text-[var(--text-secondary)] transition-transform duration-300',
+                            isOpen && 'rotate-180',
+                        )}
+                    />
                 </div>
             </div>
             <div
@@ -54,6 +54,6 @@ const DocNumberedSection = React.memo(function DocNumberedSection({
             </div>
         </div>
     );
-});
+}
 
 export default DocNumberedSection;
