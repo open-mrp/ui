@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.3
+
+### Patch Changes
+
+- 0f44c3a: fix: issue with sidenav
+
 ## 1.1.2
 
 ### Patch Changes
