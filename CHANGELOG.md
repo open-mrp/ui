@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.7
+
+### Patch Changes
+
+- 6d218a7: fix: code editor
+
 ## 1.1.6
 
 ### Patch Changes
