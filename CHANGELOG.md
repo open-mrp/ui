@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.5
+
+### Patch Changes
+
+- a7b27de: fix: subsection indicator location bug
+
 ## 1.1.4
 
 ### Patch Changes
