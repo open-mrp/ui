@@ -214,7 +214,12 @@ export default function NavSubSection({
     // Auto-open section when it becomes active
     useEffect(() => {
         if (hasActive && !isOpen && prevActiveIndex === -1) {
+            setIsInInitialTransition(true);
             setIsOpen(true);
+            setTimeout(() => {
+                setPrevActiveIdx(-1);
+                setIsInInitialTransition(false);
+            }, ANIMATION_CONSTANTS.OPEN_TIME);
         }
     }, [hasActive, isOpen, prevActiveIndex]);
 
