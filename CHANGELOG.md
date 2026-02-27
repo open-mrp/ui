@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.6
+
+### Patch Changes
+
+- 65bdcb3: fix: minor UI issues
+
 ## 1.1.5
 
 ### Patch Changes
