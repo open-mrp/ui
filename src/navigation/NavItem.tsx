@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+
 export interface NavItemProps {
     href: string;
     children: string;
@@ -12,6 +16,19 @@ export interface NavItemProps {
 }
 
 export default function NavItem({ href, children, active, onClick, renderLink }: NavItemProps) {
+    const ref = useRef<HTMLDivElement>(null);
+    const hasMountedRef = useRef(false);
+
+    useEffect(() => {
+        if (active && ref.current) {
+            ref.current.scrollIntoView({
+                block: 'nearest',
+                behavior: hasMountedRef.current ? 'smooth' : 'instant',
+            });
+        }
+        hasMountedRef.current = true;
+    }, [active]);
+
     const className = `py-1 text-sm px-2 rounded-md block !no-underline pr-3 ${
         active
             ? 'font-medium'
@@ -24,13 +41,15 @@ export default function NavItem({ href, children, active, onClick, renderLink }:
         backgroundColor: active ? 'var(--sidenav-item-active-bg)' : undefined,
     };
 
-    if (renderLink) {
-        return renderLink({ href, children, className, style });
-    }
-
     return (
-        <a href={href} className={className} style={style} onClick={onClick}>
-            {children}
-        </a>
+        <div ref={ref}>
+            {renderLink ? (
+                renderLink({ href, children, className, style })
+            ) : (
+                <a href={href} className={className} style={style} onClick={onClick}>
+                    {children}
+                </a>
+            )}
+        </div>
     );
 }
