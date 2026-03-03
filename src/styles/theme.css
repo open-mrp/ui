@@ -101,4 +101,4 @@
     --breakpoint-xl: 1440px;
     --breakpoint-2xl: 2560px; */
 }
-@source "../../dist";
+@source "./";
