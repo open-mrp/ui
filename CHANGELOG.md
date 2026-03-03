@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.8
+
+### Patch Changes
+
+- 12a8fdd: fix: export of styles issues
+
 ## 1.1.7
 
 ### Patch Changes
