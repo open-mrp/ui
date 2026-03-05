@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.1.9
+
+### Patch Changes
+
+- 4bbe128: fix: issue with code editors
+
 ## 1.1.8
 
 ### Patch Changes
