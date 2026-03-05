@@ -105,7 +105,7 @@ export default function CodeEditor({ children, className, replacements }: CodeEd
 
     return (
         <div
-            className={`bg-code-background p-4 rounded-md relative group mt-4 ${className}`}
+            className={`bg-code-background p-4 rounded-md relative group mt-4 overflow-hidden ${className}`}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
         >
@@ -118,7 +118,7 @@ export default function CodeEditor({ children, className, replacements }: CodeEd
             <CodeCopyButton onCopy={handleCopy} isHovering={isHovering} copied={copied} />
 
             {/* Hidden container for extracting raw code from children */}
-            <div ref={codeRef} style={{ position: 'absolute', left: -9999, top: -9999 }}>
+            <div ref={codeRef} hidden>
                 {children}
             </div>
 
