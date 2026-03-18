@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.2.8
+
+### Patch Changes
+
+- 4fb27df: fix: allow max-height in code editor
+
 ## 1.2.7
 
 ### Patch Changes
