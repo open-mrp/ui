@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.2.3
+
+### Patch Changes
+
+- 6b51682: fix: code editor allows vertical scroll
+
 ## 1.2.2
 
 ### Patch Changes
