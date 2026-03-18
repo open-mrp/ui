@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.2.0
+
+### Minor Changes
+
+- f9d427a: feat: allow icons and further nesting in Sidenav
+
 ## 1.1.9
 
 ### Patch Changes
