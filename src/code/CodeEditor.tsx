@@ -12,6 +12,8 @@ export interface CodeEditorProps {
     className?: string;
     /** Scrollable height (in px if number) for the code area */
     height?: number | string;
+    /** Maximum scrollable height (in px if number) for the code area */
+    maxHeight?: number | string;
     /** Optional map of placeholder strings to replacement values (e.g., { "YOUR_API_KEY": "sk_test_..." }) */
     replacements?: Record<string, string>;
     /** When true (default), show the detected language label in the header */
@@ -34,6 +36,7 @@ export default function CodeEditor({
     children,
     className,
     height,
+    maxHeight,
     replacements,
     showLanguageLabel = true,
 }: CodeEditorProps) {
@@ -121,21 +124,33 @@ export default function CodeEditor({
     };
 
     const resolvedHeight = height !== undefined ? (typeof height === 'number' ? `${height}px` : height) : undefined;
-    const scrollAreaStyle = resolvedHeight !== undefined ? { height: '100%', maxHeight: '100%' } : undefined;
+    const resolvedMaxHeight =
+        maxHeight !== undefined ? (typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight) : undefined;
+
+    const outerStyle =
+        resolvedHeight !== undefined || resolvedMaxHeight !== undefined
+            ? {
+                  ...(resolvedHeight !== undefined ? { height: resolvedHeight } : null),
+                  ...(resolvedMaxHeight !== undefined ? { maxHeight: resolvedMaxHeight } : null),
+              }
+            : undefined;
+
+    const scrollAreaStyle: React.CSSProperties | undefined =
+        resolvedHeight !== undefined
+            ? {
+                  height: '100%',
+                  ...(resolvedMaxHeight !== undefined ? { maxHeight: resolvedMaxHeight } : null),
+              }
+            : resolvedMaxHeight !== undefined
+              ? { maxHeight: resolvedMaxHeight }
+              : undefined;
 
     return (
         <div
             className={`bg-code-background pb-0 rounded-md relative group mt-4 ${height !== undefined ? 'flex flex-col' : ''} ${className}`}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
-            style={
-                resolvedHeight !== undefined
-                    ? {
-                          height: resolvedHeight,
-                          maxHeight: resolvedHeight,
-                      }
-                    : undefined
-            }
+            style={outerStyle}
         >
             {showLanguageLabel && (
                 <div
@@ -158,9 +173,9 @@ export default function CodeEditor({
                 {children}
             </div>
 
-            <div className={height !== undefined ? 'w-full flex-1 min-h-0' : 'w-full'}>
+            <div className={resolvedHeight !== undefined ? 'w-full flex-1 min-h-0' : 'w-full'}>
                 <div
-                    className={`w-full overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background ${height !== undefined ? 'h-full' : ''}`}
+                    className={`w-full overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
                     style={scrollAreaStyle}
                 >
                     {highlightedLines.length > 0 ? (

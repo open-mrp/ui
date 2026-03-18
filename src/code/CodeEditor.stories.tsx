@@ -201,6 +201,50 @@ console.log(longList.join(', '));`}
   },
 };
 
+export const HeightWithMaxHeightCap: Story = {
+  name: 'Height + MaxHeight Cap',
+  args: {
+    showLanguageLabel: false,
+    height: 280,
+    maxHeight: 200,
+    className: '!mt-0',
+    children: (
+      <code className="language-typescript">
+        {`type Row = { id: string; value: string };
+const rows: Row[] = [];
+for (let i = 0; i < 120; i++) {
+  rows.push({ id: String(i), value: 'Row ' + i });
+}
+console.log(rows.length);`}
+      </code>
+    ),
+  },
+};
+
+export const MaxHeightOnly: Story = {
+  name: 'MaxHeight Only (No Fixed Height)',
+  render: (args) => (
+    <div style={{ height: 260, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ height: 20 }} />
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <CodeEditor {...args} />
+      </div>
+    </div>
+  ),
+  args: {
+    showLanguageLabel: false,
+    maxHeight: 180,
+    className: '!mt-0',
+    children: (
+      <code className="language-javascript">
+        {`// No fixed height: maxHeight should cap scroll area.
+const items = Array.from({ length: 200 }, (_, i) => i);
+console.log(items.slice(0, 10));`}
+      </code>
+    ),
+  },
+};
+
 export const NestedBlocks: Story = {
   name: 'Nested Blocks (Folding)',
   args: {
