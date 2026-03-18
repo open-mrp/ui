@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.2.2
+
+### Patch Changes
+
+- 58a3edc: fix: allow removal of language from code editor
+
 ## 1.2.1
 
 ### Patch Changes
