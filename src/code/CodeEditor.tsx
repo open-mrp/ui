@@ -133,19 +133,19 @@ export default function CodeEditor({
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
         >
-            <div
-                className="absolute left-0 top-0 right-0 z-20 h-10 px-4 rounded-t-md rounded-b-none backdrop-blur-md flex items-center"
-                style={{
-                    backgroundColor:
-                        'color-mix(in srgb, var(--color-code-background) 20%, transparent)',
-                }}
-            >
-                {showLanguageLabel && (
+            {showLanguageLabel && (
+                <div
+                    className="absolute left-0 top-0 right-0 z-20 h-10 px-4 rounded-t-md rounded-b-none backdrop-blur-md flex items-center"
+                    style={{
+                        backgroundColor:
+                            'color-mix(in srgb, var(--color-code-background) 20%, transparent)',
+                    }}
+                >
                     <div className="text-xs text-gray-500 uppercase" style={{ height: '16px' }}>
                         {language}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             <CodeCopyButton onCopy={handleCopy} isHovering={isHovering} copied={copied} />
 
@@ -156,7 +156,7 @@ export default function CodeEditor({
 
             <div className="w-full">
                 <div
-                    className="w-full overflow-y-auto pt-10 pb-4 rounded-md bg-code-background"
+                    className={`w-full overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
                     style={scrollAreaStyle}
                 >
                     {highlightedLines.length > 0 ? (

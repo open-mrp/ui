@@ -161,6 +161,24 @@ for (const item of items) {
   },
 };
 
+export const NoLanguageLabel: Story = {
+  name: 'No Language Label',
+  args: {
+    showLanguageLabel: false,
+    height: 220,
+    children: (
+      <code className="language-javascript">
+        {`// Copy button still works, but the language label is hidden
+function add(a, b) {
+  return a + b;
+}
+
+console.log(add(1, 2));`}
+      </code>
+    ),
+  },
+};
+
 export const NestedBlocks: Story = {
   name: 'Nested Blocks (Folding)',
   args: {
