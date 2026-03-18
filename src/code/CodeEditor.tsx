@@ -120,20 +120,22 @@ export default function CodeEditor({
         setTimeout(() => setCopied(false), 1000);
     };
 
-    const scrollAreaStyle =
-        height !== undefined
-            ? (() => {
-                  const resolved = typeof height === 'number' ? `${height}px` : height;
-                  // Use `height` so expressions like `calc(100% - 12px)` behave as expected.
-                  return { height: resolved, maxHeight: resolved };
-              })()
-            : undefined;
+    const resolvedHeight = height !== undefined ? (typeof height === 'number' ? `${height}px` : height) : undefined;
+    const scrollAreaStyle = resolvedHeight !== undefined ? { height: '100%', maxHeight: '100%' } : undefined;
 
     return (
         <div
-            className={`bg-code-background pb-0 rounded-md relative group mt-4 ${className}`}
+            className={`bg-code-background pb-0 rounded-md relative group mt-4 ${height !== undefined ? 'flex flex-col' : ''} ${className}`}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
+            style={
+                resolvedHeight !== undefined
+                    ? {
+                          height: resolvedHeight,
+                          maxHeight: resolvedHeight,
+                      }
+                    : undefined
+            }
         >
             {showLanguageLabel && (
                 <div
@@ -156,7 +158,7 @@ export default function CodeEditor({
                 {children}
             </div>
 
-            <div className="w-full">
+            <div className={height !== undefined ? 'w-full flex-1' : 'w-full'}>
                 <div
                     className={`w-full overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
                     style={scrollAreaStyle}

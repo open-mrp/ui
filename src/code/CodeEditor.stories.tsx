@@ -179,6 +179,28 @@ console.log(add(1, 2));`}
   },
 };
 
+export const CalcHeightNoLanguageLabel: Story = {
+  name: 'Calc Height (No Language Label)',
+  render: (args) => (
+    <div style={{ height: '252px', display: 'flex', alignItems: 'stretch' }}>
+      <CodeEditor {...args} />
+    </div>
+  ),
+  args: {
+    showLanguageLabel: false,
+    height: 'calc(100% - 12px)',
+    className: '!mt-0',
+    children: (
+      <code className="language-javascript">
+        {`// Uses calc(100% - 12px) to ensure CSS calc strings work.
+// This should keep the scroll area sized correctly when embedded.
+const longList = Array.from({ length: 80 }, (_, i) => i);
+console.log(longList.join(', '));`}
+      </code>
+    ),
+  },
+};
+
 export const NestedBlocks: Story = {
   name: 'Nested Blocks (Folding)',
   args: {
