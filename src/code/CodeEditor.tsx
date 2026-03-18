@@ -158,9 +158,9 @@ export default function CodeEditor({
                 {children}
             </div>
 
-            <div className={height !== undefined ? 'w-full flex-1' : 'w-full'}>
+            <div className={height !== undefined ? 'w-full flex-1 min-h-0' : 'w-full'}>
                 <div
-                    className={`w-full overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
+                    className={`w-full overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background ${height !== undefined ? 'h-full' : ''}`}
                     style={scrollAreaStyle}
                 >
                     {highlightedLines.length > 0 ? (
