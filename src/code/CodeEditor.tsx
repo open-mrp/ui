@@ -10,7 +10,7 @@ import { splitHighlightedLines } from './splitHighlightedLines';
 export interface CodeEditorProps {
     children: React.ReactNode;
     className?: string;
-    /** Fixed height (in px if number) for the scrollable code area */
+    /** Scrollable height (in px if number) for the code area */
     height?: number | string;
     /** Optional map of placeholder strings to replacement values (e.g., { "YOUR_API_KEY": "sk_test_..." }) */
     replacements?: Record<string, string>;
@@ -122,9 +122,11 @@ export default function CodeEditor({
 
     const scrollAreaStyle =
         height !== undefined
-            ? {
-                maxHeight: typeof height === 'number' ? `${height}px` : height,
-            }
+            ? (() => {
+                  const resolved = typeof height === 'number' ? `${height}px` : height;
+                  // Use `height` so expressions like `calc(100% - 12px)` behave as expected.
+                  return { height: resolved, maxHeight: resolved };
+              })()
             : undefined;
 
     return (
