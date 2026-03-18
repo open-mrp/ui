@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.2.1
+
+### Patch Changes
+
+- 5c4bb3c: fix: code editor wraps text
+
 ## 1.2.0
 
 ### Minor Changes
