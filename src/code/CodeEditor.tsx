@@ -12,6 +12,8 @@ export interface CodeEditorProps {
     className?: string;
     /** Optional map of placeholder strings to replacement values (e.g., { "YOUR_API_KEY": "sk_test_..." }) */
     replacements?: Record<string, string>;
+    /** When true (default), show the detected language label in the header */
+    showLanguageLabel?: boolean;
 }
 
 /**
@@ -26,7 +28,12 @@ function applyReplacements(text: string, replacements?: Record<string, string>):
     return result;
 }
 
-export default function CodeEditor({ children, className, replacements }: CodeEditorProps) {
+export default function CodeEditor({
+    children,
+    className,
+    replacements,
+    showLanguageLabel = true,
+}: CodeEditorProps) {
     const codeRef = useRef<HTMLDivElement>(null);
     const [copied, setCopied] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
@@ -116,11 +123,13 @@ export default function CodeEditor({ children, className, replacements }: CodeEd
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
         >
-            <div className="flex justify-between items-center mb-2 px-4">
-                <div className="text-xs text-gray-500 uppercase" style={{ height: '16px' }}>
-                    {language}
+            {showLanguageLabel && (
+                <div className="flex justify-between items-center mb-2 px-4">
+                    <div className="text-xs text-gray-500 uppercase" style={{ height: '16px' }}>
+                        {language}
+                    </div>
                 </div>
-            </div>
+            )}
 
             <CodeCopyButton onCopy={handleCopy} isHovering={isHovering} copied={copied} />
 
