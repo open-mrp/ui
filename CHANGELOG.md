@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.2.7
+
+### Patch Changes
+
+- 4f430a7: fix: code editor height
+
 ## 1.2.6
 
 ### Patch Changes
