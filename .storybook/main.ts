@@ -18,12 +18,25 @@ const config = {
         reactDocgen: false,
     },
     viteFinal: async (config) => {
-        if (config.resolve) {
-            config.resolve.alias = {
-                ...config.resolve.alias,
-                '@': resolve(__dirname, '../src'),
-            };
-        }
+        config.resolve = config.resolve ?? {};
+        const existingAlias = config.resolve.alias ?? [];
+        const aliasArray = Array.isArray(existingAlias)
+            ? existingAlias
+            : Object.entries(existingAlias).map(([find, replacement]) => ({ find, replacement }));
+
+        // Put @ alias first so it wins over any existing alias rules.
+        aliasArray.unshift(
+            {
+                find: /^@\//,
+                replacement: `${resolve(__dirname, '../src')}/`,
+            },
+            {
+                find: '@',
+                replacement: resolve(__dirname, '../src'),
+            },
+        );
+
+        config.resolve.alias = aliasArray;
         return config;
     },
 };

@@ -55,7 +55,10 @@ const useActiveItem = (
         // Find active index by direct child containing the active path
         const activeIdx = items.findIndex((item) => itemHasActiveDescendant(item, isPathActive));
 
-        return { hasActive, activeIdx };
+        const hasDirectActiveLeaf =
+            activeIdx !== -1 && isNavLink(items[activeIdx]) && isPathActive(items[activeIdx].href);
+
+        return { hasActive, activeIdx, hasDirectActiveLeaf };
     }, [items, isPathActive]);
 };
 
@@ -140,23 +143,24 @@ const ActiveIndicator: React.FC<{
             className="absolute transition-all ease-out"
             style={
                 {
-                    left: '-4px',
+                    left: '0.5px',
                     top: 0,
                     '--indicator-offset': `${position.top}px`,
-                    transform: `translateY(-50%) translateY(var(--indicator-offset, 0))`,
+                    transform:
+                        'translateX(-50%) translateY(-50%) translateY(var(--indicator-offset, 0))',
                     transitionDuration: `${ANIMATION_CONSTANTS.INDICATOR_TRANS_TIME}ms`,
                 } as React.CSSProperties
             }
         >
             {showPing && (
                 <div
-                    className="absolute w-3.5 h-3.5 -left-0.25 -top-0.25 rounded-full animate-ping"
+                    className="absolute w-2.5 h-2.5 -left-0.25 -top-0.25 rounded-full animate-ping"
                     style={{ backgroundColor: 'color-mix(in srgb, var(--sidenav-active-indicator) 50%, transparent)' }}
                     aria-hidden="true"
                 />
             )}
             <div
-                className="relative w-3 h-3 rounded-full z-20 transition-transform ease-out"
+                className="relative w-2 h-2 rounded-full z-20 transition-transform ease-out"
                 style={{
                     backgroundColor: 'var(--sidenav-active-indicator)',
                     opacity: position.scale,
@@ -179,11 +183,15 @@ export default function NavSubSection({
     const [prevActiveIndex, setPrevActiveIdx] = useState<number>(-1);
     const [isInInitialTransition, setIsInInitialTransition] = useState(false);
 
-    const { hasActive, activeIdx: activeIndex } = useActiveItem(subSection.items, isPathActive);
+    const { hasActive, activeIdx: activeIndex, hasDirectActiveLeaf } = useActiveItem(
+        subSection.items,
+        isPathActive,
+    );
     const [isOpen, setIsOpen] = useState<boolean>(hasActive);
+    const indicatorActiveIndex = hasDirectActiveLeaf ? activeIndex : -1;
     const [position, showPing, setShowPing] = useIndicatorPosition(
         itemsContainerRef,
-        activeIndex,
+        indicatorActiveIndex,
         isOpen && !isInInitialTransition,
         prevActiveIndex,
     );
@@ -198,16 +206,16 @@ export default function NavSubSection({
                     setIsInInitialTransition(false);
                 }, ANIMATION_CONSTANTS.OPEN_TIME);
             } else {
-                setPrevActiveIdx(activeIndex);
+                setPrevActiveIdx(indicatorActiveIndex);
             }
             return !prev;
         });
-    }, [activeIndex]);
+    }, [indicatorActiveIndex]);
 
     // prevent ping on every change
     useEffect(() => {
-        setPrevActiveIdx(activeIndex);
-    }, [activeIndex]);
+        setPrevActiveIdx(indicatorActiveIndex);
+    }, [indicatorActiveIndex]);
 
     // Auto-open section when it becomes active
     useEffect(() => {
@@ -227,9 +235,7 @@ export default function NavSubSection({
                 onClick={toggleOpen}
                 className="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm cursor-pointer text-left transition-colors gap-2 hover:bg-[var(--sidenav-item-hover-bg)] hover:text-[var(--sidenav-item-hover-color)]"
                 style={{
-                    color: hasActive
-                        ? 'var(--sidenav-item-active-color)'
-                        : 'var(--sidenav-item-color)',
+                    color: 'var(--sidenav-item-color)',
                 }}
                 aria-expanded={isOpen}
                 aria-controls={`subsection-${subSection.title}`}
@@ -238,12 +244,11 @@ export default function NavSubSection({
                 <ChevronIcon isOpen={isOpen} />
             </button>
 
-            <div className="ml-2 relative">
+            <div className="ml-1 relative">
                 {/* Border line */}
                 <div
-                    className={`absolute inset-y-0 left-0 w-0 border-l-3 border-[var(--sidenav-border)] transition-transform origin-top ${
-                        isOpen ? 'scale-y-100' : 'scale-y-0'
-                    }`}
+                    className={`absolute inset-y-0 left-0 w-0 border-l border-[var(--sidenav-border)] transition-transform origin-top ${isOpen ? 'scale-y-100' : 'scale-y-0'
+                        }`}
                     style={{
                         transitionDuration: `${ANIMATION_CONSTANTS.OPEN_TIME}ms`,
                     }}
@@ -251,13 +256,15 @@ export default function NavSubSection({
                 />
 
                 {/* Animated Active Indicator */}
-                {isOpen && position && <ActiveIndicator position={position} showPing={showPing} />}
+                {isOpen && hasDirectActiveLeaf && position && (
+                    <ActiveIndicator position={position} showPing={showPing} />
+                )}
 
                 {/* Content with padding */}
                 <div
                     id={`subsection-${subSection.title}`}
                     ref={itemsContainerRef}
-                    className={`pl-3 overflow-hidden transition-[max-height] duration-300 ease-out
+                    className={`pl-2 overflow-hidden transition-[max-height] duration-300 ease-out
             ${isOpen ? 'max-h-[2000px]' : 'max-h-0'} ${isOpen ? 'opacity-100' : 'opacity-0'}`}
                     style={{
                         transitionProperty: 'max-height, opacity',
@@ -273,12 +280,11 @@ export default function NavSubSection({
                             style={{
                                 opacity: isOpen ? 1 : 0,
                                 transform: `translateY(${isOpen ? 0 : 8}px)`,
-                                transitionDelay: `${
-                                    isOpen
-                                        ? itemIndex * ANIMATION_CONSTANTS.ITEM_TIME
-                                        : (subSection.items.length - itemIndex - 1) *
-                                          ANIMATION_CONSTANTS.ITEM_TIME
-                                }ms`,
+                                transitionDelay: `${isOpen
+                                    ? itemIndex * ANIMATION_CONSTANTS.ITEM_TIME
+                                    : (subSection.items.length - itemIndex - 1) *
+                                    ANIMATION_CONSTANTS.ITEM_TIME
+                                    }ms`,
                                 transitionProperty: 'opacity, transform',
                             }}
                         >

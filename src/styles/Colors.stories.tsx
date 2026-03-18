@@ -30,7 +30,7 @@ const ColorSection = ({ title, colors }: { title: string; colors: { [key: string
 
 export const PrimaryColors: Story = {
     render: () => (
-        <div className="p-6 dark:bg-background">
+        <div className="p-6">
             <ColorSection
                 title="Primary Colors"
                 colors={{
@@ -52,7 +52,7 @@ export const PrimaryColors: Story = {
 
 export const SecondaryColors: Story = {
     render: () => (
-        <div className="p-6 dark:bg-background">
+        <div className="p-6">
             <ColorSection
                 title="Secondary Colors"
                 colors={{
@@ -74,7 +74,7 @@ export const SecondaryColors: Story = {
 
 export const BackgroundColors: Story = {
     render: () => (
-        <div className="p-6 dark:bg-background">
+        <div className="p-6">
             <ColorSection
                 title="Background Colors"
                 colors={{

@@ -6,13 +6,6 @@ const meta = {
     component: CodeEditor,
     title: 'Code/CodeEditor',
     tags: ['autodocs'],
-    decorators: [
-        (Story) => (
-            <div className="p-4 dark:bg-background">
-                <Story />
-            </div>
-        ),
-    ],
 } satisfies Meta<typeof CodeEditor>;
 
 export default meta;
@@ -91,6 +84,40 @@ def fibonacci(n: int) -> List[int]:
 # Using the function
 result = fibonacci(10)
 print(f"First 10 Fibonacci numbers: {result}")`}
+            </code>
+        ),
+    },
+};
+
+export const LineWrapping: Story = {
+    name: 'Line Wrapping',
+    args: {
+        children: (
+            <code className="language-typescript">
+                {`import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+interface CreateOrderPayload {
+  customerId: string;
+  items: Array<{ productId: string; quantity: number; unitPrice: number; discount?: number; metadata?: Record<string, string> }>;
+  shippingAddress: { street: string; city: string; state: string; zip: string; country: string };
+  billingAddress: { street: string; city: string; state: string; zip: string; country: string };
+  notes?: string;
+}
+
+// This function has a very long signature that should demonstrate line wrapping in the code editor component
+async function createOrderWithValidationAndRetry(payload: CreateOrderPayload, options: { maxRetries: number; retryDelay: number; validateInventory: boolean; sendConfirmationEmail: boolean }): Promise<{ orderId: string; status: string; estimatedDelivery: Date }> {
+  const response = await fetch('/api/v2/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Request-Id': crypto.randomUUID(), 'X-Idempotency-Key': \`order-\${payload.customerId}-\${Date.now()}\` },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(\`Order creation failed: \${response.status} \${response.statusText} - \${await response.text()}\`);
+  }
+
+  return response.json();
+}`}
             </code>
         ),
     },

@@ -1,3 +1,47 @@
 @import 'tailwindcss';
 @import '../src/styles/theme.css';
 @import '../src/styles/atom-one-dark.css';
+
+/*
+ * Storybook runs @augno/ui in isolation, so it does not get the CSS variables
+ * normally provided by consuming apps. Define production-like defaults here so
+ * tokens like `bg-background` resolve correctly in stories.
+ */
+:root {
+    color-scheme: light;
+
+    --background: #f8fafc; /* slate-50 */
+    --content-background: #ffffff;
+    --foreground: #0f172a; /* slate-900 */
+    --text-secondary: #475569; /* slate-600 */
+
+    --primary: #2563eb; /* blue-600 */
+    --secondary: #0f172a; /* slate-900 */
+
+    --border-color: color-mix(in srgb, var(--foreground) 12%, transparent);
+
+    --code-background: #0b1220;
+}
+
+.dark {
+    color-scheme: dark;
+
+    --background: #0b1220;
+    --content-background: #0f172a; /* slate-900 */
+    --foreground: #e2e8f0; /* slate-200 */
+    --text-secondary: #94a3b8; /* slate-400 */
+
+    --primary: #60a5fa; /* blue-400 */
+    --secondary: #e2e8f0; /* slate-200 */
+
+    --border-color: color-mix(in srgb, var(--foreground) 14%, transparent);
+
+    --code-background: #0b1220;
+}
+
+html,
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+}
