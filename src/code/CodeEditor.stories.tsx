@@ -3,19 +3,19 @@ import React from 'react';
 import CodeEditor from './CodeEditor';
 
 const meta = {
-    component: CodeEditor,
-    title: 'Code/CodeEditor',
-    tags: ['autodocs'],
+  component: CodeEditor,
+  title: 'Code/CodeEditor',
+  tags: ['autodocs'],
 } satisfies Meta<typeof CodeEditor>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const JavaScript: Story = {
-    args: {
-        children: (
-            <code className="language-javascript">
-                {`// Function with template literals and arrow functions
+  args: {
+    children: (
+      <code className="language-javascript">
+        {`// Function with template literals and arrow functions
 const greet = (name) => {
   const message = \`Hello, \${name}!\`;
   return message;
@@ -24,16 +24,16 @@ const greet = (name) => {
 // Using the function
 const result = greet("World");
 console.log(result); // Hello, World!`}
-            </code>
-        ),
-    },
+      </code>
+    ),
+  },
 };
 
 export const TypeScript: Story = {
-    args: {
-        children: (
-            <code className="language-typescript">
-                {`// Interface definition
+  args: {
+    children: (
+      <code className="language-typescript">
+        {`// Interface definition
 interface User {
   name: string;
   age: number;
@@ -56,16 +56,16 @@ const response: Response<User> = {
   data: user,
   status: 200
 };`}
-            </code>
-        ),
-    },
+      </code>
+    ),
+  },
 };
 
 export const Python: Story = {
-    args: {
-        children: (
-            <code className="language-python">
-                {`# Fibonacci sequence with type hints
+  args: {
+    children: (
+      <code className="language-python">
+        {`# Fibonacci sequence with type hints
 from typing import List
 
 def fibonacci(n: int) -> List[int]:
@@ -84,17 +84,18 @@ def fibonacci(n: int) -> List[int]:
 # Using the function
 result = fibonacci(10)
 print(f"First 10 Fibonacci numbers: {result}")`}
-            </code>
-        ),
-    },
+      </code>
+    ),
+  },
 };
 
 export const LineWrapping: Story = {
-    name: 'Line Wrapping',
-    args: {
-        children: (
-            <code className="language-typescript">
-                {`import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+  name: 'Line Wrapping',
+  args: {
+    height: 220,
+    children: (
+      <code className="language-typescript">
+        {`import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 interface CreateOrderPayload {
   customerId: string;
@@ -118,17 +119,54 @@ async function createOrderWithValidationAndRetry(payload: CreateOrderPayload, op
 
   return response.json();
 }`}
-            </code>
-        ),
-    },
+      </code>
+    ),
+  },
+};
+
+export const FixedHeightScrolling: Story = {
+  name: 'Fixed Height (Scrolling)',
+  args: {
+    height: 200,
+    children: (
+      <code className="language-typescript">
+        {`// This example is intentionally long to demonstrate vertical scrolling
+type Item = {
+  id: string;
+  name: string;
+  description: string;
+  quantity: number;
+};
+
+function createItems(count: number): Item[] {
+  const items: Item[] = [];
+  for (let i = 0; i < count; i++) {
+    items.push({
+      id: \`item-\${i}\`,
+      name: \`Item \${i}\`,
+      description: 'A long description that makes each line wrap and take up vertical space in the editor.',
+      quantity: i * 10,
+    });
+  }
+  return items;
+}
+
+const items = createItems(50);
+
+for (const item of items) {
+  console.log(item.id, item.name, item.quantity);
+}`}
+      </code>
+    ),
+  },
 };
 
 export const NestedBlocks: Story = {
-    name: 'Nested Blocks (Folding)',
-    args: {
-        children: (
-            <code className="language-typescript">
-                {`import { useState, useEffect } from 'react';
+  name: 'Nested Blocks (Folding)',
+  args: {
+    children: (
+      <code className="language-typescript">
+        {`import { useState, useEffect } from 'react';
 
 interface ApiResponse<T> {
   data: T;
@@ -180,7 +218,7 @@ function useFetch<T>(url: string): ApiResponse<T> {
 }
 
 export default useFetch;`}
-            </code>
-        ),
-    },
+      </code>
+    ),
+  },
 };

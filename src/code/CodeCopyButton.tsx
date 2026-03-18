@@ -13,7 +13,7 @@ export default function CodeCopyButton({ onCopy, isHovering, copied }: CodeCopyB
     return (
         <button
             onClick={onCopy}
-            className={`absolute top-2 right-2 z-10
+            className={`absolute top-2 right-2 z-30
         text-sm bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded
         flex items-center gap-1 
         transition-all duration-300 ease-in-out

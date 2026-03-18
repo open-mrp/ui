@@ -10,6 +10,8 @@ import { splitHighlightedLines } from './splitHighlightedLines';
 export interface CodeEditorProps {
     children: React.ReactNode;
     className?: string;
+    /** Fixed height (in px if number) for the scrollable code area */
+    height?: number | string;
     /** Optional map of placeholder strings to replacement values (e.g., { "YOUR_API_KEY": "sk_test_..." }) */
     replacements?: Record<string, string>;
     /** When true (default), show the detected language label in the header */
@@ -31,6 +33,7 @@ function applyReplacements(text: string, replacements?: Record<string, string>):
 export default function CodeEditor({
     children,
     className,
+    height,
     replacements,
     showLanguageLabel = true,
 }: CodeEditorProps) {
@@ -117,19 +120,32 @@ export default function CodeEditor({
         setTimeout(() => setCopied(false), 1000);
     };
 
+    const scrollAreaStyle =
+        height !== undefined
+            ? {
+                maxHeight: typeof height === 'number' ? `${height}px` : height,
+            }
+            : undefined;
+
     return (
         <div
-            className={`bg-code-background py-4 rounded-md relative group mt-4 overflow-hidden ${className}`}
+            className={`bg-code-background pb-0 rounded-md relative group mt-4 ${className}`}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
         >
-            {showLanguageLabel && (
-                <div className="flex justify-between items-center mb-2 px-4">
+            <div
+                className="absolute left-0 top-0 right-0 z-20 h-10 px-4 rounded-t-md rounded-b-none backdrop-blur-md flex items-center"
+                style={{
+                    backgroundColor:
+                        'color-mix(in srgb, var(--color-code-background) 20%, transparent)',
+                }}
+            >
+                {showLanguageLabel && (
                     <div className="text-xs text-gray-500 uppercase" style={{ height: '16px' }}>
                         {language}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             <CodeCopyButton onCopy={handleCopy} isHovering={isHovering} copied={copied} />
 
@@ -139,119 +155,125 @@ export default function CodeEditor({
             </div>
 
             <div className="w-full">
-                {highlightedLines.length > 0 ? (
-                    <pre className="hljs text-sm w-full whitespace-pre-wrap break-words !leading-relaxed">
-                        <code className="block w-full">
-                            {highlightedLines.map((html, i) => {
-                                const hidden = hiddenLines.has(i);
-                                const isFoldStart = foldableLineMap.has(i);
-                                const isFolded = foldedLines.has(i);
-                                const indentMatch = rawLines[i]?.match(/^[\t ]+/)?.[0] ?? '';
-                                const indentCh =
-                                    indentMatch.length > 0
-                                        ? indentMatch
-                                            .split('')
-                                            .reduce((acc, ch) => acc + (ch === '\t' ? 4 : 1), 0)
-                                        : 0;
+                <div
+                    className="w-full overflow-y-auto pt-10 pb-4 rounded-md bg-code-background"
+                    style={scrollAreaStyle}
+                >
+                    {highlightedLines.length > 0 ? (
+                        <pre className="hljs text-sm w-full whitespace-pre-wrap break-words !leading-relaxed">
+                            <code className="block w-full">
+                                {highlightedLines.map((html, i) => {
+                                    const hidden = hiddenLines.has(i);
+                                    const isFoldStart = foldableLineMap.has(i);
+                                    const isFolded = foldedLines.has(i);
+                                    const indentMatch = rawLines[i]?.match(/^[\t ]+/)?.[0] ?? '';
+                                    const indentCh =
+                                        indentMatch.length > 0
+                                            ? indentMatch
+                                                .split('')
+                                                .reduce((acc, ch) => acc + (ch === '\t' ? 4 : 1), 0)
+                                            : 0;
 
-                                const isActive = activeLine === i;
+                                    const isActive = activeLine === i;
 
-                                return (
-                                    <div
-                                        key={i}
-                                        className="grid w-full transition-[grid-template-rows] duration-200 ease-in-out"
-                                        style={{
-                                            gridTemplateRows: hidden ? '0fr' : '1fr',
-                                        }}
-                                    >
+                                    return (
                                         <div
-                                            className="w-full overflow-hidden transition-opacity duration-200 ease-in-out"
-                                            style={{ opacity: hidden ? 0 : 1 }}
+                                            key={i}
+                                            className="grid w-full transition-[grid-template-rows] duration-200 ease-in-out"
+                                            style={{
+                                                gridTemplateRows: hidden ? '0fr' : '1fr',
+                                            }}
                                         >
                                             <div
-                                            className={`grid w-full grid-cols-[auto_minmax(0,1fr)] cursor-pointer px-4 transition-colors duration-100 ${isActive ? 'bg-white/[0.05]' : ''}`}
-                                                onClick={() => setActiveLine(isActive ? null : i)}
+                                                className="w-full overflow-hidden transition-opacity duration-200 ease-in-out"
+                                                style={{ opacity: hidden ? 0 : 1 }}
                                             >
-                                                <span
-                                                    className="inline-flex items-center shrink-0 select-none self-start gap-1 mr-3"
-                                                    style={{ height: '1lh' }}
-                                                    aria-hidden="true"
-                                                    onMouseEnter={() => setGutterHovered(true)}
-                                                    onMouseLeave={() => setGutterHovered(false)}
+                                                <div
+                                                    className={`grid w-full grid-cols-[auto_minmax(0,1fr)] cursor-pointer px-4 transition-colors duration-100 ${isActive ? 'bg-white/[0.05]' : ''}`}
+                                                    onClick={() => setActiveLine(isActive ? null : i)}
                                                 >
                                                     <span
-                                                        className="text-gray-600 text-right tabular-nums"
-                                                        style={{
-                                                            width: lineNumberWidth,
-                                                            fontSize: '0.75em',
-                                                            lineHeight: 'inherit',
-                                                        }}
+                                                        className="inline-flex items-center shrink-0 select-none self-start gap-1 mr-3"
+                                                        style={{ height: '1lh' }}
+                                                        aria-hidden="true"
+                                                        onMouseEnter={() => setGutterHovered(true)}
+                                                        onMouseLeave={() => setGutterHovered(false)}
                                                     >
-                                                        {i + 1}
+                                                        <span
+                                                            className="text-gray-600 text-right tabular-nums"
+                                                            style={{
+                                                                width: lineNumberWidth,
+                                                                fontSize: '0.75em',
+                                                                lineHeight: 'inherit',
+                                                            }}
+                                                        >
+                                                            {i + 1}
+                                                        </span>
+                                                        <span className="inline-flex items-center justify-center w-3">
+                                                            {isFoldStart &&
+                                                                (gutterHovered || isFolded) && (
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            toggleFold(i);
+                                                                        }}
+                                                                        className="text-gray-600 hover:text-gray-400 leading-none p-0 bg-transparent border-none cursor-pointer"
+                                                                        style={{ fontSize: '0.5rem' }}
+                                                                        aria-label={
+                                                                            isFolded
+                                                                                ? 'Expand code block'
+                                                                                : 'Collapse code block'
+                                                                        }
+                                                                    >
+                                                                        <svg
+                                                                            className={`w-3 h-3 transition-transform duration-150 ${isFolded ? '' : 'rotate-90'
+                                                                                }`}
+                                                                            viewBox="0 0 8 8"
+                                                                            fill="currentColor"
+                                                                        >
+                                                                            <path d="M2 1 L6 4 L2 7 Z" />
+                                                                        </svg>
+                                                                    </button>
+                                                                )}
+                                                        </span>
                                                     </span>
-                                                    <span className="inline-flex items-center justify-center w-3">
-                                                        {isFoldStart && (gutterHovered || isFolded) && (
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    toggleFold(i);
-                                                                }}
-                                                                className="text-gray-600 hover:text-gray-400 leading-none p-0 bg-transparent border-none cursor-pointer"
-                                                                style={{ fontSize: '0.5rem' }}
-                                                                aria-label={
-                                                                    isFolded
-                                                                        ? 'Expand code block'
-                                                                        : 'Collapse code block'
-                                                                }
-                                                            >
-                                                                <svg
-                                                                    className={`w-3 h-3 transition-transform duration-150 ${isFolded ? '' : 'rotate-90'}`}
-                                                                    viewBox="0 0 8 8"
-                                                                    fill="currentColor"
-                                                                >
-                                                                    <path d="M2 1 L6 4 L2 7 Z" />
-                                                                </svg>
-                                                            </button>
-                                                        )}
-                                                    </span>
-                                                </span>
-                                                <span
-                                                    className="min-w-0 block"
-                                                    style={
-                                                        indentCh > 0
-                                                            ? {
-                                                                paddingLeft: `${indentCh}ch`,
-                                                                textIndent: `-${indentCh}ch`,
-                                                            }
-                                                            : undefined
-                                                    }
-                                                >
                                                     <span
-                                                        dangerouslySetInnerHTML={{ __html: html }}
-                                                    />
-                                                    {isFolded && (() => {
-                                                        const region = foldableLineMap.get(i);
-                                                        const endText =
-                                                            region?.type === 'bracket'
-                                                                ? ` ${rawLines[region.endLine]?.trim()}`
-                                                                : '';
-                                                        return (
-                                                            <span className="text-gray-300 ml-2 bg-gray-600/40 px-2 py-0.5 rounded-sm border border-gray-500/30 animate-in fade-in duration-200">
-                                                                &hellip;{endText}
-                                                            </span>
-                                                        );
-                                                    })()}
-                                                </span>
+                                                        className="min-w-0 block"
+                                                        style={
+                                                            indentCh > 0
+                                                                ? {
+                                                                    paddingLeft: `${indentCh}ch`,
+                                                                    textIndent: `-${indentCh}ch`,
+                                                                }
+                                                                : undefined
+                                                        }
+                                                    >
+                                                        <span dangerouslySetInnerHTML={{ __html: html }} />
+                                                        {isFolded &&
+                                                            (() => {
+                                                                const region = foldableLineMap.get(i);
+                                                                const endText =
+                                                                    region?.type === 'bracket'
+                                                                        ? ` ${rawLines[region.endLine]?.trim()}`
+                                                                        : '';
+                                                                return (
+                                                                    <span className="text-gray-300 ml-2 bg-gray-600/40 px-2 py-0.5 rounded-sm border border-gray-500/30 animate-in fade-in duration-200">
+                                                                        &hellip;{endText}
+                                                                    </span>
+                                                                );
+                                                            })()}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </code>
-                    </pre>
-                ) : (
-                    <pre className="text-sm w-full whitespace-pre-wrap break-words">{children}</pre>
-                )}
+                                    );
+                                })}
+                            </code>
+                        </pre>
+                    ) : (
+                        <pre className="text-sm w-full whitespace-pre-wrap break-words">{children}</pre>
+                    )}
+                </div>
             </div>
         </div>
     );
