@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
+import { FileText, Home, Layers, Settings } from 'lucide-react';
 import NavItem from './NavItem';
 import NavSubSection from './NavSubSection';
 import Sidenav from './Sidenav';
@@ -32,6 +33,7 @@ const SidenavWithState = (props: React.ComponentProps<typeof Sidenav>) => {
                 <NavItem
                     key={item.href}
                     href={item.href}
+                    icon={item.icon}
                     active={item.href === activeLink}
                     onClick={(e) => {
                         e.preventDefault();
@@ -63,19 +65,28 @@ export const Basic: Story = {
             {
                 title: 'Getting Started with Our Comprehensive Documentation Suite',
                 links: [
-                    { href: '/docs', children: 'Documentation & Getting Started Guide' },
+                    {
+                        href: '/docs',
+                        children: 'Documentation & Getting Started Guide',
+                        icon: <FileText className="w-4 h-4" />,
+                    },
                     {
                         href: '/tutorials',
                         children: 'Step-by-Step Interactive Tutorials',
+                        icon: <Layers className="w-4 h-4" />,
                     },
-                    { href: '/active', children: 'Currently Active Link Example' },
+                    {
+                        href: '/active',
+                        children: 'Currently Active Link Example',
+                        icon: <Home className="w-4 h-4" />,
+                    },
                     { href: '/quickstart', children: '5-Minute Quickstart Guide' },
                 ],
             },
             {
                 title: 'Components Library',
                 links: [
-                    { href: '/buttons', children: 'Buttons & Interactive Elements' },
+                    { href: '/buttons', children: 'Buttons & Interactive Elements', icon: <Settings className="w-4 h-4" /> },
                     { href: '/forms', children: 'Forms & Input Components' },
                     { href: '/cards', children: 'Cards & Container Components' },
                     { href: '/layout', children: 'Layout & Grid Systems' },
@@ -236,6 +247,51 @@ export const WithSubsections: Story = {
                             { href: '/items/23', children: 'Navigation Item 23' },
                             { href: '/items/24', children: 'Navigation Item 24' },
                             { href: '/items/25', children: 'Navigation Item 25' },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+};
+
+export const DeepNestingWithIcons: Story = {
+    render: (args) => <SidenavWithState {...args} />,
+    args: {
+        sections: [
+            {
+                title: 'Deep Tree',
+                links: [
+                    { href: '/home', children: 'Home', icon: <Home className="w-4 h-4" /> },
+                    {
+                        title: 'Level1',
+                        items: [
+                            { href: '/level1/overview', children: 'Overview', icon: <FileText className="w-4 h-4" /> },
+                            {
+                                title: 'Level2',
+                                items: [
+                                    {
+                                        title: 'Level3',
+                                        items: [
+                                            {
+                                                title: 'Level4',
+                                                items: [
+                                                    {
+                                                        href: '/active',
+                                                        children: 'Active Deep Link',
+                                                        icon: <Layers className="w-4 h-4" />,
+                                                    },
+                                                    {
+                                                        href: '/level4/settings',
+                                                        children: 'Settings',
+                                                        icon: <Settings className="w-4 h-4" />,
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
                         ],
                     },
                 ],

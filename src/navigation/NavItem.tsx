@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 export interface NavItemProps {
     href: string;
     children: string;
+    icon?: React.ReactNode;
     active: boolean;
     onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
     renderLink?: (props: {
@@ -15,7 +16,7 @@ export interface NavItemProps {
     }) => React.ReactNode;
 }
 
-export default function NavItem({ href, children, active, onClick, renderLink }: NavItemProps) {
+export default function NavItem({ href, children, icon, active, onClick, renderLink }: NavItemProps) {
     const ref = useRef<HTMLDivElement>(null);
     const hasMountedRef = useRef(false);
 
@@ -41,13 +42,20 @@ export default function NavItem({ href, children, active, onClick, renderLink }:
         backgroundColor: active ? 'var(--sidenav-item-active-bg)' : undefined,
     };
 
+    const content = (
+        <span className="flex items-center gap-2 min-w-0">
+            {icon ? <span className="flex-shrink-0 w-4 h-4">{icon}</span> : null}
+            <span className="truncate">{children}</span>
+        </span>
+    );
+
     return (
         <div ref={ref}>
             {renderLink ? (
-                renderLink({ href, children, className, style })
+                renderLink({ href, children: content, className, style })
             ) : (
                 <a href={href} className={className} style={style} onClick={onClick}>
-                    {children}
+                    {content}
                 </a>
             )}
         </div>

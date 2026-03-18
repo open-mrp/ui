@@ -14,6 +14,14 @@ const isNavLink = (item: NavLink | NavSubSectionData): item is NavLink => {
     return 'href' in item;
 };
 
+const itemHasActiveDescendant = (
+    item: NavLink | NavSubSectionData,
+    isPathActive: (path: string) => boolean,
+): boolean => {
+    if (isNavLink(item)) return isPathActive(item.href);
+    return item.items.some((child) => itemHasActiveDescendant(child, isPathActive));
+};
+
 interface AnimationConstants {
     readonly INDICATOR_TRANS_TIME: number;
     readonly SCALE_DELAY: number;
@@ -42,18 +50,10 @@ const useActiveItem = (
     isPathActive: (path: string) => boolean,
 ) => {
     return useMemo(() => {
-        const hasActive = items.some((item) =>
-            isNavLink(item)
-                ? isPathActive(item.href)
-                : item.items.some((subItem) => isNavLink(subItem) && isPathActive(subItem.href)),
-        );
+        const hasActive = items.some((item) => itemHasActiveDescendant(item, isPathActive));
 
-        // Find active index including subsections
-        const activeIdx = items.findIndex((item) =>
-            isNavLink(item)
-                ? isPathActive(item.href)
-                : item.items.some((subItem) => isNavLink(subItem) && isPathActive(subItem.href)),
-        );
+        // Find active index by direct child containing the active path
+        const activeIdx = items.findIndex((item) => itemHasActiveDescendant(item, isPathActive));
 
         return { hasActive, activeIdx };
     }, [items, isPathActive]);
@@ -176,10 +176,8 @@ export default function NavSubSection({
     className = '',
 }: NavSubSectionProps): React.ReactElement {
     const itemsContainerRef = useRef<HTMLDivElement>(null);
-    const borderRef = useRef<HTMLDivElement>(null);
     const [prevActiveIndex, setPrevActiveIdx] = useState<number>(-1);
     const [isInInitialTransition, setIsInInitialTransition] = useState(false);
-    const [borderHeight, setBorderHeight] = useState<number | null>(null);
 
     const { hasActive, activeIdx: activeIndex } = useActiveItem(subSection.items, isPathActive);
     const [isOpen, setIsOpen] = useState<boolean>(hasActive);
@@ -243,16 +241,11 @@ export default function NavSubSection({
             <div className="ml-2 relative">
                 {/* Border line */}
                 <div
-                    className={`absolute top-0 w-0 border-l-3 border-[var(--sidenav-border)] transition-transform duration-${
-                        ANIMATION_CONSTANTS.OPEN_TIME
-                    } origin-top
-            ${isOpen ? 'scale-y-100' : 'scale-y-0'}`}
+                    className={`absolute inset-y-0 left-0 w-0 border-l-3 border-[var(--sidenav-border)] transition-transform origin-top ${
+                        isOpen ? 'scale-y-100' : 'scale-y-0'
+                    }`}
                     style={{
-                        height: subSection.items.some((item) => !isNavLink(item))
-                            ? `calc(${
-                                  subSection.items.findIndex((item) => !isNavLink(item)) * 2.5
-                              }rem + 3.5rem)`
-                            : '100%',
+                        transitionDuration: `${ANIMATION_CONSTANTS.OPEN_TIME}ms`,
                     }}
                     aria-hidden="true"
                 />
