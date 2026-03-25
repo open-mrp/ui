@@ -11,6 +11,8 @@ export interface DocHeadingProps {
     className?: string;
     number?: number;
     isOptional?: boolean;
+    /** When set, used as the element `id` instead of a slug derived from heading text. */
+    id?: string;
 }
 
 function isReactElement(node: unknown): node is React.ReactElement {
@@ -101,8 +103,12 @@ export default function DocHeading({
     className = '',
     number,
     isOptional,
+    id: idProp,
 }: DocHeadingProps) {
-    const id = useMemo(() => createSlug(getTextContent(children)), [children]);
+    const id = useMemo(
+        () => idProp ?? createSlug(getTextContent(children)),
+        [children, idProp],
+    );
 
     const [copied, setCopied] = useState(false);
 
