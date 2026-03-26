@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { WaveShader } from '@/shaders/wave-shader/WaveShader';
+
 import type { ListResponse } from './autocomplete-types';
 import { SelectableAutocomplete } from './SelectableAutocomplete';
+import type { SelectableAutocompleteVariant } from './SelectableAutocomplete';
 
 type UserOption = {
     id: string;
@@ -50,12 +53,16 @@ function SingleSelectDemo({
     error = false,
     helperText = 'Start typing to search users.',
     clearable = true,
+    variant = 'outlined',
+    blur = false,
 }: {
     initialValue?: UserOption | null;
     disabled?: boolean;
     error?: boolean;
     helperText?: string;
     clearable?: boolean;
+    variant?: SelectableAutocompleteVariant;
+    blur?: boolean;
 }) {
     const [value, setValue] = useState<UserOption | null>(initialValue);
 
@@ -72,6 +79,8 @@ function SingleSelectDemo({
                 error={error}
                 disabled={disabled}
                 clearable={clearable}
+                variant={variant}
+                blur={blur}
                 prefetch
                 getOptionLabel={(option) => ({
                     primary: option.name,
@@ -116,4 +125,74 @@ export const ErrorState: Story = {
 
 export const Disabled: Story = {
     render: () => <SingleSelectDemo disabled helperText="Selection is disabled in this state." />,
+};
+
+export const LineVariant: Story = {
+    render: () => <SingleSelectDemo variant="line" helperText="Simple underline input style." />,
+};
+
+export const LineVariantWithValue: Story = {
+    render: () => (
+        <SingleSelectDemo
+            variant="line"
+            initialValue={USERS[1]}
+            helperText="Line variant with a preselected value."
+        />
+    ),
+};
+
+export const LineVariantError: Story = {
+    render: () => (
+        <SingleSelectDemo
+            variant="line"
+            error
+            helperText="A user selection is required."
+            clearable={false}
+        />
+    ),
+};
+
+function ShaderBackground({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="relative rounded-lg overflow-hidden" style={{ width: 400, height: 200 }}>
+            <div className="absolute inset-0">
+                <WaveShader width={400} height={200} animate seed={42} />
+            </div>
+            <div className="relative z-10 flex items-center justify-center px-8 py-10">
+                <div className="w-full">{children}</div>
+            </div>
+        </div>
+    );
+}
+
+export const BlurOutlined: Story = {
+    render: () => (
+        <ShaderBackground>
+            <SingleSelectDemo variant="outlined" blur helperText="" />
+        </ShaderBackground>
+    ),
+};
+
+export const BlurOutlinedWithValue: Story = {
+    render: () => (
+        <ShaderBackground>
+            <SingleSelectDemo variant="outlined" blur initialValue={USERS[1]} helperText="" />
+        </ShaderBackground>
+    ),
+};
+
+export const BlurLine: Story = {
+    render: () => (
+        <ShaderBackground>
+            <SingleSelectDemo variant="line" blur helperText="" />
+        </ShaderBackground>
+    ),
+};
+
+export const BlurLineWithValue: Story = {
+    render: () => (
+        <ShaderBackground>
+            <SingleSelectDemo variant="line" blur initialValue={USERS[1]} helperText="" />
+        </ShaderBackground>
+    ),
 };

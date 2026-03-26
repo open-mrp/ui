@@ -1,9 +1,9 @@
 export type { ListResponse, PageInfo } from './autocomplete-types';
 export { MultiSelectableAutocomplete } from './MultiSelectableAutocomplete';
-export type { MultiSelectableAutocompleteProps } from './MultiSelectableAutocomplete';
+export type { MultiSelectableAutocompleteProps, MultiSelectableAutocompleteVariant } from './MultiSelectableAutocomplete';
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover';
 export { SelectableAutocomplete } from './SelectableAutocomplete';
-export type { SelectableAutocompleteProps } from './SelectableAutocomplete';
+export type { SelectableAutocompleteProps, SelectableAutocompleteVariant } from './SelectableAutocomplete';
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
 export {
     Sheet,

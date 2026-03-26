@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/utils/cn';
 import type { ListResponse } from './autocomplete-types';
 
+export type MultiSelectableAutocompleteVariant = 'outlined' | 'line';
+
 export type MultiSelectableAutocompleteProps<T> = {
     value: T[];
     onSelect: (items: T[]) => void;
@@ -28,6 +30,8 @@ export type MultiSelectableAutocompleteProps<T> = {
     prefetch?: boolean;
     debounceTime?: number;
     fetchCount?: number;
+    variant?: MultiSelectableAutocompleteVariant;
+    blur?: boolean;
     className?: string;
 };
 
@@ -56,6 +60,8 @@ export function MultiSelectableAutocomplete<T>({
     prefetch = false,
     debounceTime = 500,
     fetchCount = 10,
+    variant = 'outlined',
+    blur = false,
     className,
 }: MultiSelectableAutocompleteProps<T>) {
     const [open, setOpen] = useState(false);
@@ -193,86 +199,114 @@ export function MultiSelectableAutocomplete<T>({
                 <PopoverPrimitive.Anchor asChild>
                     <div
                         className={cn(
-                            'flex min-h-[38px] flex-wrap items-center gap-1 rounded-md border bg-white px-2 py-1.5 transition-colors',
-                            'focus-within:ring-2 focus-within:ring-[var(--primary)]/30 focus-within:border-[var(--primary)]',
-                            'dark:bg-gray-900 dark:border-gray-700',
-                            error
-                                ? 'border-red-500 focus-within:ring-red-500/30 focus-within:border-red-500'
-                                : 'border-gray-300 dark:border-gray-600',
+                            'group relative',
                             disabled && 'opacity-50 cursor-default',
                         )}
                     >
-                        {value.map((item, index) => {
-                            const itemLabel = getOptionLabel(item);
-                            return (
-                                <span
-                                    key={getOptionKey ? getOptionKey(item) : index}
-                                    className={cn(
-                                        'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
-                                        'bg-[var(--primary)]/10 text-[var(--primary)]',
-                                        'dark:bg-[var(--primary)]/20 dark:text-[var(--primary)]',
-                                    )}
-                                >
-                                    {itemLabel.primary}
-                                    <button
-                                        type="button"
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            handleRemove(index);
-                                        }}
-                                        disabled={disabled}
-                                        className="rounded-full p-0.5 hover:bg-[var(--primary)]/20 dark:hover:bg-[var(--primary)]/30"
-                                        aria-label={`Remove ${itemLabel.primary}`}
+                        <div
+                            className={cn(
+                                'flex min-h-[38px] flex-wrap items-center gap-1 px-2 py-1.5 transition-colors',
+                                blur && 'backdrop-blur-md',
+                                variant === 'outlined' && [
+                                    'rounded-md border',
+                                    blur ? 'bg-white/60 dark:bg-gray-900/60' : 'bg-white dark:bg-gray-900',
+                                    'focus-within:border-[var(--primary)] focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
+                                    blur ? 'border-white/30 dark:border-white/15' : 'dark:border-gray-700',
+                                    error
+                                        ? 'border-red-500 focus-within:border-red-500 focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
+                                        : !blur && 'border-gray-300 dark:border-gray-600',
+                                ],
+                                variant === 'line' && 'bg-transparent pb-2',
+                            )}
+                        >
+                            {value.map((item, index) => {
+                                const itemLabel = getOptionLabel(item);
+                                return (
+                                    <span
+                                        key={getOptionKey ? getOptionKey(item) : index}
+                                        className={cn(
+                                            'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
+                                            'bg-[var(--primary)]/10 text-[var(--primary)]',
+                                            'dark:bg-[var(--primary)]/20 dark:text-[var(--primary)]',
+                                        )}
                                     >
-                                        <X className="h-3 w-3" />
-                                    </button>
-                                </span>
-                            );
-                        })}
-                        <div className="flex min-w-[80px] flex-1 items-center">
-                            <Search className="mr-1.5 h-4 w-4 shrink-0 text-gray-400 dark:text-gray-500" />
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                role="combobox"
-                                aria-expanded={open}
-                                aria-haspopup="listbox"
-                                aria-autocomplete="list"
-                                disabled={disabled}
-                                placeholder={value.length === 0 ? placeholder : ''}
-                                value={query}
-                                onChange={e => {
-                                    setTouched(true);
-                                    setQuery(e.target.value);
-                                    setHighlightedIndex(-1);
-                                    if (!open) setOpen(true);
-                                }}
-                                onFocus={() => {
-                                    if (query) {
-                                        requestAnimationFrame(() => {
-                                            setTouched(true);
-                                            setOpen(true);
-                                        });
-                                    }
-                                }}
-                                onKeyDown={handleKeyDown}
-                                className={cn(
-                                    'w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400',
-                                    'dark:text-gray-100 dark:placeholder:text-gray-500',
-                                    disabled && 'cursor-default',
-                                )}
-                            />
+                                        {itemLabel.primary}
+                                        <button
+                                            type="button"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                handleRemove(index);
+                                            }}
+                                            disabled={disabled}
+                                            className="rounded-full p-0.5 hover:bg-[var(--primary)]/20 dark:hover:bg-[var(--primary)]/30"
+                                            aria-label={`Remove ${itemLabel.primary}`}
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </span>
+                                );
+                            })}
+                            <div className="flex min-w-[80px] flex-1 items-center">
+                                <Search className={cn('mr-1.5 h-4 w-4 shrink-0', blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500')} />
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    role="combobox"
+                                    aria-expanded={open}
+                                    aria-haspopup="listbox"
+                                    aria-autocomplete="list"
+                                    disabled={disabled}
+                                    placeholder={value.length === 0 ? placeholder : ''}
+                                    value={query}
+                                    onChange={e => {
+                                        setTouched(true);
+                                        setQuery(e.target.value);
+                                        setHighlightedIndex(-1);
+                                        if (!open) setOpen(true);
+                                    }}
+                                    onFocus={() => {
+                                        if (query) {
+                                            requestAnimationFrame(() => {
+                                                setTouched(true);
+                                                setOpen(true);
+                                            });
+                                        }
+                                    }}
+                                    onKeyDown={handleKeyDown}
+                                    className={cn(
+                                        'w-full bg-transparent text-sm outline-none',
+                                        blur
+                                            ? 'text-white placeholder:text-white/40'
+                                            : 'text-gray-900 placeholder:text-gray-400 dark:text-gray-100 dark:placeholder:text-gray-500',
+                                        disabled && 'cursor-default',
+                                    )}
+                                />
+                            </div>
+                            {loading && <Loader2 className="ml-1 h-4 w-4 shrink-0 animate-spin text-gray-400" />}
+                            {clearable && value.length > 0 && !loading && (
+                                <button
+                                    type="button"
+                                    onClick={handleClearAll}
+                                    className="ml-1 shrink-0 rounded-sm p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    aria-label="Clear all"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            )}
                         </div>
-                        {loading && <Loader2 className="ml-1 h-4 w-4 shrink-0 animate-spin text-gray-400" />}
-                        {clearable && value.length > 0 && !loading && (
-                            <button
-                                type="button"
-                                onClick={handleClearAll}
-                                className="ml-1 shrink-0 rounded-sm p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                                aria-label="Clear all"
-                            >
-                                <X className="h-3.5 w-3.5" />
-                            </button>
+                        {variant === 'line' && (
+                            <div className="relative h-0.5">
+                                <div
+                                    className={cn(
+                                        'absolute inset-x-0 top-0 h-0.5 w-full transition-all',
+                                        error
+                                            ? 'bg-red-500 group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
+                                            : cn(blur ? 'bg-white/30' : 'bg-gray-300 dark:bg-gray-600', 'group-focus-within:!bg-[var(--primary)]'),
+                                        'group-focus-within:h-[3px]',
+                                        !error && 'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
+                                    )}
+                                />
+                            </div>
                         )}
                     </div>
                 </PopoverPrimitive.Anchor>
@@ -284,7 +318,9 @@ export function MultiSelectableAutocomplete<T>({
                         onOpenAutoFocus={e => e.preventDefault()}
                         className={cn(
                             'z-50 max-h-60 w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
-                            'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700',
+                            blur
+                                ? 'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10'
+                                : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700',
                             'data-[state=open]:animate-in data-[state=closed]:animate-out',
                             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
                             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',

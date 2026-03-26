@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { WaveShader } from '@/shaders/wave-shader/WaveShader';
+
 import type { ListResponse } from './autocomplete-types';
 import { MultiSelectableAutocomplete } from './MultiSelectableAutocomplete';
+import type { MultiSelectableAutocompleteVariant } from './MultiSelectableAutocomplete';
 
 type TeamOption = {
     id: string;
@@ -50,12 +53,16 @@ function MultiSelectDemo({
     error = false,
     helperText = 'Select one or more team members.',
     clearable = true,
+    variant = 'outlined',
+    blur = false,
 }: {
     initialValues?: TeamOption[];
     disabled?: boolean;
     error?: boolean;
     helperText?: string;
     clearable?: boolean;
+    variant?: MultiSelectableAutocompleteVariant;
+    blur?: boolean;
 }) {
     const [value, setValue] = useState<TeamOption[]>(initialValues);
 
@@ -72,6 +79,8 @@ function MultiSelectDemo({
                 error={error}
                 disabled={disabled}
                 clearable={clearable}
+                variant={variant}
+                blur={blur}
                 prefetch
                 getOptionLabel={(option) => ({
                     primary: option.name,
@@ -126,5 +135,85 @@ export const Disabled: Story = {
             initialValues={[TEAM_MEMBERS[1], TEAM_MEMBERS[3]]}
             helperText="This field is locked in read-only mode."
         />
+    ),
+};
+
+export const LineVariant: Story = {
+    render: () => <MultiSelectDemo variant="line" helperText="Simple underline input style." />,
+};
+
+export const LineVariantWithValues: Story = {
+    render: () => (
+        <MultiSelectDemo
+            variant="line"
+            initialValues={[TEAM_MEMBERS[0], TEAM_MEMBERS[2]]}
+            helperText="Line variant with preselected values."
+        />
+    ),
+};
+
+export const LineVariantError: Story = {
+    render: () => (
+        <MultiSelectDemo
+            variant="line"
+            error
+            helperText="At least one reviewer must be selected."
+            clearable={false}
+        />
+    ),
+};
+
+function ShaderBackground({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="relative rounded-lg overflow-hidden" style={{ width: 460, height: 200 }}>
+            <div className="absolute inset-0">
+                <WaveShader width={460} height={200} animate seed={42} />
+            </div>
+            <div className="relative z-10 flex items-center justify-center px-8 py-10">
+                <div className="w-full">{children}</div>
+            </div>
+        </div>
+    );
+}
+
+export const BlurOutlined: Story = {
+    render: () => (
+        <ShaderBackground>
+            <MultiSelectDemo variant="outlined" blur helperText="" />
+        </ShaderBackground>
+    ),
+};
+
+export const BlurOutlinedWithValues: Story = {
+    render: () => (
+        <ShaderBackground>
+            <MultiSelectDemo
+                variant="outlined"
+                blur
+                initialValues={[TEAM_MEMBERS[0], TEAM_MEMBERS[2]]}
+                helperText=""
+            />
+        </ShaderBackground>
+    ),
+};
+
+export const BlurLine: Story = {
+    render: () => (
+        <ShaderBackground>
+            <MultiSelectDemo variant="line" blur helperText="" />
+        </ShaderBackground>
+    ),
+};
+
+export const BlurLineWithValues: Story = {
+    render: () => (
+        <ShaderBackground>
+            <MultiSelectDemo
+                variant="line"
+                blur
+                initialValues={[TEAM_MEMBERS[0], TEAM_MEMBERS[2]]}
+                helperText=""
+            />
+        </ShaderBackground>
     ),
 };
