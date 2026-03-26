@@ -192,7 +192,7 @@ export function SelectableAutocomplete<T>({
                             error
                                 ? 'border-red-500 focus-within:ring-red-500/30 focus-within:border-red-500'
                                 : 'border-gray-300 dark:border-gray-600',
-                            disabled && 'opacity-50 cursor-not-allowed',
+                            disabled && 'opacity-50 cursor-default',
                         )}
                     >
                         <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400 dark:text-gray-500" />
@@ -213,14 +213,18 @@ export function SelectableAutocomplete<T>({
                                 if (!open) setOpen(true);
                             }}
                             onFocus={() => {
-                                setTouched(true);
-                                setOpen(true);
+                                if (query) {
+                                    requestAnimationFrame(() => {
+                                        setTouched(true);
+                                        setOpen(true);
+                                    });
+                                }
                             }}
                             onKeyDown={handleKeyDown}
                             className={cn(
                                 'w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400',
                                 'dark:text-gray-100 dark:placeholder:text-gray-500',
-                                disabled && 'cursor-not-allowed',
+                                disabled && 'cursor-default',
                             )}
                         />
                         {loading && <Loader2 className="ml-2 h-4 w-4 shrink-0 animate-spin text-gray-400" />}

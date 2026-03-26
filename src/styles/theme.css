@@ -33,6 +33,13 @@
     background: rgba(156, 163, 175, 0.5);
 }
 
+.no-transitions,
+.no-transitions *,
+.no-transitions *::before,
+.no-transitions *::after {
+    transition-duration: 0s !important;
+}
+
 @variant dark (.dark &);
 
 @theme {

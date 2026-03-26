@@ -134,11 +134,20 @@ export function useDarkMode(options?: UseDarkModeOptions) {
             const newIsDark = !prevIsDark;
 
             if (typeof document !== 'undefined') {
+                document.documentElement.classList.add('no-transitions');
+
                 if (newIsDark) {
                     document.documentElement.classList.add(DARK_MODE_KEY);
                 } else {
                     document.documentElement.classList.remove(DARK_MODE_KEY);
                 }
+
+                // Remove after the next paint so normal transitions resume
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        document.documentElement.classList.remove('no-transitions');
+                    });
+                });
             }
 
             const storage = options?.storage ?? getBrowserStorage();
