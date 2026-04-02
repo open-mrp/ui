@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/utils/cn';
 import type { ListResponse } from './autocomplete-types';
 
-export type SelectableAutocompleteVariant = 'outlined' | 'line';
+export type SelectableAutocompleteVariant = 'outlined' | 'line' | 'plain';
 
 export type SelectableAutocompleteProps<T> = {
     value: T | null;
@@ -33,6 +33,7 @@ export type SelectableAutocompleteProps<T> = {
     excludeIds?: string[];
     variant?: SelectableAutocompleteVariant;
     blur?: boolean;
+    showSearchIcon?: boolean;
     className?: string;
 };
 
@@ -64,10 +65,11 @@ export function SelectableAutocomplete<T>({
     excludeIds,
     variant = 'outlined',
     blur = false,
+    showSearchIcon = variant !== 'plain',
     className,
 }: SelectableAutocompleteProps<T>) {
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState(value ? getOptionLabel(value)?.primary || '' : '');
+    const [query, setQuery] = useState('');
     const [touched, setTouched] = useState(false);
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState<T[]>([]);
@@ -76,10 +78,12 @@ export function SelectableAutocomplete<T>({
     const listRef = useRef<HTMLUListElement>(null);
     const fetchIdRef = useRef(0);
 
+    const valueLabel = value ? getOptionLabel(value)?.primary || '' : '';
+    const inputValue = open ? query : valueLabel;
+
     const debouncedQuery = useDebounce(query, debounceTime);
 
-    const shouldFetch =
-        prefetch || (touched && (value === null || debouncedQuery !== (getOptionLabel(value)?.primary || '')));
+    const shouldFetch = prefetch || (touched && debouncedQuery !== valueLabel);
 
     const doFetch = useCallback(
         async (searchQuery: string) => {
@@ -122,7 +126,7 @@ export function SelectableAutocomplete<T>({
 
     function handleSelect(item: T) {
         onSelect({ ...item });
-        setQuery(getOptionLabel(item)?.primary || '');
+        setQuery('');
         setOpen(false);
         setHighlightedIndex(-1);
     }
@@ -198,7 +202,8 @@ export function SelectableAutocomplete<T>({
                     >
                         <div
                             className={cn(
-                                'flex items-center px-3 py-2 transition-colors',
+                                'flex items-center py-2 transition-colors',
+                                variant !== 'plain' && 'px-3',
                                 blur && 'backdrop-blur-md',
                                 variant === 'outlined' && [
                                     'rounded-md border',
@@ -210,9 +215,10 @@ export function SelectableAutocomplete<T>({
                                         : !blur && 'border-gray-300 dark:border-gray-600',
                                 ],
                                 variant === 'line' && 'bg-transparent pb-2',
+                                variant === 'plain' && 'bg-transparent',
                             )}
                         >
-                            <Search className={cn('mr-2 h-4 w-4 shrink-0', blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500')} />
+                            {showSearchIcon && <Search className={cn('mr-2 h-4 w-4 shrink-0', blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500')} />}
                             <input
                                 ref={inputRef}
                                 type="text"
@@ -222,7 +228,7 @@ export function SelectableAutocomplete<T>({
                                 aria-autocomplete="list"
                                 disabled={disabled}
                                 placeholder={placeholder}
-                                value={query}
+                                value={inputValue}
                                 onChange={e => {
                                     setTouched(true);
                                     setQuery(e.target.value);
@@ -230,12 +236,10 @@ export function SelectableAutocomplete<T>({
                                     if (!open) setOpen(true);
                                 }}
                                 onFocus={() => {
-                                    if (query) {
-                                        requestAnimationFrame(() => {
-                                            setTouched(true);
-                                            setOpen(true);
-                                        });
-                                    }
+                                    requestAnimationFrame(() => {
+                                        setTouched(true);
+                                        setOpen(true);
+                                    });
                                 }}
                                 onKeyDown={handleKeyDown}
                                 className={cn(
@@ -282,9 +286,7 @@ export function SelectableAutocomplete<T>({
                         onOpenAutoFocus={e => e.preventDefault()}
                         className={cn(
                             'z-50 max-h-60 w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
-                            blur
-                                ? 'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10'
-                                : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700',
+                            'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10',
                             'data-[state=open]:animate-in data-[state=closed]:animate-out',
                             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
                             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -295,9 +297,9 @@ export function SelectableAutocomplete<T>({
                             <div className="px-3 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
                                 {loading
                                     ? 'Loading...'
-                                    : query === ''
-                                      ? 'Type to search...'
-                                      : `No results for "${query}"`}
+                                    : inputValue === ''
+                                        ? 'Type to search...'
+                                        : `No results for "${inputValue}"`}
                             </div>
                         ) : (
                             <ul ref={listRef} role="listbox" className="py-1">
@@ -318,8 +320,8 @@ export function SelectableAutocomplete<T>({
                                                 'text-gray-900 dark:text-gray-100',
                                                 isHighlighted && 'bg-gray-100 dark:bg-gray-700',
                                                 isSelected &&
-                                                    !isHighlighted &&
-                                                    'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
+                                                !isHighlighted &&
+                                                'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
                                                 !isHighlighted && !isSelected && 'hover:bg-gray-50 dark:hover:bg-gray-700/50',
                                             )}
                                         >

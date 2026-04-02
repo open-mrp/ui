@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/utils/cn';
 import type { ListResponse } from './autocomplete-types';
 
-export type MultiSelectableAutocompleteVariant = 'outlined' | 'line';
+export type MultiSelectableAutocompleteVariant = 'outlined' | 'line' | 'plain';
 
 export type MultiSelectableAutocompleteProps<T> = {
     value: T[];
@@ -32,6 +32,7 @@ export type MultiSelectableAutocompleteProps<T> = {
     fetchCount?: number;
     variant?: MultiSelectableAutocompleteVariant;
     blur?: boolean;
+    showSearchIcon?: boolean;
     className?: string;
 };
 
@@ -62,6 +63,7 @@ export function MultiSelectableAutocomplete<T>({
     fetchCount = 10,
     variant = 'outlined',
     blur = false,
+    showSearchIcon = variant !== 'plain',
     className,
 }: MultiSelectableAutocompleteProps<T>) {
     const [open, setOpen] = useState(false);
@@ -205,7 +207,8 @@ export function MultiSelectableAutocomplete<T>({
                     >
                         <div
                             className={cn(
-                                'flex min-h-[38px] flex-wrap items-center gap-1 px-2 py-1.5 transition-colors',
+                                'flex min-h-[38px] flex-wrap items-center gap-1 py-1.5 transition-colors',
+                                variant !== 'plain' && 'px-2',
                                 blur && 'backdrop-blur-md',
                                 variant === 'outlined' && [
                                     'rounded-md border',
@@ -217,6 +220,7 @@ export function MultiSelectableAutocomplete<T>({
                                         : !blur && 'border-gray-300 dark:border-gray-600',
                                 ],
                                 variant === 'line' && 'bg-transparent pb-2',
+                                variant === 'plain' && 'bg-transparent',
                             )}
                         >
                             {value.map((item, index) => {
@@ -247,7 +251,7 @@ export function MultiSelectableAutocomplete<T>({
                                 );
                             })}
                             <div className="flex min-w-[80px] flex-1 items-center">
-                                <Search className={cn('mr-1.5 h-4 w-4 shrink-0', blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500')} />
+                                {showSearchIcon && <Search className={cn('mr-1.5 h-4 w-4 shrink-0', blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500')} />}
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -318,9 +322,7 @@ export function MultiSelectableAutocomplete<T>({
                         onOpenAutoFocus={e => e.preventDefault()}
                         className={cn(
                             'z-50 max-h-60 w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
-                            blur
-                                ? 'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10'
-                                : 'bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700',
+                            'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10',
                             'data-[state=open]:animate-in data-[state=closed]:animate-out',
                             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
                             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
