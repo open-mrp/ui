@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.3.0
+
+### Minor Changes
+
+- 7ba6d3c: feat: new selectable inputs
+
 ## 1.2.9
 
 ### Patch Changes
