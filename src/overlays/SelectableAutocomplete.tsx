@@ -83,7 +83,7 @@ export function SelectableAutocomplete<T>({
 
     const debouncedQuery = useDebounce(query, debounceTime);
 
-    const shouldFetch = prefetch || (touched && debouncedQuery !== valueLabel);
+    const shouldFetch = prefetch || touched;
 
     const doFetch = useCallback(
         async (searchQuery: string) => {
@@ -298,7 +298,7 @@ export function SelectableAutocomplete<T>({
                                 {loading
                                     ? 'Loading...'
                                     : inputValue === ''
-                                        ? 'Type to search...'
+                                        ? 'No results found'
                                         : `No results for "${inputValue}"`}
                             </div>
                         ) : (

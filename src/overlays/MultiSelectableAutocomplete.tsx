@@ -269,12 +269,10 @@ export function MultiSelectableAutocomplete<T>({
                                         if (!open) setOpen(true);
                                     }}
                                     onFocus={() => {
-                                        if (query) {
-                                            requestAnimationFrame(() => {
-                                                setTouched(true);
-                                                setOpen(true);
-                                            });
-                                        }
+                                        requestAnimationFrame(() => {
+                                            setTouched(true);
+                                            setOpen(true);
+                                        });
                                     }}
                                     onKeyDown={handleKeyDown}
                                     className={cn(
@@ -334,7 +332,7 @@ export function MultiSelectableAutocomplete<T>({
                                 {loading
                                     ? 'Loading...'
                                     : query === ''
-                                      ? 'Type to search...'
+                                      ? 'No results found'
                                       : `No results for "${query}"`}
                             </div>
                         ) : (
