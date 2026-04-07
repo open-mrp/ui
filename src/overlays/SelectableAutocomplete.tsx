@@ -285,7 +285,7 @@ export function SelectableAutocomplete<T>({
                         sideOffset={4}
                         onOpenAutoFocus={e => e.preventDefault()}
                         className={cn(
-                            'z-50 max-h-60 w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
+                            'z-[1400] max-h-60 w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
                             'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10',
                             'data-[state=open]:animate-in data-[state=closed]:animate-out',
                             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
