@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.4.0
+
+### Minor Changes
+
+- a3011dc: feat: add dialog
+
 ## 1.3.2
 
 ### Patch Changes
