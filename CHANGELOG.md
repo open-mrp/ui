@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.3.1
+
+### Patch Changes
+
+- 073856d: fix: overlay issue
+
 ## 1.3.0
 
 ### Minor Changes
