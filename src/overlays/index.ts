@@ -1,4 +1,15 @@
 export type { ListResponse, PageInfo } from './autocomplete-types';
+export {
+    Dialog,
+    DialogBody,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from './Dialog';
 export { MultiSelectableAutocomplete } from './MultiSelectableAutocomplete';
 export type { MultiSelectableAutocompleteProps, MultiSelectableAutocompleteVariant } from './MultiSelectableAutocomplete';
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover';
