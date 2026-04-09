@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.5.0
+
+### Minor Changes
+
+- 5020669: feat: new Input and Selector components
+
 ## 1.4.0
 
 ### Minor Changes
