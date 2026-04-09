@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.6.0
+
+### Minor Changes
+
+- 127823d: feat: switch component
+
 ## 1.5.0
 
 ### Minor Changes
