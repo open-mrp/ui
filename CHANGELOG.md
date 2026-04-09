@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.6.1
+
+### Patch Changes
+
+- 7fd7960: fix: issue with selector dropdowns clipping
+
 ## 1.6.0
 
 ### Minor Changes
