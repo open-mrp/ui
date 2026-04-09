@@ -16,6 +16,14 @@ export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popove
 export { SelectableAutocomplete } from './SelectableAutocomplete';
 export type { SelectableAutocompleteProps, SelectableAutocompleteVariant } from './SelectableAutocomplete';
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
+export { Selector } from './Selector';
+export type {
+    SelectorOption,
+    SelectorProps,
+    SelectorVariant,
+    SingleSelectorProps,
+    MultiSelectorProps,
+} from './Selector';
 export {
     Sheet,
     SheetBody,

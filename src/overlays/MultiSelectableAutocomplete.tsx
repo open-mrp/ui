@@ -242,7 +242,7 @@ export function MultiSelectableAutocomplete<T>({
                                                 handleRemove(index);
                                             }}
                                             disabled={disabled}
-                                            className="rounded-full p-0.5 hover:bg-[var(--primary)]/20 dark:hover:bg-[var(--primary)]/30"
+                                            className="cursor-pointer rounded-full p-0.5 hover:bg-[var(--primary)]/20 dark:hover:bg-[var(--primary)]/30"
                                             aria-label={`Remove ${itemLabel.primary}`}
                                         >
                                             <X className="h-3 w-3" />
@@ -289,7 +289,7 @@ export function MultiSelectableAutocomplete<T>({
                                 <button
                                     type="button"
                                     onClick={handleClearAll}
-                                    className="ml-1 shrink-0 rounded-sm p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    className="ml-1 shrink-0 cursor-pointer rounded-sm p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                     aria-label="Clear all"
                                 >
                                     <X className="h-3.5 w-3.5" />
