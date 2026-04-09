@@ -318,9 +318,9 @@ export function MultiSelectableAutocomplete<T>({
                         align="start"
                         sideOffset={4}
                         onOpenAutoFocus={e => e.preventDefault()}
-                        style={{ zIndex: 1400 }}
+                        style={{ zIndex: 1400, maxHeight: 'min(240px, var(--radix-popover-content-available-height))' }}
                         className={cn(
-                            'max-h-60 w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
+                            'w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
                             'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10',
                             'data-[state=open]:animate-in data-[state=closed]:animate-out',
                             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',

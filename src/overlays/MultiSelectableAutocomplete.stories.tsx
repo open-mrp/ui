@@ -176,6 +176,49 @@ function ShaderBackground({ children }: { children: React.ReactNode }) {
     );
 }
 
+// ---------------------------------------------------------------------------
+// Overflow / clipping edge cases
+// ---------------------------------------------------------------------------
+
+export const InsideCardNearBottom: Story = {
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <div className="flex min-h-screen flex-col items-center justify-end p-8 pb-24">
+            <p className="mb-4 max-w-sm text-center text-xs text-gray-400">
+                The dropdown should float above the card boundary without clipping.
+            </p>
+            <div className="w-[460px] overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800">
+                <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Short card
+                </h3>
+                <MultiSelectDemo helperText="" />
+            </div>
+        </div>
+    ),
+};
+
+export const InsideOverflowHiddenContainer: Story = {
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <div className="flex min-h-screen items-end justify-center p-8 pb-16">
+            <div className="w-[460px] overflow-hidden rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
+                <div className="border-b border-gray-100 px-4 py-3 dark:border-gray-700">
+                    <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                        Card with overflow:hidden
+                    </h3>
+                </div>
+                <div className="p-4">
+                    <MultiSelectDemo helperText="Dropdown should escape this container." />
+                </div>
+            </div>
+        </div>
+    ),
+};
+
+// ---------------------------------------------------------------------------
+// Blur (shader background)
+// ---------------------------------------------------------------------------
+
 export const BlurOutlined: Story = {
     render: () => (
         <ShaderBackground>

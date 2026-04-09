@@ -776,6 +776,102 @@ export const BlurLine: Story = {
 };
 
 // ---------------------------------------------------------------------------
+// Overflow / clipping edge cases
+// ---------------------------------------------------------------------------
+
+export const InsideCardNearBottom: Story = {
+    parameters: { layout: 'fullscreen' },
+    render: () => {
+        const [value, setValue] = useState<string | null>(null);
+        return (
+            <div className="flex min-h-screen flex-col items-center justify-end p-8 pb-24">
+                <p className="mb-4 max-w-sm text-center text-xs text-gray-400">
+                    The dropdown should float above the card boundary without clipping.
+                </p>
+                <div className="w-[360px] overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800">
+                    <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Short card
+                    </h3>
+                    <Selector
+                        label="Country"
+                        options={COUNTRIES}
+                        value={value}
+                        onChange={setValue}
+                        searchable
+                        placeholder="Select a country..."
+                    />
+                </div>
+            </div>
+        );
+    },
+};
+
+export const InsideOverflowHiddenContainer: Story = {
+    parameters: { layout: 'fullscreen' },
+    render: () => {
+        const [v1, setV1] = useState<string | null>(null);
+        const [v2, setV2] = useState<string[]>([]);
+        return (
+            <div className="flex min-h-screen items-end justify-center p-8 pb-16">
+                <div className="w-[400px] overflow-hidden rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
+                    <div className="border-b border-gray-100 px-4 py-3 dark:border-gray-700">
+                        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            Card with overflow:hidden
+                        </h3>
+                    </div>
+                    <div className="space-y-4 p-4">
+                        <Selector
+                            label="Single select"
+                            options={MANY_OPTIONS}
+                            value={v1}
+                            onChange={setV1}
+                            searchable
+                            placeholder="Pick one..."
+                        />
+                        <Selector
+                            mode="multi"
+                            label="Multi select"
+                            options={COUNTRIES}
+                            value={v2}
+                            onChange={setV2}
+                            searchable
+                            placeholder="Pick many..."
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    },
+};
+
+export const StackedCardsBottomSelector: Story = {
+    parameters: { layout: 'fullscreen' },
+    render: () => {
+        const [value, setValue] = useState<string | null>(null);
+        return (
+            <div className="flex min-h-screen flex-col items-center justify-end gap-4 p-8 pb-12">
+                <div className="w-[360px] overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800">
+                    <p className="text-sm text-gray-500">
+                        Content card above — the selector below should not be
+                        clipped by this card or the viewport edge.
+                    </p>
+                </div>
+                <div className="w-[360px] overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800">
+                    <Selector
+                        label="Country"
+                        options={COUNTRIES}
+                        value={value}
+                        onChange={setValue}
+                        searchable
+                        placeholder="Select a country..."
+                    />
+                </div>
+            </div>
+        );
+    },
+};
+
+// ---------------------------------------------------------------------------
 // Form layout
 // ---------------------------------------------------------------------------
 
