@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.6.2
+
+### Patch Changes
+
+- 9d22b6a: fix: issue with selected values not sorting properly
+
 ## 1.6.1
 
 ### Patch Changes
