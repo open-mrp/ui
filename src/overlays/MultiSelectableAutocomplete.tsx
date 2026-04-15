@@ -74,7 +74,10 @@ export function MultiSelectableAutocomplete<T>({
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
+    const anchorRef = useRef<HTMLDivElement>(null);
     const fetchIdRef = useRef(0);
+    const displayOrderAtOpenRef = useRef<T[]>([]);
+    const prevOpenRef = useRef(false);
 
     const debouncedQuery = useDebounce(query, debounceTime);
 
@@ -107,13 +110,37 @@ export function MultiSelectableAutocomplete<T>({
         }
     }, [debouncedQuery, shouldFetch, doFetch]);
 
-    // Merge fetched options with currently selected values
+    // Snapshot the full display order on open→close transitions.
+    // Keeps items in their open-time positions (pinned selection at top),
+    // so selecting an item during the session doesn't cause it to jump.
+    if (open !== prevOpenRef.current) {
+        if (open) {
+            const pinnedNow = value.map(
+                v => fetchedOptions.find(item => isOptionEqualToValue(item, v)) ?? v,
+            );
+            const restNow = fetchedOptions.filter(
+                item => !value.some(v => isOptionEqualToValue(item, v)),
+            );
+            displayOrderAtOpenRef.current = [...pinnedNow, ...restNow];
+        } else {
+            displayOrderAtOpenRef.current = [];
+        }
+        prevOpenRef.current = open;
+    }
+
+    // While open, preserve snapshot order; append any newly fetched items (e.g. from search)
+    // at the end so searching still surfaces results without reordering existing rows.
     const displayOptions = useMemo(() => {
-        const missingValues = value.filter(
-            v => !fetchedOptions.some(item => isOptionEqualToValue(item, v)),
+        const order = displayOrderAtOpenRef.current;
+        if (order.length === 0) return fetchedOptions;
+        const orderedExisting = order.filter(o =>
+            fetchedOptions.some(f => isOptionEqualToValue(f, o)),
         );
-        return [...missingValues, ...fetchedOptions];
-    }, [fetchedOptions, value, isOptionEqualToValue]);
+        const newItems = fetchedOptions.filter(
+            f => !order.some(o => isOptionEqualToValue(f, o)),
+        );
+        return [...orderedExisting, ...newItems];
+    }, [fetchedOptions, open, isOptionEqualToValue]);
 
     function isSelected(option: T): boolean {
         return value.some(v => isOptionEqualToValue(option, v));
@@ -200,6 +227,7 @@ export function MultiSelectableAutocomplete<T>({
             <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
                 <PopoverPrimitive.Anchor asChild>
                     <div
+                        ref={anchorRef}
                         className={cn(
                             'group relative',
                             disabled && 'opacity-50 cursor-default',
@@ -274,6 +302,10 @@ export function MultiSelectableAutocomplete<T>({
                                             setOpen(true);
                                         });
                                     }}
+                                    onClick={() => {
+                                        setTouched(true);
+                                        setOpen(prev => !prev);
+                                    }}
                                     onKeyDown={handleKeyDown}
                                     className={cn(
                                         'w-full bg-transparent text-sm outline-none',
@@ -318,6 +350,11 @@ export function MultiSelectableAutocomplete<T>({
                         align="start"
                         sideOffset={4}
                         onOpenAutoFocus={e => e.preventDefault()}
+                        onInteractOutside={e => {
+                            if (anchorRef.current?.contains(e.target as Node)) {
+                                e.preventDefault();
+                            }
+                        }}
                         style={{ zIndex: 1400, maxHeight: 'min(240px, var(--radix-popover-content-available-height))' }}
                         className={cn(
                             'w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
@@ -349,6 +386,7 @@ export function MultiSelectableAutocomplete<T>({
                                             role="option"
                                             aria-selected={selected}
                                             data-highlighted={isHighlighted || undefined}
+                                            onMouseDown={e => e.preventDefault()}
                                             onClick={() => handleToggle(option)}
                                             className={cn(
                                                 'flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors',

@@ -38,6 +38,8 @@
         "build:storybook": "storybook build",
         "yalc:publish": "bun run build && yalc publish --push",
         "yalc:watch": "bun run build && yalc publish --push && chokidar 'src/**/*' -c 'bun run build && yalc publish --push'",
+        "link:all": "./scripts/link-all.sh",
+        "unlink:all": "./scripts/unlink-all.sh",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
     },

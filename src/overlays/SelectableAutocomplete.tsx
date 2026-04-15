@@ -77,6 +77,14 @@ export function SelectableAutocomplete<T>({
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
     const fetchIdRef = useRef(0);
+    const selectedAtOpenRef = useRef<T | null>(null);
+    const prevOpenRef = useRef(false);
+
+    // Snapshot the selected value on each open→close transition so pinning stays stable while open.
+    if (open !== prevOpenRef.current) {
+        selectedAtOpenRef.current = open ? value : null;
+        prevOpenRef.current = open;
+    }
 
     const valueLabel = value ? getOptionLabel(value)?.primary || '' : '';
     const inputValue = open ? query : valueLabel;
@@ -112,10 +120,19 @@ export function SelectableAutocomplete<T>({
         }
     }, [debouncedQuery, shouldFetch, doFetch]);
 
-    // Ensure current value is always in the options list
+    // Pin the snapshot selection to the top, preferring the fresh fetched copy if present.
     const displayOptions = (() => {
-        let items =
-            value && !options.some(item => isOptionEqualToValue(item, value)) ? [value, ...options] : options;
+        const pinned = selectedAtOpenRef.current;
+        let items: T[];
+        if (pinned) {
+            const match = options.find(item => isOptionEqualToValue(item, pinned));
+            const rest = match
+                ? options.filter(item => !isOptionEqualToValue(item, pinned))
+                : options;
+            items = [match ?? pinned, ...rest];
+        } else {
+            items = options;
+        }
 
         if (excludeIds && getOptionKey) {
             items = items.filter(item => !excludeIds.includes(getOptionKey(item)));
@@ -315,6 +332,7 @@ export function SelectableAutocomplete<T>({
                                             role="option"
                                             aria-selected={isSelected}
                                             data-highlighted={isHighlighted || undefined}
+                                            onMouseDown={e => e.preventDefault()}
                                             onClick={() => handleSelect(option)}
                                             className={cn(
                                                 'cursor-pointer px-3 py-2 text-sm transition-colors',

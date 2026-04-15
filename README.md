@@ -21,10 +21,24 @@ The process to publish a new version:
 - Merge the PR
 - Let the github action run, and you will see a new version number once it has finished
 
-### Using a local UI repo in other repos
+### Prototyping local UI changes in consumers
 
-First, install yalc globally with `npm install -g yalc`.
+`@augno/ui` is consumed by both `dashboard/` and `public-docs/`. To test local changes in both without publishing:
 
-Now, after any change you just run `bun run local-ui` to build and publish the changes for you other local repo to use.
+```bash
+bun run link:all
+```
 
-In your other repo you will then need to run `bun run local-ui` to update the dependency on that end.
+This builds the library, publishes to the local yalc store, and links it into both consumers. For continuous rebuild as you edit:
+
+```bash
+bun run yalc:watch
+```
+
+**Always tear down before committing** so `file:.yalc/...` refs don't leak:
+
+```bash
+bun run unlink:all
+```
+
+Unlinking queries GitHub Packages for the latest version, pins each consumer's `package.json` to it, removes `.yalc/` and `yalc.lock` artefacts, and runs `bun install`. See the root `CLAUDE.md` for details.

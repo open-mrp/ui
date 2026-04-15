@@ -73,19 +73,46 @@ export function Selector(props: SelectorProps) {
     const searchInputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
+    const selectedAtOpenRef = useRef<Set<string>>(new Set());
+    const prevOpenRef = useRef(false);
 
     const multi = isMulti(props);
 
-    // Filter options by search
+    // Snapshot selection on each open→close transition so the order stays stable while open.
+    if (open !== prevOpenRef.current) {
+        if (open) {
+            selectedAtOpenRef.current = multi
+                ? new Set(props.value)
+                : props.value !== null
+                  ? new Set([props.value])
+                  : new Set<string>();
+        } else {
+            selectedAtOpenRef.current = new Set();
+        }
+        prevOpenRef.current = open;
+    }
+
+    // Filter by search, then pin snapshot-selected options to the top.
     const filteredOptions = useMemo(() => {
-        if (!search) return options;
-        const lower = search.toLowerCase();
-        return options.filter(
-            o =>
-                o.label.toLowerCase().includes(lower) ||
-                o.description?.toLowerCase().includes(lower),
-        );
-    }, [options, search]);
+        const base = search
+            ? options.filter(o => {
+                  const lower = search.toLowerCase();
+                  return (
+                      o.label.toLowerCase().includes(lower) ||
+                      o.description?.toLowerCase().includes(lower)
+                  );
+              })
+            : options;
+        const selectedSet = selectedAtOpenRef.current;
+        if (selectedSet.size === 0) return base;
+        const pinned: SelectorOption[] = [];
+        const rest: SelectorOption[] = [];
+        for (const o of base) {
+            if (selectedSet.has(o.value)) pinned.push(o);
+            else rest.push(o);
+        }
+        return [...pinned, ...rest];
+    }, [options, search, open]);
 
     // Reset search and highlight when popover closes
     useEffect(() => {
