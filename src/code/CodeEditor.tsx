@@ -7,6 +7,13 @@ import CodeCopyButton from './CodeCopyButton';
 import { findFoldRegions, type FoldRegion } from './findFoldRegions';
 import { splitHighlightedLines } from './splitHighlightedLines';
 
+/**
+ * A replacement value. Pass a string to use the same text for both display and
+ * copy, or `{ display, copy }` to show a shortened/pretty value in the
+ * rendered snippet while the copy button hands back the full value.
+ */
+export type ReplacementValue = string | { display: string; copy: string };
+
 export interface CodeEditorProps {
     children: React.ReactNode;
     className?: string;
@@ -15,19 +22,21 @@ export interface CodeEditorProps {
     /** Maximum scrollable height (in px if number) for the code area */
     maxHeight?: number | string;
     /** Optional map of placeholder strings to replacement values (e.g., { "YOUR_API_KEY": "sk_test_..." }) */
-    replacements?: Record<string, string>;
+    replacements?: Record<string, ReplacementValue>;
     /** When true (default), show the detected language label in the header */
     showLanguageLabel?: boolean;
 }
 
-/**
- * Applies text replacements to a string
- */
-function applyReplacements(text: string, replacements?: Record<string, string>): string {
+function applyReplacements(
+    text: string,
+    replacements: Record<string, ReplacementValue> | undefined,
+    variant: 'display' | 'copy',
+): string {
     if (!replacements) return text;
     let result = text;
     for (const [placeholder, value] of Object.entries(replacements)) {
-        result = result.replaceAll(placeholder, value);
+        const replacement = typeof value === 'string' ? value : value[variant];
+        result = result.replaceAll(placeholder, replacement);
     }
     return result;
 }
@@ -45,14 +54,15 @@ export default function CodeEditor({
     const [isHovering, setIsHovering] = useState(false);
     const [language, setLanguage] = useState<string | null>(null);
     const [highlightedLines, setHighlightedLines] = useState<string[]>([]);
-    const [rawCode, setRawCode] = useState('');
+    const [displayCode, setDisplayCode] = useState('');
+    const [copyCode, setCopyCode] = useState('');
     const [foldedLines, setFoldedLines] = useState<Set<number>>(new Set());
     const [activeLine, setActiveLine] = useState<number | null>(null);
     const [gutterHovered, setGutterHovered] = useState(false);
 
     const foldRegions = useMemo(
-        () => findFoldRegions(rawCode, language ?? undefined),
-        [rawCode, language],
+        () => findFoldRegions(displayCode, language ?? undefined),
+        [displayCode, language],
     );
 
     const foldableLineMap = useMemo(() => {
@@ -74,9 +84,11 @@ export default function CodeEditor({
                     const lang = match[1];
                     setLanguage(lang);
                     const rawText = codeElement.textContent || '';
-                    const code = applyReplacements(rawText, replacements);
-                    setRawCode(code);
-                    highlightCode(code, lang).then((html) => {
+                    const displayText = applyReplacements(rawText, replacements, 'display');
+                    const copyText = applyReplacements(rawText, replacements, 'copy');
+                    setDisplayCode(displayText);
+                    setCopyCode(copyText);
+                    highlightCode(displayText, lang).then((html) => {
                         setHighlightedLines(splitHighlightedLines(html));
                     });
                 }
@@ -96,7 +108,7 @@ export default function CodeEditor({
         });
     }, []);
 
-    const rawLines = useMemo(() => rawCode.split('\n'), [rawCode]);
+    const rawLines = useMemo(() => displayCode.split('\n'), [displayCode]);
 
     const hiddenLines = useMemo(() => {
         const hidden = new Set<number>();
@@ -117,7 +129,7 @@ export default function CodeEditor({
     );
 
     const handleCopy = () => {
-        const text = rawCode || codeRef.current?.textContent || '';
+        const text = copyCode || codeRef.current?.textContent || '';
         copy(text);
         setCopied(true);
         setTimeout(() => setCopied(false), 1000);
@@ -147,7 +159,7 @@ export default function CodeEditor({
 
     return (
         <div
-            className={`bg-code-background pb-0 rounded-md relative group mt-4 ${height !== undefined || maxHeight !== undefined ? 'flex flex-col' : ''} ${className}`}
+            className={`bg-code-background pb-0 rounded-md relative group mt-4 flex flex-col ${className}`}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             style={outerStyle}
@@ -173,12 +185,11 @@ export default function CodeEditor({
                 {children}
             </div>
 
-            <div className={resolvedHeight !== undefined || resolvedMaxHeight !== undefined ? 'w-full flex-1 min-h-0' : 'w-full'}>
-                <div
-                    className={`w-full overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
-                    style={scrollAreaStyle}
-                >
-                    {highlightedLines.length > 0 ? (
+            <div
+                className={`w-full min-h-0 overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
+                style={scrollAreaStyle}
+            >
+                {highlightedLines.length > 0 ? (
                         <pre className="hljs text-sm w-full whitespace-pre-wrap break-words !leading-relaxed">
                             <code className="block w-full">
                                 {highlightedLines.map((html, i) => {
@@ -289,10 +300,9 @@ export default function CodeEditor({
                                 })}
                             </code>
                         </pre>
-                    ) : (
-                        <pre className="text-sm w-full whitespace-pre-wrap break-words">{children}</pre>
-                    )}
-                </div>
+                ) : (
+                    <pre className="text-sm w-full whitespace-pre-wrap break-words">{children}</pre>
+                )}
             </div>
         </div>
     );

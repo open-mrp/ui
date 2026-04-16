@@ -245,6 +245,45 @@ console.log(items.slice(0, 10));`}
   },
 };
 
+export const ShortenedApiKey: Story = {
+  name: 'Shortened API Key (display vs copy)',
+  args: {
+    replacements: {
+      YOUR_API_KEY: {
+        display: 'sk_test_abc...xyz',
+        copy: 'sk_test_abcdef1234567890ghijklmnopqrstuvwxyz',
+      },
+    },
+    children: (
+      <code className="language-bash">
+        {`# The rendered snippet shows a shortened key for readability.
+# Hover and click the copy button to get the full key on your clipboard.
+curl -H "Authorization: Bearer YOUR_API_KEY" \\
+  https://api.example.com/v1/orders`}
+      </code>
+    ),
+  },
+};
+
+export const MixedReplacements: Story = {
+  name: 'Mixed Replacements (string + display/copy)',
+  args: {
+    replacements: {
+      YOUR_API_KEY: {
+        display: 'sk_test_abc...xyz',
+        copy: 'sk_test_abcdef1234567890ghijklmnopqrstuvwxyz',
+      },
+      API_HOST: 'https://api.example.com',
+    },
+    children: (
+      <code className="language-bash">
+        {`curl -H "Authorization: Bearer YOUR_API_KEY" \\
+  API_HOST/v1/orders`}
+      </code>
+    ),
+  },
+};
+
 export const NestedBlocks: Story = {
   name: 'Nested Blocks (Folding)',
   args: {
