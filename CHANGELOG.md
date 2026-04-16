@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.6.3
+
+### Patch Changes
+
+- 4fbae5f: fix: improve CodeEditor performance
+
 ## 1.6.2
 
 ### Patch Changes
