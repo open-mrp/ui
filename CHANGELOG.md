@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.6.5
+
+### Patch Changes
+
+- 6a447aa: fix: issue with multi select dialog flash
+
 ## 1.6.4
 
 ### Patch Changes
