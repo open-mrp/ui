@@ -188,6 +188,7 @@ export default function NavSubSection({
         isPathActive,
     );
     const [isOpen, setIsOpen] = useState<boolean>(hasActive);
+    const prevHasActiveRef = useRef(hasActive);
     const indicatorActiveIndex = hasDirectActiveLeaf ? activeIndex : -1;
     const [position, showPing, setShowPing] = useIndicatorPosition(
         itemsContainerRef,
@@ -217,9 +218,12 @@ export default function NavSubSection({
         setPrevActiveIdx(indicatorActiveIndex);
     }, [indicatorActiveIndex]);
 
-    // Auto-open section when it becomes active
+    // Auto-open section when it transitions from inactive to active via route change.
+    // Use a ref so user-initiated closes (which don't change hasActive) aren't reverted.
     useEffect(() => {
-        if (hasActive && !isOpen && prevActiveIndex === -1) {
+        const wasActive = prevHasActiveRef.current;
+        prevHasActiveRef.current = hasActive;
+        if (hasActive && !wasActive && !isOpen) {
             setIsInInitialTransition(true);
             setIsOpen(true);
             setTimeout(() => {
@@ -227,7 +231,7 @@ export default function NavSubSection({
                 setIsInInitialTransition(false);
             }, ANIMATION_CONSTANTS.OPEN_TIME);
         }
-    }, [hasActive, isOpen, prevActiveIndex]);
+    }, [hasActive, isOpen]);
 
     return (
         <div className={className}>
