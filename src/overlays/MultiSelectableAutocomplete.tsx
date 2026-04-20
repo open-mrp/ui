@@ -78,6 +78,7 @@ export function MultiSelectableAutocomplete<T>({
     const fetchIdRef = useRef(0);
     const displayOrderAtOpenRef = useRef<T[]>([]);
     const prevOpenRef = useRef(false);
+    const wasFocusedOnMouseDownRef = useRef(false);
 
     const debouncedQuery = useDebounce(query, debounceTime);
 
@@ -296,6 +297,10 @@ export function MultiSelectableAutocomplete<T>({
                                         setHighlightedIndex(-1);
                                         if (!open) setOpen(true);
                                     }}
+                                    onMouseDown={() => {
+                                        wasFocusedOnMouseDownRef.current =
+                                            document.activeElement === inputRef.current;
+                                    }}
                                     onFocus={() => {
                                         requestAnimationFrame(() => {
                                             setTouched(true);
@@ -304,7 +309,11 @@ export function MultiSelectableAutocomplete<T>({
                                     }}
                                     onClick={() => {
                                         setTouched(true);
-                                        setOpen(prev => !prev);
+                                        if (wasFocusedOnMouseDownRef.current) {
+                                            setOpen(prev => !prev);
+                                        } else {
+                                            setOpen(true);
+                                        }
                                     }}
                                     onKeyDown={handleKeyDown}
                                     className={cn(
