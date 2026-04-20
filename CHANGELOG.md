@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.6.4
+
+### Patch Changes
+
+- 3157d5e: fix: issue with sidenav collapsing
+
 ## 1.6.3
 
 ### Patch Changes
