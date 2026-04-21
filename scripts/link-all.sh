@@ -30,6 +30,6 @@ echo "[3/3] Linking into public-docs/..."
 "$PUBLIC_DOCS_ROOT/scripts/ui-link.sh"
 
 echo ""
-echo "✓ @augno/ui is now yalc-linked in dashboard and public-docs."
+echo "@augno/ui is now yalc-linked in dashboard and public-docs."
 echo "  Continuous rebuild: cd ui && bun run yalc:watch"
 echo "  Teardown:           cd ui && bun run unlink:all"

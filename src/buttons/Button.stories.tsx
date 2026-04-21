@@ -13,7 +13,7 @@ const meta = {
     component: Button,
     title: 'Button',
     tags: ['autodocs'],
-    //👇 Our exports that end in "Data" are not stories.
+    // NOTE: Our exports that end in "Data" are not stories.
     excludeStories: /.*Data$/,
     args: {
         children: 'Button',
@@ -213,7 +213,7 @@ export const LargeButton: Story = {
 export const IconButton: Story = {
     args: {
         variant: 'icon',
-        children: '🔍',
+        children: 'Search',
     },
 };
 
@@ -221,7 +221,7 @@ export const IconButtonBlur: Story = {
     args: {
         variant: 'icon',
         blur: true,
-        children: '🔍',
+        children: 'Search',
     },
     decorators: [blurDecorator],
 };

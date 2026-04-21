@@ -93,25 +93,25 @@ export const WithIcons: Story = {
                 <SelectContent>
                     <SelectItem value="javascript">
                         <span className="flex items-center gap-2">
-                            <span className="text-yellow-500">🟨</span>
+                            <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" />
                             JavaScript
                         </span>
                     </SelectItem>
                     <SelectItem value="typescript">
                         <span className="flex items-center gap-2">
-                            <span className="text-blue-500">🔷</span>
+                            <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
                             TypeScript
                         </span>
                     </SelectItem>
                     <SelectItem value="python">
                         <span className="flex items-center gap-2">
-                            <span className="text-green-500">🐍</span>
+                            <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
                             Python
                         </span>
                     </SelectItem>
                     <SelectItem value="rust">
                         <span className="flex items-center gap-2">
-                            <span className="text-orange-500">🦀</span>
+                            <span className="inline-block w-2 h-2 rounded-full bg-orange-500" />
                             Rust
                         </span>
                     </SelectItem>

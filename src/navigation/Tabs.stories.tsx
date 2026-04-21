@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
+import { ClipboardList, FileCode2, LayoutDashboard, Palette, Puzzle, TrendingUp } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs';
 
 const meta = {
@@ -60,19 +61,19 @@ export const WithIcons: Story = {
             <TabsList>
                 <TabsTrigger value="dashboard">
                     <span className="flex items-center gap-2">
-                        <span>📊</span>
+                        <LayoutDashboard className="size-4" />
                         Dashboard
                     </span>
                 </TabsTrigger>
                 <TabsTrigger value="analytics">
                     <span className="flex items-center gap-2">
-                        <span>📈</span>
+                        <TrendingUp className="size-4" />
                         Analytics
                     </span>
                 </TabsTrigger>
                 <TabsTrigger value="reports">
                     <span className="flex items-center gap-2">
-                        <span>📋</span>
+                        <ClipboardList className="size-4" />
                         Reports
                     </span>
                 </TabsTrigger>
@@ -251,19 +252,19 @@ export const CodeEditor: Story = {
             <TabsList>
                 <TabsTrigger value="index">
                     <span className="flex items-center gap-2">
-                        <span className="text-blue-500">📄</span>
+                        <FileCode2 className="size-4 text-blue-500" />
                         index.tsx
                     </span>
                 </TabsTrigger>
                 <TabsTrigger value="components">
                     <span className="flex items-center gap-2">
-                        <span className="text-green-500">🧩</span>
+                        <Puzzle className="size-4 text-green-500" />
                         components.tsx
                     </span>
                 </TabsTrigger>
                 <TabsTrigger value="styles">
                     <span className="flex items-center gap-2">
-                        <span className="text-purple-500">🎨</span>
+                        <Palette className="size-4 text-purple-500" />
                         styles.css
                     </span>
                 </TabsTrigger>

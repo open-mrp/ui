@@ -89,28 +89,28 @@ export const WithShortcuts: Story = {
                 <DropdownMenuItem>
                     <UserIcon className="size-4" />
                     New File
-                    <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>Cmd+N</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <SettingsIcon className="size-4" />
                     Open
-                    <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>Cmd+O</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <EditIcon className="size-4" />
                     Save
-                    <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>Cmd+S</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                     <CopyIcon className="size-4" />
                     Copy
-                    <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>Cmd+C</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <EditIcon className="size-4" />
                     Paste
-                    <DropdownMenuShortcut>⌘V</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>Cmd+V</DropdownMenuShortcut>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

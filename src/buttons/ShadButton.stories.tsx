@@ -1,6 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import React from 'react';
+import {
+    ArrowLeft,
+    ArrowRight,
+    Clipboard,
+    Folder,
+    Heart,
+    Hourglass,
+    Link as LinkIcon,
+    Paperclip,
+    Pencil,
+    Save,
+    Search,
+    Settings,
+    Trash2,
+    Upload,
+    X,
+} from 'lucide-react';
 import { Button } from './ShadButton';
 
 const meta = {
@@ -33,7 +50,7 @@ export const DefaultWithIcon: Story = {
     args: {
         children: (
             <>
-                <span>🔍</span>
+                <Search />
                 Search
             </>
         ),
@@ -53,7 +70,7 @@ export const DestructiveWithIcon: Story = {
         variant: 'destructive',
         children: (
             <>
-                <span>🗑️</span>
+                <Trash2 />
                 Delete Item
             </>
         ),
@@ -73,7 +90,7 @@ export const OutlineWithIcon: Story = {
         variant: 'outline',
         children: (
             <>
-                <span>📤</span>
+                <Upload />
                 Export
             </>
         ),
@@ -93,7 +110,7 @@ export const SecondaryWithIcon: Story = {
         variant: 'secondary',
         children: (
             <>
-                <span>⚙️</span>
+                <Settings />
                 Settings
             </>
         ),
@@ -113,7 +130,7 @@ export const GhostWithIcon: Story = {
         variant: 'ghost',
         children: (
             <>
-                <span>❤️</span>
+                <Heart />
                 Like
             </>
         ),
@@ -133,7 +150,7 @@ export const LinkWithIcon: Story = {
         variant: 'link',
         children: (
             <>
-                <span>🔗</span>
+                <LinkIcon />
                 Learn More
             </>
         ),
@@ -166,21 +183,21 @@ export const Large: Story = {
 export const IconButton: Story = {
     args: {
         size: 'icon',
-        children: '🔍',
+        children: <Search />,
     },
 };
 
 export const IconButtonSmall: Story = {
     args: {
         size: 'icon-sm',
-        children: '⚙️',
+        children: <Settings />,
     },
 };
 
 export const IconButtonLarge: Story = {
     args: {
         size: 'icon-lg',
-        children: '📁',
+        children: <Folder />,
     },
 };
 
@@ -238,7 +255,7 @@ export const Loading: Story = {
             <Button onClick={handleClick} disabled={isLoading}>
                 {isLoading ? (
                     <>
-                        <span className="animate-spin">⏳</span>
+                        <Hourglass className="animate-spin" />
                         Loading...
                     </>
                 ) : (
@@ -263,12 +280,12 @@ export const ButtonGroupWithIcons: Story = {
     render: () => (
         <div className="flex gap-2">
             <Button variant="outline">
-                <span>←</span>
+                <ArrowLeft />
                 Back
             </Button>
             <Button>
                 Next
-                <span>→</span>
+                <ArrowRight />
             </Button>
         </div>
     ),
@@ -291,20 +308,20 @@ export const Toolbar: Story = {
     render: () => (
         <div className="flex gap-1 p-2 border rounded-md bg-muted/50">
             <Button size="icon-sm" variant="ghost">
-                <span>📝</span>
+                <Pencil />
             </Button>
             <Button size="icon-sm" variant="ghost">
-                <span>🔍</span>
+                <Search />
             </Button>
             <Button size="icon-sm" variant="ghost">
-                <span>📋</span>
+                <Clipboard />
             </Button>
             <div className="w-px bg-border mx-1" />
             <Button size="icon-sm" variant="ghost">
-                <span>🔗</span>
+                <LinkIcon />
             </Button>
             <Button size="icon-sm" variant="ghost">
-                <span>📎</span>
+                <Paperclip />
             </Button>
         </div>
     ),
@@ -349,9 +366,9 @@ export const AllSizes: Story = {
             <Button size="sm">Small</Button>
             <Button size="default">Default</Button>
             <Button size="lg">Large</Button>
-            <Button size="icon-sm">⚙️</Button>
-            <Button size="icon">🔍</Button>
-            <Button size="icon-lg">📁</Button>
+            <Button size="icon-sm"><Settings /></Button>
+            <Button size="icon"><Search /></Button>
+            <Button size="icon-lg"><Folder /></Button>
         </div>
     ),
 };
@@ -414,10 +431,10 @@ export const Accessibility: Story = {
             <div className="space-y-2">
                 <h3 className="text-sm font-medium">ARIA Labels</h3>
                 <Button aria-label="Close dialog">
-                    <span>✕</span>
+                    <X />
                 </Button>
                 <Button aria-label="Save document">
-                    <span>💾</span>
+                    <Save />
                 </Button>
             </div>
 

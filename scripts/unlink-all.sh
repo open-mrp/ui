@@ -27,4 +27,4 @@ echo "Unlinking @augno/ui from public-docs/..."
 "$PUBLIC_DOCS_ROOT/scripts/ui-unlink.sh"
 
 echo ""
-echo "✓ @augno/ui yalc link removed from dashboard and public-docs."
+echo "@augno/ui yalc link removed from dashboard and public-docs."

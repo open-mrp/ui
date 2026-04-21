@@ -1,3 +1,9 @@
+export {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from './Accordion';
 export type { ListResponse, PageInfo } from './autocomplete-types';
 export {
     Dialog,
