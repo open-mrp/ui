@@ -1,5 +1,12 @@
 # @augno/ui
 
+## 1.7.0
+
+### Minor Changes
+
+- 0ba2e6e: Add primitives needed for the customer portal checkout redesign: `Card` (+ header/body/footer/title/description), `Accordion`, `Stepper`, `ProgressBar`, `Checkbox`, `Radio`/`RadioGroup`, `Textarea`, `Skeleton`, and `Alert`. Also adds `@radix-ui/react-accordion` and `@radix-ui/react-radio-group` as dependencies.
+- 0ba2e6e: feat: new components
+
 ## 1.6.5
 
 ### Patch Changes
