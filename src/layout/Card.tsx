@@ -17,7 +17,7 @@ function Card({ className, unstyled = false, ...props }: CardProps) {
         <div
             data-slot="card"
             className={cn(
-                'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
+                'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100',
                 !unstyled && 'rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm',
                 className,
             )}
