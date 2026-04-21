@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.7.1
+
+### Patch Changes
+
+- 6266bb7: fix: card
+
 ## 1.7.0
 
 ### Minor Changes
