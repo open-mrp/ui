@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.8.3
+
+### Patch Changes
+
+- 0825cc3: fix: issue with trigger selection
+
 ## 1.8.2
 
 ### Patch Changes
