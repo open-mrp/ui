@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.8.2
+
+### Patch Changes
+
+- ac55c00: fix: adding ability to change description orientation
+
 ## 1.8.1
 
 ### Patch Changes
