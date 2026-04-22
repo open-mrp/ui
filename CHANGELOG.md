@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.8.0
+
+### Minor Changes
+
+- 5dbd2d2: feat: remove unused Select component
+
 ## 1.7.1
 
 ### Patch Changes
