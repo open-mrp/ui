@@ -872,6 +872,52 @@ export const StackedCardsBottomSelector: Story = {
 };
 
 // ---------------------------------------------------------------------------
+// Narrow trigger — dropdown sizes to content
+// ---------------------------------------------------------------------------
+
+const LONG_LABELS: SelectorOption[] = [
+    {
+        label: 'A very descriptive option label that is quite long',
+        value: 'a',
+    },
+    {
+        label: 'Another lengthy label for demonstration purposes',
+        value: 'b',
+    },
+    {
+        label: 'Short',
+        value: 'c',
+    },
+    {
+        label: 'Yet another option with a verbose, wordy label',
+        value: 'd',
+    },
+];
+
+export const NarrowTriggerWideDropdown: Story = {
+    decorators: [
+        (Story) => (
+            <div className="flex w-full items-start justify-center p-8">
+                <Story />
+            </div>
+        ),
+    ],
+    render: () => {
+        const [value, setValue] = useState<string | null>(null);
+        return (
+            <div className="w-[80px]">
+                <Selector
+                    options={LONG_LABELS}
+                    value={value}
+                    onChange={setValue}
+                    placeholder="Pick"
+                />
+            </div>
+        );
+    },
+};
+
+// ---------------------------------------------------------------------------
 // Form layout
 // ---------------------------------------------------------------------------
 

@@ -21,7 +21,6 @@ export type { MultiSelectableAutocompleteProps, MultiSelectableAutocompleteVaria
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover';
 export { SelectableAutocomplete } from './SelectableAutocomplete';
 export type { SelectableAutocompleteProps, SelectableAutocompleteVariant } from './SelectableAutocomplete';
-export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
 export { Selector } from './Selector';
 export type {
     SelectorOption,

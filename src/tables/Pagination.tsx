@@ -3,7 +3,7 @@
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react';
 import * as React from 'react';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/overlays/Select';
+import { Selector } from '@/overlays/Selector';
 import { cn } from '@/utils/cn';
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
@@ -143,28 +143,29 @@ export function ItemsPerPageSelector({
     label = 'Items per page:',
     ...props
 }: ItemsPerPageSelectorProps) {
-    const handleItemsPerPageChange = (value: string) => {
+    const handleItemsPerPageChange = (value: string | null) => {
+        if (value === null) return;
         const newItemsPerPage = parseInt(value, 10);
         if (newItemsPerPage !== itemsPerPage) {
             onItemsPerPageChange(newItemsPerPage);
         }
     };
 
+    const options = itemsPerPageOptions.map((option) => ({
+        label: option.toString(),
+        value: option.toString(),
+    }));
+
     return (
         <div className={cn('flex items-center gap-2', className)} {...props}>
             <span className="text-sm opacity-75 text-gray-600 dark:text-gray-400">{label}</span>
-            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                <SelectTrigger className="w-20">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    {itemsPerPageOptions.map((option) => (
-                        <SelectItem key={option} value={option.toString()}>
-                            {option}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+            <Selector
+                className="w-20"
+                size="sm"
+                value={itemsPerPage.toString()}
+                onChange={handleItemsPerPageChange}
+                options={options}
+            />
         </div>
     );
 }

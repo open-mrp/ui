@@ -2,7 +2,19 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as React from 'react';
 import { Button } from '../buttons/ShadButton';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
+import { Selector } from './Selector';
+
+const themeOptions = [
+    { label: 'Light', value: 'light' },
+    { label: 'Dark', value: 'dark' },
+    { label: 'System', value: 'system' },
+];
+
+const languageOptions = [
+    { label: 'English', value: 'en' },
+    { label: 'Spanish', value: 'es' },
+    { label: 'French', value: 'fr' },
+];
 
 const meta: Meta<typeof Popover> = {
     title: 'Overlays/Popover',
@@ -36,8 +48,8 @@ export const Default: Story = {
 
 export const WithForm: Story = {
     render: () => {
-        const [theme, setTheme] = React.useState('');
-        const [language, setLanguage] = React.useState('');
+        const [theme, setTheme] = React.useState<string | null>(null);
+        const [language, setLanguage] = React.useState<string | null>(null);
 
         return (
             <Popover>
@@ -48,30 +60,22 @@ export const WithForm: Story = {
                     <div className="space-y-4">
                         <h4 className="font-medium">Settings</h4>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Theme</label>
-                            <Select value={theme} onValueChange={setTheme}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select theme" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="light">Light</SelectItem>
-                                    <SelectItem value="dark">Dark</SelectItem>
-                                    <SelectItem value="system">System</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <Selector
+                                label="Theme"
+                                placeholder="Select theme"
+                                value={theme}
+                                onChange={setTheme}
+                                options={themeOptions}
+                            />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Language</label>
-                            <Select value={language} onValueChange={setLanguage}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select language" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="en">English</SelectItem>
-                                    <SelectItem value="es">Spanish</SelectItem>
-                                    <SelectItem value="fr">French</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <Selector
+                                label="Language"
+                                placeholder="Select language"
+                                value={language}
+                                onChange={setLanguage}
+                                options={languageOptions}
+                            />
                         </div>
                         <div className="flex justify-end gap-2">
                             <Button size="sm" variant="outline">
