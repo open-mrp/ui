@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.8.1
+
+### Patch Changes
+
+- 4312d7a: fix: minor ui issues with selector
+
 ## 1.8.0
 
 ### Minor Changes
