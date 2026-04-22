@@ -80,12 +80,11 @@ export function Selector(props: SelectorProps) {
     const listRef = useRef<HTMLUListElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const selectedAtOpenRef = useRef<Set<string>>(new Set());
-    const prevOpenRef = useRef(false);
 
     const multi = isMulti(props);
 
     // Snapshot selection on each open→close transition so the order stays stable while open.
-    if (open !== prevOpenRef.current) {
+    useEffect(() => {
         if (open) {
             selectedAtOpenRef.current = multi
                 ? new Set(props.value)
@@ -95,8 +94,8 @@ export function Selector(props: SelectorProps) {
         } else {
             selectedAtOpenRef.current = new Set();
         }
-        prevOpenRef.current = open;
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
 
     // Filter by search, then pin snapshot-selected options to the top.
     const filteredOptions = useMemo(() => {
@@ -118,7 +117,7 @@ export function Selector(props: SelectorProps) {
             else rest.push(o);
         }
         return [...pinned, ...rest];
-    }, [options, search, open]);
+    }, [options, search]);
 
     // Reset search and highlight when popover closes
     useEffect(() => {
