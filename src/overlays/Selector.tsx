@@ -80,33 +80,34 @@ export function Selector(props: SelectorProps) {
     const listRef = useRef<HTMLUListElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const selectedAtOpenRef = useRef<Set<string>>(new Set());
+    const prevOpenRef = useRef(false);
 
     const multi = isMulti(props);
 
     // Snapshot selection on each open→close transition so the order stays stable while open.
-    useEffect(() => {
+    if (open !== prevOpenRef.current) {
         if (open) {
             selectedAtOpenRef.current = multi
                 ? new Set(props.value)
                 : props.value !== null
-                  ? new Set([props.value])
-                  : new Set<string>();
+                    ? new Set([props.value])
+                    : new Set<string>();
         } else {
             selectedAtOpenRef.current = new Set();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open]);
+        prevOpenRef.current = open;
+    }
 
     // Filter by search, then pin snapshot-selected options to the top.
     const filteredOptions = useMemo(() => {
         const base = search
             ? options.filter(o => {
-                  const lower = search.toLowerCase();
-                  return (
-                      o.label.toLowerCase().includes(lower) ||
-                      o.description?.toLowerCase().includes(lower)
-                  );
-              })
+                const lower = search.toLowerCase();
+                return (
+                    o.label.toLowerCase().includes(lower) ||
+                    o.description?.toLowerCase().includes(lower)
+                );
+            })
             : options;
         const selectedSet = selectedAtOpenRef.current;
         if (selectedSet.size === 0) return base;
@@ -117,7 +118,7 @@ export function Selector(props: SelectorProps) {
             else rest.push(o);
         }
         return [...pinned, ...rest];
-    }, [options, search]);
+    }, [options, search, open]);
 
     // Reset search and highlight when popover closes
     useEffect(() => {
@@ -357,14 +358,14 @@ export function Selector(props: SelectorProps) {
                                 error
                                     ? 'bg-red-500 group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
                                     : cn(
-                                          blur
-                                              ? 'bg-white/30'
-                                              : 'bg-gray-300 dark:bg-gray-600',
-                                          'group-focus-within:!bg-[var(--primary)]',
-                                      ),
+                                        blur
+                                            ? 'bg-white/30'
+                                            : 'bg-gray-300 dark:bg-gray-600',
+                                        'group-focus-within:!bg-[var(--primary)]',
+                                    ),
                                 'group-focus-within:h-[3px]',
                                 !error &&
-                                    'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
+                                'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
                             )}
                         />
                     </div>
@@ -448,13 +449,13 @@ export function Selector(props: SelectorProps) {
                                                 'text-gray-900 dark:text-gray-100',
                                                 isHighlighted && 'bg-gray-200 dark:bg-gray-700',
                                                 selected &&
-                                                    !isHighlighted &&
-                                                    'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
                                                 !isHighlighted &&
-                                                    !selected &&
-                                                    'hover:bg-gray-200 dark:hover:bg-gray-700/50',
+                                                'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
+                                                !isHighlighted &&
+                                                !selected &&
+                                                'hover:bg-gray-200 dark:hover:bg-gray-700/50',
                                                 option.disabled &&
-                                                    'cursor-default opacity-50',
+                                                'cursor-default opacity-50',
                                             )}
                                         >
                                             {multi && (
