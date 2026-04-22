@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.8.4
+
+### Patch Changes
+
+- 1b04925: fix: selector
+
 ## 1.8.3
 
 ### Patch Changes
