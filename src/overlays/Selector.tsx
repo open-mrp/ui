@@ -30,6 +30,7 @@ interface SelectorBaseProps {
     size?: 'sm' | 'md' | 'lg';
     blur?: boolean;
     className?: string;
+    triggerClassName?: string;
 }
 
 export interface SingleSelectorProps extends SelectorBaseProps {
@@ -65,6 +66,7 @@ export function Selector(props: SelectorProps) {
         size = 'md',
         blur = false,
         className,
+        triggerClassName,
     } = props;
 
     const [open, setOpen] = useState(false);
@@ -267,6 +269,7 @@ export function Selector(props: SelectorProps) {
                             variant === 'line' && 'bg-transparent',
                             variant === 'plain' && 'bg-transparent',
                             disabled && 'opacity-50 cursor-default',
+                            triggerClassName,
                         )}
                     >
                         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
@@ -417,7 +420,7 @@ export function Selector(props: SelectorProps) {
                                 ref={listRef}
                                 role="listbox"
                                 aria-multiselectable={multi || undefined}
-                                className="py-1"
+                                className="space-y-1 p-1"
                             >
                                 {filteredOptions.map((option, index) => {
                                     const selected = multi
@@ -434,15 +437,15 @@ export function Selector(props: SelectorProps) {
                                             data-highlighted={isHighlighted || undefined}
                                             onClick={() => handleSelect(option)}
                                             className={cn(
-                                                'flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors',
+                                                'flex cursor-pointer items-center gap-3 rounded-md px-3 py-1.5 text-sm transition-colors',
                                                 'text-gray-900 dark:text-gray-100',
-                                                isHighlighted && 'bg-gray-100 dark:bg-gray-700',
+                                                isHighlighted && 'bg-gray-200 dark:bg-gray-700',
                                                 selected &&
                                                     !isHighlighted &&
                                                     'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
                                                 !isHighlighted &&
                                                     !selected &&
-                                                    'hover:bg-gray-50 dark:hover:bg-gray-700/50',
+                                                    'hover:bg-gray-200 dark:hover:bg-gray-700/50',
                                                 option.disabled &&
                                                     'cursor-default opacity-50',
                                             )}

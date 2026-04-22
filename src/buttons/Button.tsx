@@ -12,10 +12,11 @@ const BASE_STYLES =
 const buttonVariants = cva(BASE_STYLES, {
     variants: {
         variant: {
-            contained: 'hover:brightness-95',
-            outlined: 'border border-current text-current hover:bg-current/5',
-            text: 'text-current hover:bg-current/5',
-            icon: 'p-2 text-current hover:bg-current/5',
+            contained: 'bg-[var(--ui-btn-bg)] hover:brightness-95',
+            outlined:
+                'border border-[var(--ui-btn-fg)] text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
+            text: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
+            icon: 'p-2 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
         },
         size: {
             sm: 'px-4 py-2 text-xs',
@@ -56,25 +57,25 @@ const buttonVariants = cva(BASE_STYLES, {
             variant: 'contained',
             blur: true,
             disabled: false,
-            class: 'bg-current/10 text-current hover:bg-current/15 dark:bg-current/5 dark:hover:bg-current/10',
+            class: 'bg-[var(--ui-btn-fg)]/10 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/15 dark:bg-[var(--ui-btn-fg)]/5 dark:hover:bg-[var(--ui-btn-fg)]/10',
         },
         {
             variant: 'outlined',
             blur: true,
             disabled: false,
-            class: 'border-current/20 text-current hover:bg-current/10 hover:border-current/30 dark:hover:bg-current/5',
+            class: 'border-[var(--ui-btn-fg)]/20 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/10 hover:border-[var(--ui-btn-fg)]/30 dark:hover:bg-[var(--ui-btn-fg)]/5',
         },
         {
             variant: 'text',
             blur: true,
             disabled: false,
-            class: 'text-current hover:bg-current/20 dark:hover:bg-current/15',
+            class: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
         },
         {
             variant: 'icon',
             blur: true,
             disabled: false,
-            class: 'text-current hover:bg-current/20 dark:hover:bg-current/15',
+            class: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
         },
     ],
     defaultVariants: {
@@ -122,10 +123,15 @@ export default function Button({
     const isLightBackground = LIGHT_COLORS.has(color);
     const isDarkBackground = DARK_COLORS.has(color);
 
-    // Build style object based on variant
-    const buttonStyle: React.CSSProperties = isContained
-        ? { backgroundColor: resolvedColor, ...style }
-        : { color: resolvedColor, ...style };
+    // Expose the resolved color as a CSS custom property so variant classes can
+    // reference it. This lets consumers override hover/background via `className`
+    // (e.g. `hover:bg-red-500`), which inline `style` would otherwise block.
+    const buttonStyle = {
+        ...(isContained
+            ? { '--ui-btn-bg': resolvedColor }
+            : { '--ui-btn-fg': resolvedColor }),
+        ...style,
+    } as React.CSSProperties;
 
     // Determine text color class for contained variant
     let textColorClass = '';
