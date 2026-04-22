@@ -31,6 +31,7 @@ interface SelectorBaseProps {
     blur?: boolean;
     className?: string;
     triggerClassName?: string;
+    descriptionPosition?: 'below' | 'inline';
 }
 
 export interface SingleSelectorProps extends SelectorBaseProps {
@@ -67,6 +68,7 @@ export function Selector(props: SelectorProps) {
         blur = false,
         className,
         triggerClassName,
+        descriptionPosition = 'below',
     } = props;
 
     const [open, setOpen] = useState(false);
@@ -450,7 +452,7 @@ export function Selector(props: SelectorProps) {
                                                     'cursor-default opacity-50',
                                             )}
                                         >
-                                            {multi ? (
+                                            {multi && (
                                                 <div
                                                     className={cn(
                                                         'flex h-4 w-4 shrink-0 items-center justify-center rounded border',
@@ -471,7 +473,29 @@ export function Selector(props: SelectorProps) {
                                                         </svg>
                                                     )}
                                                 </div>
+                                            )}
+                                            {descriptionPosition === 'inline' && option.description ? (
+                                                <div className="flex min-w-0 flex-1 items-baseline gap-2">
+                                                    <div className="font-semibold leading-tight">
+                                                        {option.label}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                        {option.description}
+                                                    </div>
+                                                </div>
                                             ) : (
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="font-semibold leading-tight">
+                                                        {option.label}
+                                                    </div>
+                                                    {option.description && (
+                                                        <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                                            {option.description}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {!multi && (
                                                 <Check
                                                     className={cn(
                                                         'h-4 w-4 shrink-0',
@@ -481,16 +505,6 @@ export function Selector(props: SelectorProps) {
                                                     )}
                                                 />
                                             )}
-                                            <div className="min-w-0 flex-1">
-                                                <div className="font-semibold leading-tight">
-                                                    {option.label}
-                                                </div>
-                                                {option.description && (
-                                                    <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                                                        {option.description}
-                                                    </div>
-                                                )}
-                                            </div>
                                         </li>
                                     );
                                 })}

@@ -131,6 +131,29 @@ export const WithDescriptions: Story = {
     },
 };
 
+const UNITS: SelectorOption[] = [
+    { label: 'Pair', value: 'pr', description: 'pr' },
+    { label: 'Carton (12 pr)', value: 'ct12pr', description: 'ct12pr' },
+    { label: 'Case (48 pr)', value: 'cs48pr', description: 'cs48pr' },
+];
+
+export const WithInlineDescriptions: Story = {
+    render: () => {
+        const [value, setValue] = useState<string | null>('ct12pr');
+        return (
+            <Selector
+                label="Unit"
+                options={UNITS}
+                value={value}
+                onChange={setValue}
+                descriptionPosition="inline"
+                placeholder="Select unit..."
+                helperText="Description sits to the right of the label."
+            />
+        );
+    },
+};
+
 export const WithDisabledOptions: Story = {
     render: () => {
         const [value, setValue] = useState<string | null>(null);
