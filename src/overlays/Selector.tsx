@@ -32,6 +32,7 @@ interface SelectorBaseProps {
     className?: string;
     triggerClassName?: string;
     descriptionPosition?: 'below' | 'inline';
+    triggerField?: 'label' | 'description';
 }
 
 export interface SingleSelectorProps extends SelectorBaseProps {
@@ -69,6 +70,7 @@ export function Selector(props: SelectorProps) {
         className,
         triggerClassName,
         descriptionPosition = 'below',
+        triggerField = 'label',
     } = props;
 
     const [open, setOpen] = useState(false);
@@ -141,7 +143,11 @@ export function Selector(props: SelectorProps) {
         }
         if (props.value === null) return null;
         const selected = options.find(o => o.value === props.value);
-        return selected?.label ?? null;
+        if (!selected) return null;
+        if (triggerField === 'description') {
+            return selected.description ?? selected.label;
+        }
+        return selected.label;
     })();
 
     // Selected values for multi mode
