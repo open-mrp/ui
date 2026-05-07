@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.0
+
+### Minor Changes
+
+- a38f66e: feat: code editor links
+
 ## 1.8.5
 
 ### Patch Changes
