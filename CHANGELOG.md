@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.1
+
+### Patch Changes
+
+- 5b09973: fix: minor ui tweaks to links in code editors
+
 ## 1.9.0
 
 ### Minor Changes
