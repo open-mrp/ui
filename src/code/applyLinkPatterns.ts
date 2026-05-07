@@ -17,7 +17,7 @@ function escapeHtmlAttr(value: string): string {
 
 /** Shared styles for `<a>` injected into highlighted code (Tailwind v4 scans this file). */
 export const CODE_EDITOR_LINK_CLASS =
-    'code-editor-link cursor-pointer select-text rounded-sm px-0.5 -mx-0.5 -my-px underline underline-offset-2 decoration-sky-400/70 decoration-transparent hover:text-sky-300 hover:decoration-sky-400 hover:bg-sky-400/15 active:bg-sky-400/25 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400/70 transition-[color,background-color,text-decoration-color] duration-150';
+    'code-editor-link cursor-pointer select-text rounded-sm px-0.5 -mx-0.5 -my-px underline underline-offset-2 decoration-current hover:text-blue-300 hover:decoration-blue-300 hover:bg-blue-400/15 active:bg-blue-400/20 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 transition-[color,background-color,text-decoration-color] duration-150';
 
 /** Default: http(s) URLs in code text. */
 const DEFAULT_URL_PATTERN: LinkPattern = {
