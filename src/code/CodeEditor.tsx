@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { highlightCode } from '../utils/highlight';
 import CodeCopyButton from './CodeCopyButton';
 import { findFoldRegions, type FoldRegion } from './findFoldRegions';
+import { applyLinkPatterns, type LinkPattern } from './applyLinkPatterns';
 import { splitHighlightedLines } from './splitHighlightedLines';
 
 /**
@@ -23,6 +24,11 @@ export interface CodeEditorProps {
     maxHeight?: number | string;
     /** Optional map of placeholder strings to replacement values (e.g., { "YOUR_API_KEY": "sk_test_..." }) */
     replacements?: Record<string, ReplacementValue>;
+    /**
+     * Extra link patterns for clickable spans inside highlighted code (e.g. ID prefixes).
+     * `http://` and `https://` URLs are always linked without passing this prop.
+     */
+    linkPatterns?: LinkPattern[];
     /** When true (default), show the detected language label in the header */
     showLanguageLabel?: boolean;
 }
@@ -47,6 +53,7 @@ export default function CodeEditor({
     height,
     maxHeight,
     replacements,
+    linkPatterns,
     showLanguageLabel = true,
 }: CodeEditorProps) {
     const codeRef = useRef<HTMLDivElement>(null);
@@ -89,12 +96,12 @@ export default function CodeEditor({
                     setDisplayCode(displayText);
                     setCopyCode(copyText);
                     highlightCode(displayText, lang).then((html) => {
-                        setHighlightedLines(splitHighlightedLines(html));
+                        setHighlightedLines(splitHighlightedLines(applyLinkPatterns(html, linkPatterns)));
                     });
                 }
             }
         }
-    }, [children, replacements]);
+    }, [children, replacements, linkPatterns]);
 
     const toggleFold = useCallback((startLine: number) => {
         setFoldedLines((prev) => {
@@ -219,8 +226,12 @@ export default function CodeEditor({
                                                 style={{ opacity: hidden ? 0 : 1 }}
                                             >
                                                 <div
-                                                    className={`grid w-full grid-cols-[auto_minmax(0,1fr)] cursor-pointer px-4 transition-colors duration-100 ${isActive ? 'bg-white/[0.05]' : ''}`}
-                                                    onClick={() => setActiveLine(isActive ? null : i)}
+                                                    className={`grid w-full grid-cols-[auto_minmax(0,1fr)] cursor-text px-4 transition-colors duration-100 ${isActive ? 'bg-white/[0.05]' : ''}`}
+                                                    onClick={(e) => {
+                                                        if ((e.target as HTMLElement).closest('a')) return;
+                                                        if (window.getSelection()?.toString()) return;
+                                                        setActiveLine(isActive ? null : i);
+                                                    }}
                                                 >
                                                     <span
                                                         className="inline-flex items-center shrink-0 select-none self-start gap-1 mr-3"

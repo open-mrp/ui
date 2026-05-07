@@ -284,6 +284,90 @@ export const MixedReplacements: Story = {
   },
 };
 
+export const AutoLinkedUrls: Story = {
+  name: 'Auto-linked URLs',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'HTTP and HTTPS URLs in the snippet are turned into links that open in a new tab. No `linkPatterns` prop is required.',
+      },
+    },
+  },
+  args: {
+    height: 260,
+    children: (
+      <code className="language-json">
+        {`{
+  "documentation": "https://docs.example.com/api",
+  "callback": "https://app.example.com/webhooks/inbound",
+  "legacy_endpoint": "http://internal.example.local/health"
+}`}
+      </code>
+    ),
+  },
+};
+
+export const CustomLinkPatterns: Story = {
+  name: 'Custom linkPatterns (IDs)',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Pass `linkPatterns` to match prefixed IDs (or any regex) and map them to dashboard URLs. URLs are still linked automatically.',
+      },
+    },
+  },
+  args: {
+    height: 280,
+    linkPatterns: [
+      {
+        pattern: /\bcust_[A-Za-z0-9]+\b/g,
+        href: (id) => `/customers/${id}`,
+        label: 'View customer',
+      },
+      {
+        pattern: /\bord_[A-Za-z0-9]+\b/g,
+        href: (id) => `/orders/${id}`,
+        label: 'View order',
+      },
+    ],
+    children: (
+      <code className="language-json">
+        {`{
+  "customer_id": "cust_a1b2c3",
+  "order_id": "ord_xyz789",
+  "note": "See cust_a1b2c3 for billing profile."
+}`}
+      </code>
+    ),
+  },
+};
+
+export const UrlsAndCustomIds: Story = {
+  name: 'URLs + custom IDs together',
+  args: {
+    height: 320,
+    linkPatterns: [
+      {
+        pattern: /\bcust_[A-Za-z0-9]+\b/g,
+        href: (id) => `/customers/${id}`,
+        label: 'Open customer',
+      },
+    ],
+    children: (
+      <code className="language-json">
+        {`{
+  "customer_id": "cust_9f3k2j",
+  "invoice_pdf": "https://files.example.com/invoices/cust_9f3k2j/latest.pdf",
+  "support_url": "https://help.example.com/contact",
+  "detail": "Customer cust_9f3k2j also has docs at https://docs.example.com/billing"
+}`}
+      </code>
+    ),
+  },
+};
+
 export const NestedBlocks: Story = {
   name: 'Nested Blocks (Folding)',
   args: {
