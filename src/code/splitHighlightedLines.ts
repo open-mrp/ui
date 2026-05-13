@@ -1,7 +1,12 @@
+function getTagName(openTag: string): string {
+    const m = openTag.match(/^<(\w+)/);
+    return m ? m[1] : 'span';
+}
+
 /**
  * Splits highlighted HTML into individual lines with valid, self-contained HTML per line.
- * Handles spans that cross line boundaries by closing them at line ends
- * and re-opening them at the start of the next line.
+ * Handles spans (and any other elements, e.g. <a> injected by applyLinkPatterns) that cross
+ * line boundaries by closing them at line ends and re-opening them at the start of the next line.
  */
 export function splitHighlightedLines(html: string): string[] {
     // Extract content from <code>...</code> wrapper
@@ -15,7 +20,7 @@ export function splitHighlightedLines(html: string): string[] {
     let i = 0;
     while (i < content.length) {
         if (content[i] === '\n') {
-            const closing = [...tagStack].reverse().map(() => '</span>').join('');
+            const closing = [...tagStack].reverse().map(t => `</${getTagName(t)}>`).join('');
             lines.push(currentLine + closing);
             currentLine = tagStack.join('');
             i++;
@@ -42,7 +47,7 @@ export function splitHighlightedLines(html: string): string[] {
     }
 
     if (currentLine || lines.length === 0) {
-        const closing = [...tagStack].reverse().map(() => '</span>').join('');
+        const closing = [...tagStack].reverse().map(t => `</${getTagName(t)}>`).join('');
         lines.push(currentLine + closing);
     }
 
