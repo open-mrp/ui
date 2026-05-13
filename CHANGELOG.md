@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.2
+
+### Patch Changes
+
+- cbfdbce: fix: links in codeblocks
+
 ## 1.9.1
 
 ### Patch Changes
