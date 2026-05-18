@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.3
+
+### Patch Changes
+
+- 070deb8: fix: minor pagination
+
 ## 1.9.2
 
 ### Patch Changes
