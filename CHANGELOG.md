@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.4
+
+### Patch Changes
+
+- 973ef9a: fix: minor UI annoyances with CodeEditor
+
 ## 1.9.3
 
 ### Patch Changes
