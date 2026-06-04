@@ -5,19 +5,19 @@ import CopyIcon from '@/icons/CopyIcon';
 
 export interface CodeCopyButtonProps {
     onCopy: () => void;
-    isHovering: boolean;
     copied: boolean;
 }
 
-export default function CodeCopyButton({ onCopy, isHovering, copied }: CodeCopyButtonProps) {
+export default function CodeCopyButton({ onCopy, copied }: CodeCopyButtonProps) {
     return (
         <button
             onClick={onCopy}
             className={`absolute top-2 right-2 z-30
         text-sm bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded
-        flex items-center gap-1 
+        flex items-center gap-1 cursor-pointer
         transition-all duration-300 ease-in-out
-        ${isHovering ? 'opacity-100' : 'opacity-0'}`}
+        opacity-100 [@media(hover:hover)]:opacity-0
+        group-hover:opacity-100 group-focus-within:opacity-100`}
             aria-label={copied ? 'Copied!' : 'Copy code'}
         >
             <div className="relative w-16 h-5 flex items-center justify-center overflow-hidden">

@@ -1,9 +1,11 @@
 'use client';
 
+import { useVirtualizer } from '@tanstack/react-virtual';
 import copy from 'copy-to-clipboard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { highlightCode } from '../utils/highlight';
+import { escapeHtml, highlightCode } from '../utils/highlight';
 import CodeCopyButton from './CodeCopyButton';
+import CodeLine from './CodeLine';
 import { findFoldRegions, type FoldRegion } from './findFoldRegions';
 import { applyLinkPatterns, type LinkPattern } from './applyLinkPatterns';
 import { splitHighlightedLines } from './splitHighlightedLines';
@@ -14,6 +16,23 @@ import { splitHighlightedLines } from './splitHighlightedLines';
  * rendered snippet while the copy button hands back the full value.
  */
 export type ReplacementValue = string | { display: string; copy: string };
+
+/** Above this many lines, the code area renders with windowing (virtualization). */
+const DEFAULT_VIRTUALIZE_THRESHOLD = 500;
+/**
+ * Above this many characters, syntax highlighting is computed lazily per visible
+ * line instead of highlighting the whole document up front. See `lazyHighlightThreshold`.
+ */
+const DEFAULT_LAZY_HIGHLIGHT_THRESHOLD = 500_000;
+/** Estimated line height (px) used before a line is measured. */
+const ESTIMATED_LINE_HEIGHT = 24;
+/**
+ * Fallback max height (px) applied when a snippet is virtualized but the consumer
+ * gave no `height`/`maxHeight`. Windowing needs a bounded, internally-scrolling
+ * container; without this the editor would grow to full content height and the page
+ * (not the container) would scroll, defeating virtualization.
+ */
+const DEFAULT_VIRTUALIZED_MAX_HEIGHT = 600;
 
 export interface CodeEditorProps {
     children: React.ReactNode;
@@ -31,6 +50,23 @@ export interface CodeEditorProps {
     linkPatterns?: LinkPattern[];
     /** When true (default), show the detected language label in the header */
     showLanguageLabel?: boolean;
+    /**
+     * Render the code area with windowing once the snippet exceeds this many lines.
+     * Below the threshold the full list renders (with animated fold/expand); above it
+     * only the visible lines are mounted and folding collapses instantly. Defaults to 500.
+     */
+    virtualizeThreshold?: number;
+    /**
+     * Above this many characters, highlight lazily per visible line rather than
+     * highlighting the entire document up front (which can freeze the main thread on
+     * multi-MB payloads). Defaults to 500,000.
+     *
+     * Caveat: per-line highlighting has no cross-line lexer state, so constructs that
+     * span lines (block comments, multi-line strings/templates) may be miscolored in
+     * this mode. Raise the threshold to force full-document highlighting if exactness
+     * matters more than responsiveness for your payload sizes.
+     */
+    lazyHighlightThreshold?: number;
 }
 
 function applyReplacements(
@@ -55,10 +91,14 @@ export default function CodeEditor({
     replacements,
     linkPatterns,
     showLanguageLabel = true,
+    virtualizeThreshold = DEFAULT_VIRTUALIZE_THRESHOLD,
+    lazyHighlightThreshold = DEFAULT_LAZY_HIGHLIGHT_THRESHOLD,
 }: CodeEditorProps) {
     const codeRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [copied, setCopied] = useState(false);
-    const [isHovering, setIsHovering] = useState(false);
     const [language, setLanguage] = useState<string | null>(null);
     const [highlightedLines, setHighlightedLines] = useState<string[]>([]);
     const [displayCode, setDisplayCode] = useState('');
@@ -66,6 +106,15 @@ export default function CodeEditor({
     const [foldedLines, setFoldedLines] = useState<Set<number>>(new Set());
     const [activeLine, setActiveLine] = useState<number | null>(null);
     const [gutterHovered, setGutterHovered] = useState(false);
+
+    // Lazy (viewport) highlighting state: a per-line HTML cache keyed by line index,
+    // and a version counter bumped to re-render when newly highlighted lines land.
+    const lazyCacheRef = useRef<Map<number, string>>(new Map());
+    const lazyPendingRef = useRef<Set<number>>(new Set());
+    const [, setLazyVersion] = useState(0);
+
+    const highlightMode: 'full' | 'lazy' =
+        displayCode.length > lazyHighlightThreshold ? 'lazy' : 'full';
 
     const foldRegions = useMemo(
         () => findFoldRegions(displayCode, language ?? undefined),
@@ -83,25 +132,61 @@ export default function CodeEditor({
     }, [foldRegions]);
 
     useEffect(() => {
-        if (codeRef.current) {
-            const codeElement = codeRef.current.querySelector('code');
-            if (codeElement && codeElement.className) {
-                const match = codeElement.className.match(/language-([^\s]+)/);
-                if (match && match[1]) {
-                    const lang = match[1];
-                    setLanguage(lang);
-                    const rawText = codeElement.textContent || '';
-                    const displayText = applyReplacements(rawText, replacements, 'display');
-                    const copyText = applyReplacements(rawText, replacements, 'copy');
-                    setDisplayCode(displayText);
-                    setCopyCode(copyText);
-                    highlightCode(displayText, lang).then((html) => {
-                        setHighlightedLines(splitHighlightedLines(applyLinkPatterns(html, linkPatterns)));
-                    });
-                }
-            }
+        const codeElement = codeRef.current?.querySelector('code');
+        if (!codeElement?.className) return;
+        const match = codeElement.className.match(/language-([^\s]+)/);
+        if (!match?.[1]) return;
+
+        const lang = match[1];
+        const rawText = codeElement.textContent || '';
+        const displayText = applyReplacements(rawText, replacements, 'display');
+        const copyText = applyReplacements(rawText, replacements, 'copy');
+        setLanguage(lang);
+        setDisplayCode(displayText);
+        setCopyCode(copyText);
+
+        // New content invalidates the lazy cache.
+        lazyCacheRef.current = new Map();
+        lazyPendingRef.current = new Set();
+        setLazyVersion((v) => v + 1);
+
+        if (displayText.length <= lazyHighlightThreshold) {
+            let cancelled = false;
+            highlightCode(displayText, lang).then((html) => {
+                if (cancelled) return;
+                setHighlightedLines(splitHighlightedLines(applyLinkPatterns(html, linkPatterns)));
+            });
+            return () => {
+                cancelled = true;
+            };
         }
-    }, [children, replacements, linkPatterns]);
+        // Lazy mode: no up-front highlight; visible lines are highlighted on demand.
+        setHighlightedLines([]);
+    }, [children, replacements, linkPatterns, lazyHighlightThreshold]);
+
+    useEffect(() => {
+        const handlePointerDown = (e: PointerEvent) => {
+            const container = containerRef.current;
+            if (!container || container.contains(e.target as Node)) return;
+            setActiveLine(null);
+        };
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setActiveLine(null);
+        };
+        document.addEventListener('pointerdown', handlePointerDown);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', handlePointerDown);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
+    useEffect(
+        () => () => {
+            if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+        },
+        [],
+    );
 
     const toggleFold = useCallback((startLine: number) => {
         setFoldedLines((prev) => {
@@ -115,7 +200,16 @@ export default function CodeEditor({
         });
     }, []);
 
+    const selectLine = useCallback((lineIndex: number) => {
+        setActiveLine((prev) => (prev === lineIndex ? null : lineIndex));
+    }, []);
+
+    const onGutterEnter = useCallback(() => setGutterHovered(true), []);
+    const onGutterLeave = useCallback(() => setGutterHovered(false), []);
+
     const rawLines = useMemo(() => displayCode.split('\n'), [displayCode]);
+
+    const lineCount = highlightMode === 'full' ? highlightedLines.length : rawLines.length;
 
     const hiddenLines = useMemo(() => {
         const hidden = new Set<number>();
@@ -131,20 +225,121 @@ export default function CodeEditor({
     }, [foldedLines, foldableLineMap]);
 
     const lineNumberWidth = useMemo(
-        () => `${Math.max(2, String(highlightedLines.length).length)}ch`,
-        [highlightedLines.length],
+        () => `${Math.max(2, String(lineCount).length)}ch`,
+        [lineCount],
     );
+
+    /** HTML for a line: highlighted when available, else plain escaped text (lazy mode). */
+    const getLineHtml = useCallback(
+        (i: number): string => {
+            if (highlightMode === 'full') return highlightedLines[i] ?? '';
+            const cached = lazyCacheRef.current.get(i);
+            if (cached !== undefined) return cached;
+            return applyLinkPatterns(escapeHtml(rawLines[i] ?? ''), linkPatterns);
+        },
+        [highlightMode, highlightedLines, rawLines, linkPatterns],
+    );
+
+    const foldEndText = useCallback(
+        (i: number): string => {
+            const region = foldableLineMap.get(i);
+            return region?.type === 'bracket' ? ` ${rawLines[region.endLine]?.trim() ?? ''}` : '';
+        },
+        [foldableLineMap, rawLines],
+    );
+
+    const isReady = highlightMode === 'full' ? highlightedLines.length > 0 : displayCode.length > 0;
+    const shouldVirtualize = lineCount > virtualizeThreshold;
+
+    // Virtualization: the list of line indices that are actually visible (not folded away).
+    const visibleIndices = useMemo(() => {
+        if (!shouldVirtualize) return null;
+        const arr: number[] = [];
+        for (let i = 0; i < lineCount; i++) {
+            if (!hiddenLines.has(i)) arr.push(i);
+        }
+        return arr;
+    }, [shouldVirtualize, lineCount, hiddenLines]);
+
+    const virtualizer = useVirtualizer({
+        count: visibleIndices?.length ?? 0,
+        getScrollElement: () => scrollRef.current,
+        estimateSize: () => ESTIMATED_LINE_HEIGHT,
+        overscan: 12,
+        // Key by stable line index so measurements survive fold/expand re-indexing.
+        getItemKey: (index) => visibleIndices?.[index] ?? index,
+    });
+
+    const virtualItems = shouldVirtualize ? virtualizer.getVirtualItems() : [];
+
+    // Line indices currently mounted in the DOM — the ones lazy highlighting targets.
+    const renderedLineIndices = useMemo(() => {
+        if (shouldVirtualize) {
+            return virtualItems
+                .map((vi) => visibleIndices?.[vi.index])
+                .filter((i): i is number => i != null);
+        }
+        const arr: number[] = [];
+        for (let i = 0; i < lineCount; i++) {
+            if (!hiddenLines.has(i)) arr.push(i);
+        }
+        return arr;
+        // virtualItems is recreated each scroll; that's the intended trigger.
+    }, [shouldVirtualize, virtualItems, visibleIndices, lineCount, hiddenLines]);
+
+    const renderedRangeKey = renderedLineIndices.join(',');
+
+    // Lazy highlight: colorize any rendered lines not yet in the cache.
+    useEffect(() => {
+        if (highlightMode !== 'lazy' || !language) return;
+        const cache = lazyCacheRef.current;
+        const pending = lazyPendingRef.current;
+        const todo = renderedLineIndices.filter((i) => !cache.has(i) && !pending.has(i));
+        if (todo.length === 0) return;
+
+        todo.forEach((i) => pending.add(i));
+        let cancelled = false;
+        Promise.all(
+            todo.map(async (i) => {
+                const html = await highlightCode(rawLines[i] ?? '', language);
+                const lineHtml =
+                    splitHighlightedLines(applyLinkPatterns(html, linkPatterns))[0] ?? '';
+                return [i, lineHtml] as const;
+            }),
+        ).then((results) => {
+            results.forEach(([i]) => pending.delete(i));
+            if (cancelled) return;
+            results.forEach(([i, html]) => cache.set(i, html));
+            setLazyVersion((v) => v + 1);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [renderedRangeKey, highlightMode, language, linkPatterns, rawLines, renderedLineIndices]);
 
     const handleCopy = () => {
         const text = copyCode || codeRef.current?.textContent || '';
         copy(text);
         setCopied(true);
-        setTimeout(() => setCopied(false), 1000);
+        if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+        copiedTimeoutRef.current = setTimeout(() => setCopied(false), 1000);
     };
 
-    const resolvedHeight = height !== undefined ? (typeof height === 'number' ? `${height}px` : height) : undefined;
+    const resolvedHeight =
+        height !== undefined ? (typeof height === 'number' ? `${height}px` : height) : undefined;
+    const explicitMaxHeight =
+        maxHeight !== undefined
+            ? typeof maxHeight === 'number'
+                ? `${maxHeight}px`
+                : maxHeight
+            : undefined;
+    // Ensure virtualized snippets always have a bounded, scrollable container.
     const resolvedMaxHeight =
-        maxHeight !== undefined ? (typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight) : undefined;
+        explicitMaxHeight ??
+        (shouldVirtualize && resolvedHeight === undefined
+            ? `${DEFAULT_VIRTUALIZED_MAX_HEIGHT}px`
+            : undefined);
 
     const outerStyle =
         resolvedHeight !== undefined || resolvedMaxHeight !== undefined
@@ -164,11 +359,26 @@ export default function CodeEditor({
               ? { maxHeight: resolvedMaxHeight }
               : undefined;
 
+    const lineProps = (i: number) => ({
+        lineIndex: i,
+        html: getLineHtml(i),
+        rawLine: rawLines[i] ?? '',
+        isActive: activeLine === i,
+        isFoldStart: foldableLineMap.has(i),
+        isFolded: foldedLines.has(i),
+        foldEndText: foldEndText(i),
+        lineNumberWidth,
+        gutterHovered,
+        onGutterEnter,
+        onGutterLeave,
+        onToggleFold: toggleFold,
+        onSelect: selectLine,
+    });
+
     return (
         <div
+            ref={containerRef}
             className={`bg-code-background pb-0 rounded-md relative group mt-4 flex flex-col ${className}`}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
             style={outerStyle}
         >
             {showLanguageLabel && (
@@ -185,7 +395,7 @@ export default function CodeEditor({
                 </div>
             )}
 
-            <CodeCopyButton onCopy={handleCopy} isHovering={isHovering} copied={copied} />
+            <CodeCopyButton onCopy={handleCopy} copied={copied} />
 
             {/* Hidden container for extracting raw code from children */}
             <div ref={codeRef} hidden>
@@ -193,124 +403,62 @@ export default function CodeEditor({
             </div>
 
             <div
+                ref={scrollRef}
                 className={`w-full min-h-0 overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
                 style={scrollAreaStyle}
             >
-                {highlightedLines.length > 0 ? (
-                        <pre className="hljs text-sm w-full whitespace-pre-wrap break-words !leading-relaxed">
+                {isReady ? (
+                    <pre className="hljs text-sm w-full whitespace-pre-wrap break-words !leading-relaxed">
+                        {shouldVirtualize ? (
+                            <div
+                                style={{
+                                    height: virtualizer.getTotalSize(),
+                                    width: '100%',
+                                    position: 'relative',
+                                }}
+                            >
+                                {virtualItems.map((vi) => {
+                                    const i = visibleIndices![vi.index];
+                                    return (
+                                        <div
+                                            key={i}
+                                            data-index={vi.index}
+                                            ref={virtualizer.measureElement}
+                                            style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                transform: `translateY(${vi.start}px)`,
+                                            }}
+                                        >
+                                            <CodeLine {...lineProps(i)} />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
                             <code className="block w-full">
-                                {highlightedLines.map((html, i) => {
+                                {Array.from({ length: lineCount }, (_, i) => {
                                     const hidden = hiddenLines.has(i);
-                                    const isFoldStart = foldableLineMap.has(i);
-                                    const isFolded = foldedLines.has(i);
-                                    const indentMatch = rawLines[i]?.match(/^[\t ]+/)?.[0] ?? '';
-                                    const indentCh =
-                                        indentMatch.length > 0
-                                            ? indentMatch
-                                                .split('')
-                                                .reduce((acc, ch) => acc + (ch === '\t' ? 4 : 1), 0)
-                                            : 0;
-
-                                    const isActive = activeLine === i;
-
                                     return (
                                         <div
                                             key={i}
                                             className="grid w-full transition-[grid-template-rows] duration-200 ease-in-out"
-                                            style={{
-                                                gridTemplateRows: hidden ? '0fr' : '1fr',
-                                            }}
+                                            style={{ gridTemplateRows: hidden ? '0fr' : '1fr' }}
                                         >
                                             <div
                                                 className="w-full overflow-hidden transition-opacity duration-200 ease-in-out"
                                                 style={{ opacity: hidden ? 0 : 1 }}
                                             >
-                                                <div
-                                                    className={`grid w-full grid-cols-[auto_minmax(0,1fr)] cursor-text px-4 transition-colors duration-100 ${isActive ? 'bg-white/[0.05]' : ''}`}
-                                                    onClick={(e) => {
-                                                        if ((e.target as HTMLElement).closest('a')) return;
-                                                        if (window.getSelection()?.toString()) return;
-                                                        setActiveLine(isActive ? null : i);
-                                                    }}
-                                                >
-                                                    <span
-                                                        className="inline-flex items-center shrink-0 select-none self-start gap-1 mr-3"
-                                                        style={{ height: '1lh' }}
-                                                        aria-hidden="true"
-                                                        onMouseEnter={() => setGutterHovered(true)}
-                                                        onMouseLeave={() => setGutterHovered(false)}
-                                                    >
-                                                        <span
-                                                            className="text-gray-600 text-right tabular-nums"
-                                                            style={{
-                                                                width: lineNumberWidth,
-                                                                fontSize: '0.75em',
-                                                                lineHeight: 'inherit',
-                                                            }}
-                                                        >
-                                                            {i + 1}
-                                                        </span>
-                                                        <span className="inline-flex items-center justify-center w-3">
-                                                            {isFoldStart &&
-                                                                (gutterHovered || isFolded) && (
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            toggleFold(i);
-                                                                        }}
-                                                                        className="text-gray-600 hover:text-gray-400 leading-none p-0 bg-transparent border-none cursor-pointer"
-                                                                        style={{ fontSize: '0.5rem' }}
-                                                                        aria-label={
-                                                                            isFolded
-                                                                                ? 'Expand code block'
-                                                                                : 'Collapse code block'
-                                                                        }
-                                                                    >
-                                                                        <svg
-                                                                            className={`w-3 h-3 transition-transform duration-150 ${isFolded ? '' : 'rotate-90'
-                                                                                }`}
-                                                                            viewBox="0 0 8 8"
-                                                                            fill="currentColor"
-                                                                        >
-                                                                            <path d="M2 1 L6 4 L2 7 Z" />
-                                                                        </svg>
-                                                                    </button>
-                                                                )}
-                                                        </span>
-                                                    </span>
-                                                    <span
-                                                        className="min-w-0 block"
-                                                        style={
-                                                            indentCh > 0
-                                                                ? {
-                                                                    paddingLeft: `${indentCh}ch`,
-                                                                    textIndent: `-${indentCh}ch`,
-                                                                }
-                                                                : undefined
-                                                        }
-                                                    >
-                                                        <span dangerouslySetInnerHTML={{ __html: html }} />
-                                                        {isFolded &&
-                                                            (() => {
-                                                                const region = foldableLineMap.get(i);
-                                                                const endText =
-                                                                    region?.type === 'bracket'
-                                                                        ? ` ${rawLines[region.endLine]?.trim()}`
-                                                                        : '';
-                                                                return (
-                                                                    <span className="text-gray-300 ml-2 bg-gray-600/40 px-2 py-0.5 rounded-sm border border-gray-500/30 animate-in fade-in duration-200">
-                                                                        &hellip;{endText}
-                                                                    </span>
-                                                                );
-                                                            })()}
-                                                    </span>
-                                                </div>
+                                                <CodeLine {...lineProps(i)} />
                                             </div>
                                         </div>
                                     );
                                 })}
                             </code>
-                        </pre>
+                        )}
+                    </pre>
                 ) : (
                     <pre className="text-sm w-full whitespace-pre-wrap break-words">{children}</pre>
                 )}

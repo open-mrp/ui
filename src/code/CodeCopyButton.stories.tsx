@@ -12,7 +12,7 @@ const meta = {
     },
     decorators: [
         (Story) => (
-            <div className="relative h-32 w-[480px] rounded-md bg-gray-900 p-4 font-mono text-sm text-gray-100">
+            <div className="group relative h-32 w-[480px] rounded-md bg-gray-900 p-4 font-mono text-sm text-gray-100">
                 <code>console.log('Hello, world!');</code>
                 <Story />
             </div>
@@ -23,17 +23,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// The button reveals itself on hover/focus of the surrounding `group` container
+// (and stays visible on touch devices). Hover the preview to see it.
 export const Idle: Story = {
     args: {
-        isHovering: true,
-        copied: false,
-        onCopy: () => undefined,
-    },
-};
-
-export const Hidden: Story = {
-    args: {
-        isHovering: false,
         copied: false,
         onCopy: () => undefined,
     },
@@ -41,7 +34,6 @@ export const Hidden: Story = {
 
 export const Copied: Story = {
     args: {
-        isHovering: true,
         copied: true,
         onCopy: () => undefined,
     },
@@ -52,7 +44,6 @@ export const Interactive: Story = {
         const [copied, setCopied] = useState(false);
         return (
             <CodeCopyButton
-                isHovering
                 copied={copied}
                 onCopy={() => {
                     setCopied(true);
