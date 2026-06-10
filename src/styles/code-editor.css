@@ -3,5 +3,5 @@
 .code-editor,
 .code-editor-scroll,
 .code-editor .hljs {
-    background-color: var(--code-background);
+    background: var(--code-background);
 }
