@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.5
+
+### Patch Changes
+
+- f8f139a: fix: code editor background color issues
+
 ## 1.9.4
 
 ### Patch Changes
