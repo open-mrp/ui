@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.6
+
+### Patch Changes
+
+- 00ac81d: fix: more code editor theme tweaks
+
 ## 1.9.5
 
 ### Patch Changes
