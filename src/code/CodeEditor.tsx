@@ -51,6 +51,11 @@ export interface CodeEditorProps {
     /** When true (default), show the detected language label in the header */
     showLanguageLabel?: boolean;
     /**
+     * Flush layout for embedding inside a parent panel (no outer margin or rounding).
+     * Vertical padding around the code block is preserved.
+     */
+    embedded?: boolean;
+    /**
      * Render the code area with windowing once the snippet exceeds this many lines.
      * Below the threshold the full list renders (with animated fold/expand); above it
      * only the visible lines are mounted and folding collapses instantly. Defaults to 500.
@@ -91,6 +96,7 @@ export default function CodeEditor({
     replacements,
     linkPatterns,
     showLanguageLabel = true,
+    embedded = false,
     virtualizeThreshold = DEFAULT_VIRTUALIZE_THRESHOLD,
     lazyHighlightThreshold = DEFAULT_LAZY_HIGHLIGHT_THRESHOLD,
 }: CodeEditorProps) {
@@ -375,10 +381,13 @@ export default function CodeEditor({
         onSelect: selectLine,
     });
 
+    const chromeRounding = embedded ? '' : 'rounded-md';
+    const outerSpacing = embedded ? '' : 'mt-4';
+
     return (
         <div
             ref={containerRef}
-            className={`bg-code-background pb-0 rounded-md relative group mt-4 flex flex-col ${className}`}
+            className={`code-editor pb-0 relative group flex flex-col ${chromeRounding} ${outerSpacing} ${className}`}
             style={outerStyle}
         >
             {showLanguageLabel && (
@@ -386,7 +395,7 @@ export default function CodeEditor({
                     className="absolute left-0 top-0 right-0 z-20 h-10 px-4 rounded-t-md rounded-b-none backdrop-blur-md flex items-center"
                     style={{
                         backgroundColor:
-                            'color-mix(in srgb, var(--color-code-background) 20%, transparent)',
+                            'color-mix(in srgb, var(--code-background) 20%, transparent)',
                     }}
                 >
                     <div className="text-xs text-gray-500 uppercase" style={{ height: '16px' }}>
@@ -404,7 +413,7 @@ export default function CodeEditor({
 
             <div
                 ref={scrollRef}
-                className={`w-full min-h-0 overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 rounded-md bg-code-background`}
+                className={`code-editor-scroll w-full min-h-0 overflow-y-auto ${showLanguageLabel ? 'pt-10' : 'pt-4'} pb-4 ${chromeRounding}`}
                 style={scrollAreaStyle}
             >
                 {isReady ? (

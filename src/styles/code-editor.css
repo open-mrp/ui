@@ -1,0 +1,7 @@
+/* CodeEditor chrome — uses consumer --code-background directly so backgrounds
+   stay correct without relying on Tailwind scanning bg-code-background. */
+.code-editor,
+.code-editor-scroll,
+.code-editor .hljs {
+    background-color: var(--code-background);
+}
