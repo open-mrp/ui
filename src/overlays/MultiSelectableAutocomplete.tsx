@@ -366,6 +366,10 @@ export function MultiSelectableAutocomplete<T>({
                         }}
                         style={{ zIndex: 1400, maxHeight: 'min(240px, var(--radix-popover-content-available-height))' }}
                         className={cn(
+                            // pointer-events-auto: a modal Radix Dialog sets `pointer-events: none` on
+                            // <body>; since this Popover portals to <body> (outside the dialog's layer),
+                            // it inherits that and becomes unclickable. Re-enable it on the content itself.
+                            'pointer-events-auto',
                             'w-[var(--radix-popover-trigger-width)] overflow-auto rounded-md border shadow-md outline-hidden',
                             'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10',
                             'data-[state=open]:animate-in data-[state=closed]:animate-out',
