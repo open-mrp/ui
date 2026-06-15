@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.7
+
+### Patch Changes
+
+- 4b284b2: fix: issue with dropdowns on the selectables
+
 ## 1.9.6
 
 ### Patch Changes
