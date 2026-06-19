@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.8
+
+### Patch Changes
+
+- d5a04d8: chore: update deps
+
 ## 1.9.7
 
 ### Patch Changes
