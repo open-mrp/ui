@@ -56,7 +56,7 @@ function Checkbox({
     );
 
     if (!label && !helperText) {
-        return <div className={cn('inline-flex', wrapperClassName)}>{control}</div>;
+        return <div className={cn('relative inline-flex', wrapperClassName)}>{control}</div>;
     }
 
     return (
@@ -64,7 +64,7 @@ function Checkbox({
             <label
                 htmlFor={inputId}
                 className={cn(
-                    'inline-flex items-start gap-2',
+                    'relative inline-flex items-start gap-2',
                     disabled ? 'cursor-not-allowed' : 'cursor-pointer',
                 )}
             >
