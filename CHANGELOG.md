@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.12
+
+### Patch Changes
+
+- 87ea962: fix: isue with canvas deploy
+
 ## 1.9.11
 
 ### Patch Changes
