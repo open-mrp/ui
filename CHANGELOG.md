@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.11
+
+### Patch Changes
+
+- 6c63f80: fix: stop the wave shader from leaking WebGL contexts on remount/resize (caused a black shader once the browser's context cap was hit, e.g. on macOS split-screen) and recover gracefully from context loss
+
 ## 1.9.10
 
 ### Patch Changes
