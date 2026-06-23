@@ -38,6 +38,10 @@ export function WaveShader({
     const [webglUnavailable, setWebglUnavailable] = useState(false);
     const contextRetriesRef = useRef(0);
     const [contextRetryTick, setContextRetryTick] = useState(0);
+    // Whether the renderer has painted at least one frame. Until it has, we keep the
+    // static still on top of the canvas so the page never flashes black while WebGL is
+    // initializing (or retrying context acquisition).
+    const [hasRenderedFrame, setHasRenderedFrame] = useState(false);
 
     const initialHeightRef = useRef(initialHeight);
     initialHeightRef.current = initialHeight;
@@ -177,6 +181,7 @@ export function WaveShader({
         let lastBackgroundColor = backgroundColor;
         let resized = true;
         let stop = false;
+        let signaledFirstFrame = false;
         let dirty = true; // Track if rendering is needed
         let lastRenderTime = 0;
         const minFrameTime = 1000 / 60; // Cap at 60 FPS
@@ -241,6 +246,12 @@ export function WaveShader({
 
             renderer.render();
             dirty = false; // Reset dirty flag after render
+
+            // First successful paint — reveal the canvas and fade out the still.
+            if (!signaledFirstFrame) {
+                signaledFirstFrame = true;
+                setHasRenderedFrame(true);
+            }
         }
         tick();
 
@@ -304,6 +315,10 @@ export function WaveShader({
         );
     }
 
+    // Still shown on top of the canvas until the first frame paints (and as the
+    // permanent image if WebGL never comes up). Empty string means none is bundled.
+    const still = getWaveShaderStill(backgroundColor, fallbackImage);
+
     return (
         <div className="relative">
             {showPerformanceMetrics && performanceMetrics && (
@@ -350,6 +365,22 @@ export function WaveShader({
                             transformOrigin: '0 0',
                         }}
                     />
+                    {still && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={still}
+                            alt=""
+                            aria-hidden
+                            className="absolute top-0 left-0 w-full h-full"
+                            style={{
+                                objectFit: 'cover',
+                                objectPosition: 'center',
+                                pointerEvents: 'none',
+                                opacity: hasRenderedFrame ? 0 : 1,
+                                transition: 'opacity 300ms ease-out',
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </div>
