@@ -26,4 +26,15 @@ export interface WaveShaderProps {
      * Defaults to #060815 (dark blue).
      */
     backgroundColor?: RGBColor;
+    /**
+     * Static image shown when WebGL is unavailable (hardware acceleration off, crashed
+     * GPU process, etc.) so the area isn't blank. Either a single URL, or a
+     * `{ light, dark }` pair — the variant is chosen from `backgroundColor`'s luminance.
+     */
+    fallbackImage?: string | WaveShaderFallbackImage;
+}
+
+export interface WaveShaderFallbackImage {
+    light?: string;
+    dark?: string;
 }

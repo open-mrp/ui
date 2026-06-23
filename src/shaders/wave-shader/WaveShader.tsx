@@ -10,6 +10,10 @@ import vertexShaderSource from './shaders/vertex.glsl';
 import { DEFAULT_BACKGROUND_COLOR, WaveShaderProps } from './types';
 import { PerformanceMonitor } from './utils/PerformanceMonitor';
 import { WaveShaderRenderer } from './WaveShaderRenderer';
+import { getWaveShaderStill } from './waveShaderStill';
+
+/** How many times to re-attempt WebGL context acquisition before declaring it unavailable. */
+const MAX_CONTEXT_RETRIES = 5;
 
 export function WaveShader({
     animate = true,
@@ -22,6 +26,7 @@ export function WaveShader({
     numWaves = 8,
     showPerformanceMetrics = false,
     backgroundColor = DEFAULT_BACKGROUND_COLOR,
+    fallbackImage,
 }: WaveShaderProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [shader, setShader] = useState<FragmentShader | null>(null);
@@ -30,6 +35,17 @@ export function WaveShader({
     const [performanceMetrics, setPerformanceMetrics] = useState<any>(null);
     const [isVisible, setIsVisible] = useState(true);
     const observerRef = useRef<IntersectionObserver | null>(null);
+    const [webglUnavailable, setWebglUnavailable] = useState(false);
+    const contextRetriesRef = useRef(0);
+    const [contextRetryTick, setContextRetryTick] = useState(0);
+
+    const initialHeightRef = useRef(initialHeight);
+    initialHeightRef.current = initialHeight;
+    const widthRef = useRef(width);
+    widthRef.current = width;
+    const isVisibleRef = useRef(isVisible);
+    isVisibleRef.current = isVisible;
+    const pendingResizeRef = useRef(true);
 
     // Use isomorphic viewport width to ensure SSR/client initial values match (both start as null)
     const viewportWidth = useIsomorphicViewportWidth();
@@ -47,6 +63,10 @@ export function WaveShader({
             setDimensions([newWidth, newHeight]);
         }
     }, [viewportWidth, animate, colorConfiguration, skew, width, initialHeight]);
+
+    useEffect(() => {
+        pendingResizeRef.current = true;
+    }, [initialHeight, width, viewportWidth]);
 
     const [canvasWidth, canvasHeight] = dimensions;
 
@@ -102,7 +122,7 @@ export function WaveShader({
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas || !shader || !vertexShader) return;
+        if (!canvas || !shader || !vertexShader || webglUnavailable) return;
 
         if (!colorConfigurations[colorConfiguration]) {
             console.warn(colorConfiguration);
@@ -112,16 +132,36 @@ export function WaveShader({
         const devicePixelRatio = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
         const currentEffectiveScale = Math.min(2.0, devicePixelRatio);
 
-        const renderer = new WaveShaderRenderer(
-            canvas,
-            vertexShader,
-            shader.shader,
-            colorConfigurations[colorConfiguration],
-            seed,
-            numWaves,
-            currentEffectiveScale,
-            backgroundColor,
-        );
+        let renderer: WaveShaderRenderer;
+        try {
+            renderer = new WaveShaderRenderer(
+                canvas,
+                vertexShader,
+                shader.shader,
+                colorConfigurations[colorConfiguration],
+                seed,
+                numWaves,
+                currentEffectiveScale,
+                backgroundColor,
+            );
+        } catch {
+            // Context acquisition can fail transiently when the browser is briefly at
+            // its WebGL-context cap (e.g. other instances mid-teardown during a
+            // split-screen resize). Retry a few times before giving up for good, since
+            // those contexts free asynchronously.
+            if (contextRetriesRef.current < MAX_CONTEXT_RETRIES) {
+                contextRetriesRef.current += 1;
+                const retryId = window.setTimeout(
+                    () => setContextRetryTick((n) => n + 1),
+                    200 * contextRetriesRef.current,
+                );
+                return () => window.clearTimeout(retryId);
+            }
+            setWebglUnavailable(true);
+            return;
+        }
+        // Acquired successfully — reset the retry budget for any future remounts.
+        contextRetriesRef.current = 0;
         for (const [key, value] of Object.entries(shader.uniforms)) {
             pendingUniformWrites.current.push([key, value.value]);
         }
@@ -147,10 +187,10 @@ export function WaveShader({
             requestAnimationFrame(tick);
 
             // Skip rendering if not visible
-            if (!isVisible) return;
+            if (!isVisibleRef.current) return;
 
             // Skip rendering if not animated and not dirty
-            if (!animate && !dirty && !resized) return;
+            if (!animate && !dirty && !resized && !pendingResizeRef.current) return;
 
             // Frame rate limiting
             const now = Date.now();
@@ -162,14 +202,15 @@ export function WaveShader({
                 performanceMonitor.current.measure();
             }
 
-            if (resized) {
+            if (resized || pendingResizeRef.current) {
+                pendingResizeRef.current = false;
                 const [newWidth, newHeight] = calculateShaderCanvasDimensions(
                     {
                         animate,
                         colorConfiguration,
                         skew,
-                        width,
-                        height: initialHeight,
+                        width: widthRef.current,
+                        height: initialHeightRef.current,
                     },
                     window.innerWidth,
                 );
@@ -214,15 +255,54 @@ export function WaveShader({
     }, [
         animate,
         colorConfiguration,
-        initialHeight,
-        width,
         seed,
         skew,
         shader,
         vertexShader,
         numWaves,
         showPerformanceMetrics,
+        webglUnavailable,
+        contextRetryTick,
     ]);
+
+    if (webglUnavailable) {
+        // WebGL couldn't be acquired (hardware acceleration off, crashed GPU process,
+        // etc.). Fall back to a pre-rendered still so the page isn't blank. Pick the
+        // light/dark variant from the background color; render nothing if none bundled.
+        const still = getWaveShaderStill(backgroundColor, fallbackImage);
+        if (!still) return null;
+        return (
+            <div className="relative">
+                <div
+                    className="relative max-w-full"
+                    style={{
+                        width: canvasWidth,
+                        ...(skew === 'full' ? { transform: `skewY(-${skewDegree}deg)` } : {}),
+                    }}
+                >
+                    <div style={{ paddingTop: `${(canvasHeight / canvasWidth) * 100}%` }} />
+                    <div
+                        className="absolute top-0 left-0 w-full h-full"
+                        style={{
+                            clipPath:
+                                skew === 'bottom'
+                                    ? `polygon(0 0, 100% 0, 100% ${50 + skewDegree / 2}%, 0 100%)`
+                                    : 'none',
+                        }}
+                    >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={still}
+                            alt=""
+                            aria-hidden
+                            className="absolute top-0 left-0 w-full h-full"
+                            style={{ objectFit: 'cover', objectPosition: 'center' }}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="relative">
