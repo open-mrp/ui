@@ -1,5 +1,11 @@
 # @augno/ui
 
+## 1.9.13
+
+### Patch Changes
+
+- 0cca292: fix: issue with tabs and headings and buttons
+
 ## 1.9.12
 
 ### Patch Changes
