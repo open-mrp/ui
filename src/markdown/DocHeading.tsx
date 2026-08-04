@@ -19,23 +19,22 @@ function isReactElement(node: unknown): node is React.ReactElement {
     return React.isValidElement(node);
 }
 
-// Extract text content iteratively without recursion
+// Extract text content iteratively without recursion.
+// `depth` is tree nesting (element → children), not nodes visited — headings with
+// multiple inline elements (e.g. two `code` spans) must not trip the guard.
 function getTextContent(node: React.ReactNode): string {
     const parts: string[] = [];
-    const stack: React.ReactNode[] = [node];
-    let depth = 0;
-    const MAX_DEPTH = 5;
+    const stack: { node: React.ReactNode; depth: number }[] = [{ node, depth: 0 }];
+    const MAX_DEPTH = 32;
+    const MAX_NODES = 1000;
+    let nodesVisited = 0;
 
     while (stack.length > 0) {
-        depth++;
-        // Prevent infinite recursion and set reasonable limit to depth
-        if (depth > MAX_DEPTH) {
-            throw new Error(
-                `Maximum stack depth of ${MAX_DEPTH} exceeded in getTextContent. This might indicate a circular reference in your React components.`,
-            );
+        if (++nodesVisited > MAX_NODES) {
+            break;
         }
 
-        const current = stack.pop();
+        const { node: current, depth } = stack.pop()!;
 
         if (current === null || current === undefined) {
             continue;
@@ -52,37 +51,42 @@ function getTextContent(node: React.ReactNode): string {
         }
 
         if (Array.isArray(current)) {
-            // Push in reverse order to maintain left-to-right processing
+            // Siblings share depth — arrays are containers, not nesting.
             for (let i = current.length - 1; i >= 0; i--) {
-                stack.push(current[i]);
+                stack.push({ node: current[i], depth });
             }
             continue;
         }
 
         if (isReactElement(current)) {
+            if (depth > MAX_DEPTH) {
+                continue;
+            }
+
             const { props } = current;
 
-            // Check if component has identifier props (like tableName, prefixId)
-            if (typeof current.type === 'function' && props) {
-                // Look for string properties that might be identifiers
-                const stringProps = Object.entries(props)
-                    .filter(([key, value]) => typeof value === 'string' && key !== 'className')
-                    .map(([_, value]) => value as string);
-
-                if (stringProps.length > 0) {
-                    parts.push(stringProps[0]);
+            // Prefer an explicit text/label prop over walking children (e.g. InternalLink).
+            if (typeof current.type === 'function' && props && typeof props === 'object') {
+                const record = props as Record<string, unknown>;
+                const label =
+                    (typeof record.text === 'string' && record.text) ||
+                    (typeof record.label === 'string' && record.label) ||
+                    (typeof record.children === 'string' && record.children);
+                if (label) {
+                    parts.push(label);
                     continue;
                 }
             }
 
-            // Process children if present
             if (props && typeof props === 'object' && 'children' in props) {
-                stack.push((props as { children: React.ReactNode }).children);
+                stack.push({
+                    node: (props as { children: React.ReactNode }).children,
+                    depth: depth + 1,
+                });
             }
             continue;
         }
 
-        // For any other type, convert to string
         parts.push(String(current));
     }
 

@@ -33,8 +33,11 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
         <TabsPrimitive.Trigger
             data-slot="tabs-trigger"
             className={cn(
-                'inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm',
+                'inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=active]:shadow-sm',
                 'text-gray-900 dark:text-gray-400',
+                // Scoped to the inactive state so it can never fight the active styles,
+                // whatever order Tailwind emits the two variants in.
+                'data-[state=inactive]:hover:bg-white/60 data-[state=inactive]:hover:text-gray-950 dark:data-[state=inactive]:hover:bg-gray-700/50 dark:data-[state=inactive]:hover:text-gray-200',
                 'data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-gray-100 dark:data-[state=active]:border-gray-600',
                 'focus-visible:border-stone-500 focus-visible:ring-stone-500/50 focus-visible:outline-stone-500 focus-visible:ring-[3px] focus-visible:outline-1',
                 'dark:focus-visible:border-stone-400 dark:focus-visible:ring-stone-400/50',
