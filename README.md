@@ -1,6 +1,6 @@
-# @augno/ui
+# @openmrp/ui
 
-Shared react components and user interface utilities for Augno
+Shared react components and user interface utilities for OpenMRP
 
 TODO:
 
@@ -23,7 +23,7 @@ The process to publish a new version:
 
 ### Prototyping local UI changes in consumers
 
-`@augno/ui` is consumed by both `dashboard/` and `public-docs/`. To test local changes in both without publishing:
+`@openmrp/ui` is consumed by both `dashboard/` and `public-docs/`. To test local changes in both without publishing:
 
 ```bash
 bun run link:all

@@ -30,7 +30,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-    render: (args) => <BlendText {...args}>AUGNO</BlendText>,
+    render: (args) => <BlendText {...args}>OPENMRP</BlendText>,
     args: {},
 };
 

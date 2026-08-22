@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 const DARK_MODE_KEY = 'dark';
 const LIGHT_MODE_KEY = 'light';
-const THEME_CHANGE_EVENT = 'augno-theme-change';
+const THEME_CHANGE_EVENT = 'openmrp-theme-change';
 
 type StorageLike = {
     getItem(key: string): string | null;
@@ -46,7 +46,7 @@ const getBrowserStorage = (): StorageLike | null => {
         }
 
         // Touch localStorage inside try/catch in case access throws (e.g. opaque origins)
-        const testKey = '__augno_theme_test__';
+        const testKey = '__openmrp_theme_test__';
         candidate.setItem(testKey, '1');
         candidate.setItem(testKey, '0');
 

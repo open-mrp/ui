@@ -3,7 +3,7 @@ import React from 'react';
 
 import {
     ArrowRightIcon,
-    AugnoLogo,
+    OpenMRPLogo,
     CheckIcon,
     ChevronDownIcon,
     ChevronRightIcon,
@@ -42,9 +42,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// AugnoLogo
+// OpenMRPLogo
 export const LogoIcon: Story = {
-    render: () => <AugnoLogo />,
+    render: () => <OpenMRPLogo />,
 };
 
 // ArrowRightIcon
@@ -152,8 +152,8 @@ export const AllIcons: Story = {
     render: () => (
         <div className="grid grid-cols-3 gap-8">
             <div className="flex flex-col items-center">
-                <AugnoLogo />
-                <span className="text-sm mt-2">AugnoLogo</span>
+                <OpenMRPLogo />
+                <span className="text-sm mt-2">OpenMRPLogo</span>
             </div>
             <div className="flex flex-col items-center">
                 <ArrowRightIcon />

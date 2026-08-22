@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`@augno/ui` is a React component library published to GitHub Packages. It provides UI components, hooks, icons, WebGL shaders, and utilities for the Augno ecosystem.
+`@openmrp/ui` is a React component library published to GitHub Packages. It provides UI components, hooks, icons, WebGL shaders, and utilities for the OpenMRP ecosystem.
 
 ## Commands
 

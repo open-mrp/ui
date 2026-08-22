@@ -25,11 +25,11 @@ export const Default: Story = {
     render: () => (
         <DocChecklist storageKey="storybook-getting-started">
             <DocChecklistItem id="install">
-                <strong>Install the CLI.</strong> Run <code>npm install -g augno</code> to get
+                <strong>Install the CLI.</strong> Run <code>npm install -g openmrp</code> to get
                 started.
             </DocChecklistItem>
             <DocChecklistItem id="auth">
-                <strong>Authenticate.</strong> Run <code>augno login</code> and paste your API
+                <strong>Authenticate.</strong> Run <code>openmrp login</code> and paste your API
                 token when prompted.
             </DocChecklistItem>
             <DocChecklistItem id="create">

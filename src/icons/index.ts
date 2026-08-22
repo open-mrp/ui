@@ -1,5 +1,5 @@
 import ArrowRightIcon from './ArrowRightIcon';
-import AugnoLogo from './AugnoLogo';
+import OpenMRPLogo from './OpenMRPLogo';
 import CheckIcon from './CheckIcon';
 import ChevronDownIcon from './ChevronDownIcon';
 import ChevronRightIcon from './ChevronRightIcon';
@@ -20,7 +20,7 @@ import ZoomOutIcon from './ZoomOutIcon';
 
 // Individual icon exports
 export { default as ArrowRightIcon } from './ArrowRightIcon';
-export { default as AugnoLogo } from './AugnoLogo';
+export { default as OpenMRPLogo } from './OpenMRPLogo';
 export { default as CheckIcon } from './CheckIcon';
 export { default as ChevronDownIcon } from './ChevronDownIcon';
 export { default as ChevronRightIcon } from './ChevronRightIcon';
@@ -46,7 +46,7 @@ export { default as ZoomOutIcon } from './ZoomOutIcon';
 // Named export for all icons
 export const icons = {
     Icon,
-    AugnoLogo,
+    OpenMRPLogo,
     ArrowRightIcon,
     ClipboardIcon,
     CheckIcon,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-shot teardown: restore dashboard and public-docs @augno/ui deps to the
+# One-shot teardown: restore dashboard and public-docs @openmrp/ui deps to the
 # latest published GitHub Packages version and remove all yalc artefacts.
 #
 # Run this before committing — ensures no file:.yalc/... refs or .yalc/ state
@@ -20,11 +20,11 @@ if [ ! -d "$PUBLIC_DOCS_ROOT" ]; then
   exit 1
 fi
 
-echo "Unlinking @augno/ui from dashboard/..."
+echo "Unlinking @openmrp/ui from dashboard/..."
 "$DASHBOARD_ROOT/scripts/ui-unlink.sh"
 
-echo "Unlinking @augno/ui from public-docs/..."
+echo "Unlinking @openmrp/ui from public-docs/..."
 "$PUBLIC_DOCS_ROOT/scripts/ui-unlink.sh"
 
 echo ""
-echo "@augno/ui yalc link removed from dashboard and public-docs."
+echo "@openmrp/ui yalc link removed from dashboard and public-docs."
