@@ -3,7 +3,7 @@
 @import '../src/styles/atom-one-dark.css';
 
 /*
- * Storybook runs @augno/ui in isolation, so it does not get the CSS variables
+ * Storybook runs @openmrp/ui in isolation, so it does not get the CSS variables
  * normally provided by consuming apps. Define production-like defaults here so
  * tokens like `bg-background` resolve correctly in stories.
  */

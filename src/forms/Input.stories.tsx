@@ -52,7 +52,7 @@ export const WithHelperText: Story = {
 
 export const WithValue: Story = {
     render: () => {
-        const [value, setValue] = useState('hello@augno.com');
+        const [value, setValue] = useState('hello@openmrp.ai');
         return (
             <Input
                 label="Email"
@@ -242,7 +242,7 @@ export const Loading: Story = {
 export const LoadingWithValue: Story = {
     args: {
         label: 'Validating',
-        value: 'hello@augno.com',
+        value: 'hello@openmrp.ai',
         loading: true,
         helperText: 'Checking availability...',
     },
@@ -356,7 +356,7 @@ export const SearchInput: Story = {
 
 export const FullFeatured: Story = {
     render: () => {
-        const [value, setValue] = useState('hello@augno.com');
+        const [value, setValue] = useState('hello@openmrp.ai');
         return (
             <Input
                 label="Email address"

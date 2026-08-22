@@ -30,9 +30,9 @@ export const Single: Story = {
     render: () => (
         <Accordion type="single" collapsible defaultValue="item-1">
             <AccordionItem value="item-1">
-                <AccordionTrigger>What is Augno?</AccordionTrigger>
+                <AccordionTrigger>What is OpenMRP?</AccordionTrigger>
                 <AccordionContent>
-                    Augno is a SaaS platform for inventory management and order fulfillment.
+                    OpenMRP is a SaaS platform for inventory management and order fulfillment.
                 </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">

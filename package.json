@@ -1,6 +1,6 @@
 {
-    "name": "@augno/ui",
-    "description": "A collection of react components and other user interface utilities for Augno.",
+    "name": "@openmrp/ui",
+    "description": "A collection of react components and other user interface utilities for OpenMRP.",
     "version": "1.9.13",
     "author": "Augno, Inc.",
     "type": "module",
@@ -117,5 +117,9 @@
     },
     "overrides": {
         "chalk": "^4.1.2"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
     }
 }

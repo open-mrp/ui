@@ -18,7 +18,7 @@ export const useSidenavStore = create<SidenavState>()(
             toggleCollapsed: () => set((state) => ({ isCollapsed: !state.isCollapsed })),
         }),
         {
-            name: 'augno-sidenav-state',
+            name: 'openmrp-sidenav-state',
         },
     ),
 );

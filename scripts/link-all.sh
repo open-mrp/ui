@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# One-shot orchestrator: build @augno/ui, publish via yalc, and link into both
+# One-shot orchestrator: build @openmrp/ui, publish via yalc, and link into both
 # dashboard and public-docs consumers.
 #
-# Prerequisite: the augno/core monorepo is checked out with dashboard/ and
+# Prerequisite: the open-mrp/core monorepo is checked out with dashboard/ and
 # public-docs/ as sibling directories of ui/.
 
 set -e
@@ -20,7 +20,7 @@ if [ ! -d "$PUBLIC_DOCS_ROOT" ]; then
   exit 1
 fi
 
-echo "[1/3] Building and publishing @augno/ui to yalc store..."
+echo "[1/3] Building and publishing @openmrp/ui to yalc store..."
 cd "$UI_ROOT" && bun run yalc:publish
 
 echo "[2/3] Linking into dashboard/..."
@@ -30,6 +30,6 @@ echo "[3/3] Linking into public-docs/..."
 "$PUBLIC_DOCS_ROOT/scripts/ui-link.sh"
 
 echo ""
-echo "@augno/ui is now yalc-linked in dashboard and public-docs."
+echo "@openmrp/ui is now yalc-linked in dashboard and public-docs."
 echo "  Continuous rebuild: cd ui && bun run yalc:watch"
 echo "  Teardown:           cd ui && bun run unlink:all"

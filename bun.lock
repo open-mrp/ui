@@ -1,8 +1,9 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "@augno/ui",
+      "name": "@openmrp/ui",
       "dependencies": {
         "@radix-ui/react-accordion": "^1.2.14",
         "@radix-ui/react-checkbox": "^1.3.5",

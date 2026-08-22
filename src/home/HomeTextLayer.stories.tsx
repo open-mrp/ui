@@ -30,7 +30,7 @@ export const Default: Story = {
             fontWeight: 900,
             color: 'var(--primary)',
         },
-        children: 'AUGNO',
+        children: 'OPENMRP',
     },
 };
 

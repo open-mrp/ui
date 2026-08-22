@@ -14,12 +14,12 @@ type UserOption = {
 };
 
 const USERS: UserOption[] = [
-    { id: '1', name: 'Ada Lovelace', email: 'ada@augno.com' },
-    { id: '2', name: 'Grace Hopper', email: 'grace@augno.com' },
-    { id: '3', name: 'Katherine Johnson', email: 'katherine@augno.com' },
-    { id: '4', name: 'Margaret Hamilton', email: 'margaret@augno.com' },
-    { id: '5', name: 'Annie Easley', email: 'annie@augno.com' },
-    { id: '6', name: 'Radia Perlman', email: 'radia@augno.com' },
+    { id: '1', name: 'Ada Lovelace', email: 'ada@openmrp.ai' },
+    { id: '2', name: 'Grace Hopper', email: 'grace@openmrp.ai' },
+    { id: '3', name: 'Katherine Johnson', email: 'katherine@openmrp.ai' },
+    { id: '4', name: 'Margaret Hamilton', email: 'margaret@openmrp.ai' },
+    { id: '5', name: 'Annie Easley', email: 'annie@openmrp.ai' },
+    { id: '6', name: 'Radia Perlman', email: 'radia@openmrp.ai' },
 ];
 
 async function fetchUsers({

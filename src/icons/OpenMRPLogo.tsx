@@ -1,9 +1,9 @@
-interface AugnoLogoProps {
+interface OpenMRPLogoProps {
     size?: string | number;
     color?: string;
 }
 
-export default function AugnoLogo({ size = 36, color = '#C1C4D6' }: AugnoLogoProps) {
+export default function OpenMRPLogo({ size = 36, color = '#C1C4D6' }: OpenMRPLogoProps) {
     return (
         <div style={{ width: `${size}px`, height: `${size}px` }}>
             <svg viewBox="0 0 188 188" fill="none" xmlns="http://www.w3.org/2000/svg">
