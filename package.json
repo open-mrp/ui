@@ -49,7 +49,7 @@
         "@babel/preset-env": "^7.29.7",
         "@babel/preset-react": "^7.29.7",
         "@babel/preset-typescript": "^7.29.7",
-        "@babel/register": "^7.29.7",
+        "@babel/register": "^8.0.1",
         "@changesets/cli": "^2.31.0",
         "@storybook/addon-docs": "^10.4.6",
         "@storybook/addon-onboarding": "^10.4.6",
