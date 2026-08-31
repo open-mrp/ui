@@ -20,7 +20,10 @@ export function splitHighlightedLines(html: string): string[] {
     let i = 0;
     while (i < content.length) {
         if (content[i] === '\n') {
-            const closing = [...tagStack].reverse().map(t => `</${getTagName(t)}>`).join('');
+            const closing = [...tagStack]
+                .reverse()
+                .map((t) => `</${getTagName(t)}>`)
+                .join('');
             lines.push(currentLine + closing);
             currentLine = tagStack.join('');
             i++;
@@ -47,7 +50,10 @@ export function splitHighlightedLines(html: string): string[] {
     }
 
     if (currentLine || lines.length === 0) {
-        const closing = [...tagStack].reverse().map(t => `</${getTagName(t)}>`).join('');
+        const closing = [...tagStack]
+            .reverse()
+            .map((t) => `</${getTagName(t)}>`)
+            .join('');
         lines.push(currentLine + closing);
     }
 

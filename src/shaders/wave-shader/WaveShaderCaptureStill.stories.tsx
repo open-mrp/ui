@@ -90,7 +90,10 @@ function CaptureStill({
     return (
         <div className="flex flex-col gap-3 p-4">
             {/* Big, obvious Dark/Light toggle — no Storybook Controls panel needed. */}
-            <div className="flex" style={{ borderRadius: 6, overflow: 'hidden', width: 'fit-content' }}>
+            <div
+                className="flex"
+                style={{ borderRadius: 6, overflow: 'hidden', width: 'fit-content' }}
+            >
                 {toggleBtn('dark', '🌙 Dark')}
                 {toggleBtn('light', '☀️ Light')}
             </div>

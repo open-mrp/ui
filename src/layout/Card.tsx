@@ -57,13 +57,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<'p'>) {
 }
 
 function CardBody({ className, ...props }: React.ComponentProps<'div'>) {
-    return (
-        <div
-            data-slot="card-body"
-            className={cn('p-4 sm:p-5', className)}
-            {...props}
-        />
-    );
+    return <div data-slot="card-body" className={cn('p-4 sm:p-5', className)} {...props} />;
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {

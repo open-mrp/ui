@@ -120,11 +120,7 @@ export class WaveShaderRenderer {
     private initGLResources() {
         const { gl } = this;
         this.uniformLocations.clear();
-        this.program = WaveShaderRenderer.createProgram(
-            gl,
-            this.vertexShader,
-            this.fragmentShader,
-        );
+        this.program = WaveShaderRenderer.createProgram(gl, this.vertexShader, this.fragmentShader);
         this.positionBuffer = gl.createBuffer();
         // Use cached gradient texture instead of creating new one
         this.gradientTexture = gradientTextureCache.getOrCreateTexture(
@@ -373,11 +369,7 @@ export class WaveShaderRenderer {
         const { gl } = this;
 
         this.canvas.removeEventListener('webglcontextlost', this.handleContextLost, false);
-        this.canvas.removeEventListener(
-            'webglcontextrestored',
-            this.handleContextRestored,
-            false,
-        );
+        this.canvas.removeEventListener('webglcontextrestored', this.handleContextRestored, false);
 
         // Delete buffer
         if (this.positionBuffer) {

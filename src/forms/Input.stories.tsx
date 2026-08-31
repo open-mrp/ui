@@ -309,11 +309,7 @@ export const PasswordToggle: Story = {
                         onClick={() => setShow(!show)}
                         className="cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
-                        {show ? (
-                            <EyeOff className="h-4 w-4" />
-                        ) : (
-                            <Eye className="h-4 w-4" />
-                        )}
+                        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                 }
             />
@@ -325,12 +321,8 @@ export const PrefixAndSuffix: Story = {
     args: {
         label: 'Website',
         placeholder: 'example.com',
-        prefix: (
-            <span className="text-xs text-gray-400">https://</span>
-        ),
-        suffix: (
-            <span className="text-xs text-gray-400">.com</span>
-        ),
+        prefix: <span className="text-xs text-gray-400">https://</span>,
+        suffix: <span className="text-xs text-gray-400">.com</span>,
     },
 };
 

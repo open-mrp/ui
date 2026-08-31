@@ -634,9 +634,7 @@ export const MultiWithDisabledOptions: Story = {
 
 export const MultiManySelected: Story = {
     render: () => {
-        const [value, setValue] = useState<string[]>([
-            'us', 'uk', 'ca', 'de', 'jp', 'au', 'br',
-        ]);
+        const [value, setValue] = useState<string[]>(['us', 'uk', 'ca', 'de', 'jp', 'au', 'br']);
         return (
             <Selector
                 mode="multi"
@@ -875,8 +873,8 @@ export const StackedCardsBottomSelector: Story = {
             <div className="flex min-h-screen flex-col items-center justify-end gap-4 p-8 pb-12">
                 <div className="w-[360px] overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800">
                     <p className="text-sm text-gray-500">
-                        Content card above — the selector below should not be
-                        clipped by this card or the viewport edge.
+                        Content card above — the selector below should not be clipped by this card
+                        or the viewport edge.
                     </p>
                 </div>
                 <div className="w-[360px] overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800">

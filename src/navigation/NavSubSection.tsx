@@ -155,7 +155,10 @@ const ActiveIndicator: React.FC<{
             {showPing && (
                 <div
                     className="absolute w-2.5 h-2.5 -left-0.25 -top-0.25 rounded-full animate-ping"
-                    style={{ backgroundColor: 'color-mix(in srgb, var(--sidenav-active-indicator) 50%, transparent)' }}
+                    style={{
+                        backgroundColor:
+                            'color-mix(in srgb, var(--sidenav-active-indicator) 50%, transparent)',
+                    }}
                     aria-hidden="true"
                 />
             )}
@@ -183,10 +186,11 @@ export default function NavSubSection({
     const [prevActiveIndex, setPrevActiveIdx] = useState<number>(-1);
     const [isInInitialTransition, setIsInInitialTransition] = useState(false);
 
-    const { hasActive, activeIdx: activeIndex, hasDirectActiveLeaf } = useActiveItem(
-        subSection.items,
-        isPathActive,
-    );
+    const {
+        hasActive,
+        activeIdx: activeIndex,
+        hasDirectActiveLeaf,
+    } = useActiveItem(subSection.items, isPathActive);
     const [isOpen, setIsOpen] = useState<boolean>(hasActive);
     const prevHasActiveRef = useRef(hasActive);
     const indicatorActiveIndex = hasDirectActiveLeaf ? activeIndex : -1;
@@ -251,8 +255,9 @@ export default function NavSubSection({
             <div className="ml-1 relative">
                 {/* Border line */}
                 <div
-                    className={`absolute inset-y-0 left-0 w-0 border-l border-[var(--sidenav-border)] transition-transform origin-top ${isOpen ? 'scale-y-100' : 'scale-y-0'
-                        }`}
+                    className={`absolute inset-y-0 left-0 w-0 border-l border-[var(--sidenav-border)] transition-transform origin-top ${
+                        isOpen ? 'scale-y-100' : 'scale-y-0'
+                    }`}
                     style={{
                         transitionDuration: `${ANIMATION_CONSTANTS.OPEN_TIME}ms`,
                     }}
@@ -284,11 +289,12 @@ export default function NavSubSection({
                             style={{
                                 opacity: isOpen ? 1 : 0,
                                 transform: `translateY(${isOpen ? 0 : 8}px)`,
-                                transitionDelay: `${isOpen
-                                    ? itemIndex * ANIMATION_CONSTANTS.ITEM_TIME
-                                    : (subSection.items.length - itemIndex - 1) *
-                                    ANIMATION_CONSTANTS.ITEM_TIME
-                                    }ms`,
+                                transitionDelay: `${
+                                    isOpen
+                                        ? itemIndex * ANIMATION_CONSTANTS.ITEM_TIME
+                                        : (subSection.items.length - itemIndex - 1) *
+                                          ANIMATION_CONSTANTS.ITEM_TIME
+                                }ms`,
                                 transitionProperty: 'opacity, transform',
                             }}
                         >

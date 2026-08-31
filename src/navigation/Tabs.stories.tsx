@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
-import { ClipboardList, FileCode2, LayoutDashboard, Palette, Puzzle, TrendingUp } from 'lucide-react';
+import {
+    ClipboardList,
+    FileCode2,
+    LayoutDashboard,
+    Palette,
+    Puzzle,
+    TrendingUp,
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs';
 
 const meta = {

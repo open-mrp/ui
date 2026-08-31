@@ -55,8 +55,8 @@ export const TabPanelActive: Story = {
         isActive: true,
         children: (
             <p className="text-sm">
-                This panel renders only when the tab is the active tab. For full
-                composition with a tab bar, see <code>DocTabs</code>.
+                This panel renders only when the tab is the active tab. For full composition with a
+                tab bar, see <code>DocTabs</code>.
             </p>
         ),
     },

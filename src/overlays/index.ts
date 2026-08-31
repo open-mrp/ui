@@ -1,9 +1,4 @@
-export {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from './Accordion';
+export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './Accordion';
 export type { ListResponse, PageInfo } from './autocomplete-types';
 export {
     Dialog,
@@ -17,10 +12,16 @@ export {
     DialogTrigger,
 } from './Dialog';
 export { MultiSelectableAutocomplete } from './MultiSelectableAutocomplete';
-export type { MultiSelectableAutocompleteProps, MultiSelectableAutocompleteVariant } from './MultiSelectableAutocomplete';
+export type {
+    MultiSelectableAutocompleteProps,
+    MultiSelectableAutocompleteVariant,
+} from './MultiSelectableAutocomplete';
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover';
 export { SelectableAutocomplete } from './SelectableAutocomplete';
-export type { SelectableAutocompleteProps, SelectableAutocompleteVariant } from './SelectableAutocomplete';
+export type {
+    SelectableAutocompleteProps,
+    SelectableAutocompleteVariant,
+} from './SelectableAutocomplete';
 export { Selector } from './Selector';
 export type {
     SelectorOption,

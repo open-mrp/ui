@@ -99,11 +99,7 @@ export const Controlled: Story = {
                         label="Monthly"
                         description="$10/month, billed every month"
                     />
-                    <Radio
-                        value="yearly"
-                        label="Yearly"
-                        description="$96/year, saves 20%"
-                    />
+                    <Radio value="yearly" label="Yearly" description="$96/year, saves 20%" />
                 </RadioGroup>
                 <p className="text-xs text-gray-500">Selected: {value}</p>
             </div>

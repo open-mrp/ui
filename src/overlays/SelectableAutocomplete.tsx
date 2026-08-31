@@ -125,9 +125,9 @@ export function SelectableAutocomplete<T>({
         const pinned = selectedAtOpenRef.current;
         let items: T[];
         if (pinned) {
-            const match = options.find(item => isOptionEqualToValue(item, pinned));
+            const match = options.find((item) => isOptionEqualToValue(item, pinned));
             const rest = match
-                ? options.filter(item => !isOptionEqualToValue(item, pinned))
+                ? options.filter((item) => !isOptionEqualToValue(item, pinned))
                 : options;
             items = [match ?? pinned, ...rest];
         } else {
@@ -135,7 +135,7 @@ export function SelectableAutocomplete<T>({
         }
 
         if (excludeIds && getOptionKey) {
-            items = items.filter(item => !excludeIds.includes(getOptionKey(item)));
+            items = items.filter((item) => !excludeIds.includes(getOptionKey(item)));
         }
 
         return items;
@@ -167,11 +167,11 @@ export function SelectableAutocomplete<T>({
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
-                setHighlightedIndex(prev => (prev < displayOptions.length - 1 ? prev + 1 : 0));
+                setHighlightedIndex((prev) => (prev < displayOptions.length - 1 ? prev + 1 : 0));
                 break;
             case 'ArrowUp':
                 e.preventDefault();
-                setHighlightedIndex(prev => (prev > 0 ? prev - 1 : displayOptions.length - 1));
+                setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : displayOptions.length - 1));
                 break;
             case 'Enter':
                 e.preventDefault();
@@ -211,12 +211,7 @@ export function SelectableAutocomplete<T>({
             )}
             <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
                 <PopoverPrimitive.Anchor asChild>
-                    <div
-                        className={cn(
-                            'group relative',
-                            disabled && 'opacity-50 cursor-default',
-                        )}
-                    >
+                    <div className={cn('group relative', disabled && 'opacity-50 cursor-default')}>
                         <div
                             className={cn(
                                 'flex items-center py-2 transition-colors',
@@ -224,9 +219,13 @@ export function SelectableAutocomplete<T>({
                                 blur && 'backdrop-blur-md',
                                 variant === 'outlined' && [
                                     'rounded-md border',
-                                    blur ? 'bg-white/60 dark:bg-gray-900/60' : 'bg-white dark:bg-gray-900',
+                                    blur
+                                        ? 'bg-white/60 dark:bg-gray-900/60'
+                                        : 'bg-white dark:bg-gray-900',
                                     'focus-within:border-[var(--primary)] focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
-                                    blur ? 'border-white/30 dark:border-white/15' : 'dark:border-gray-700',
+                                    blur
+                                        ? 'border-white/30 dark:border-white/15'
+                                        : 'dark:border-gray-700',
                                     error
                                         ? 'border-red-500 focus-within:border-red-500 focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
                                         : !blur && 'border-gray-300 dark:border-gray-600',
@@ -235,7 +234,14 @@ export function SelectableAutocomplete<T>({
                                 variant === 'plain' && 'bg-transparent',
                             )}
                         >
-                            {showSearchIcon && <Search className={cn('mr-2 h-4 w-4 shrink-0', blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500')} />}
+                            {showSearchIcon && (
+                                <Search
+                                    className={cn(
+                                        'mr-2 h-4 w-4 shrink-0',
+                                        blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500',
+                                    )}
+                                />
+                            )}
                             <input
                                 ref={inputRef}
                                 type="text"
@@ -246,7 +252,7 @@ export function SelectableAutocomplete<T>({
                                 disabled={disabled}
                                 placeholder={placeholder}
                                 value={inputValue}
-                                onChange={e => {
+                                onChange={(e) => {
                                     setTouched(true);
                                     setQuery(e.target.value);
                                     setHighlightedIndex(-1);
@@ -267,7 +273,9 @@ export function SelectableAutocomplete<T>({
                                     disabled && 'cursor-default',
                                 )}
                             />
-                            {loading && <Loader2 className="ml-2 h-4 w-4 shrink-0 animate-spin text-gray-400" />}
+                            {loading && (
+                                <Loader2 className="ml-2 h-4 w-4 shrink-0 animate-spin text-gray-400" />
+                            )}
                             {clearable && value && !loading && (
                                 <button
                                     type="button"
@@ -286,9 +294,15 @@ export function SelectableAutocomplete<T>({
                                         'absolute inset-x-0 top-0 h-0.5 w-full transition-all',
                                         error
                                             ? 'bg-red-500 group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
-                                            : cn(blur ? 'bg-white/30' : 'bg-gray-300 dark:bg-gray-600', 'group-focus-within:!bg-[var(--primary)]'),
+                                            : cn(
+                                                  blur
+                                                      ? 'bg-white/30'
+                                                      : 'bg-gray-300 dark:bg-gray-600',
+                                                  'group-focus-within:!bg-[var(--primary)]',
+                                              ),
                                         'group-focus-within:h-[3px]',
-                                        !error && 'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
+                                        !error &&
+                                            'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
                                     )}
                                 />
                             </div>
@@ -300,8 +314,11 @@ export function SelectableAutocomplete<T>({
                     <PopoverPrimitive.Content
                         align="start"
                         sideOffset={4}
-                        onOpenAutoFocus={e => e.preventDefault()}
-                        style={{ zIndex: 1400, maxHeight: 'min(240px, var(--radix-popover-content-available-height))' }}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        style={{
+                            zIndex: 1400,
+                            maxHeight: 'min(240px, var(--radix-popover-content-available-height))',
+                        }}
                         className={cn(
                             // pointer-events-auto: a modal Radix Dialog sets `pointer-events: none` on
                             // <body>; since this Popover portals to <body> (outside the dialog's layer),
@@ -320,14 +337,16 @@ export function SelectableAutocomplete<T>({
                                 {loading
                                     ? 'Loading...'
                                     : inputValue === ''
-                                        ? 'No results found'
-                                        : `No results for "${inputValue}"`}
+                                      ? 'No results found'
+                                      : `No results for "${inputValue}"`}
                             </div>
                         ) : (
                             <ul ref={listRef} role="listbox" className="py-1">
                                 {displayOptions.map((option, index) => {
                                     const optionLabel = getOptionLabel(option);
-                                    const isSelected = value ? isOptionEqualToValue(option, value) : false;
+                                    const isSelected = value
+                                        ? isOptionEqualToValue(option, value)
+                                        : false;
                                     const isHighlighted = index === highlightedIndex;
 
                                     return (
@@ -336,16 +355,18 @@ export function SelectableAutocomplete<T>({
                                             role="option"
                                             aria-selected={isSelected}
                                             data-highlighted={isHighlighted || undefined}
-                                            onMouseDown={e => e.preventDefault()}
+                                            onMouseDown={(e) => e.preventDefault()}
                                             onClick={() => handleSelect(option)}
                                             className={cn(
                                                 'cursor-pointer px-3 py-2 text-sm transition-colors',
                                                 'text-gray-900 dark:text-gray-100',
                                                 isHighlighted && 'bg-gray-100 dark:bg-gray-700',
                                                 isSelected &&
+                                                    !isHighlighted &&
+                                                    'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
                                                 !isHighlighted &&
-                                                'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
-                                                !isHighlighted && !isSelected && 'hover:bg-gray-50 dark:hover:bg-gray-700/50',
+                                                    !isSelected &&
+                                                    'hover:bg-gray-50 dark:hover:bg-gray-700/50',
                                             )}
                                         >
                                             <div className="font-semibold leading-tight">
@@ -368,7 +389,9 @@ export function SelectableAutocomplete<T>({
                 <p
                     className={cn(
                         'mt-1 text-xs',
-                        error ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400',
+                        error
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-gray-500 dark:text-gray-400',
                     )}
                 >
                     {helperText}

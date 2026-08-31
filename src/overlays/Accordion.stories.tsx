@@ -1,11 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from './Accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './Accordion';
 
 const meta = {
     title: 'Overlays/Accordion',

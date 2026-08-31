@@ -8,16 +8,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `bun run build` | Full production build (types + CJS + ESM + CSS) |
-| `bun run test` | Run all Jest tests |
-| `bun run test -- --testPathPattern=<pattern>` | Run a single test file |
-| `bun run storybook` | Start Storybook dev server (port 6006) |
-| `bun run format` | Format with Prettier |
-| `bun run format:check` | Check formatting |
-| `bun run yalc:publish` | Publish locally via yalc for testing in consuming apps |
-| `bun run yalc:watch` | Watch mode for local development with yalc |
+| Command                                       | Purpose                                                |
+| --------------------------------------------- | ------------------------------------------------------ |
+| `bun run build`                               | Full production build (types + CJS + ESM + CSS)        |
+| `bun run test`                                | Run all Jest tests                                     |
+| `bun run test -- --testPathPattern=<pattern>` | Run a single test file                                 |
+| `bun run storybook`                           | Start Storybook dev server (port 6006)                 |
+| `bun run format`                              | Format with Prettier                                   |
+| `bun run format:check`                        | Check formatting                                       |
+| `bun run yalc:publish`                        | Publish locally via yalc for testing in consuming apps |
+| `bun run yalc:watch`                          | Watch mode for local development with yalc             |
 
 ## Architecture
 

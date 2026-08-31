@@ -101,14 +101,9 @@ function Switch({
             name={name}
             value={value}
             required={required}
-            className={cn(
-                switchTrackVariants({ size, disabled }),
-                trackColorClasses,
-            )}
+            className={cn(switchTrackVariants({ size, disabled }), trackColorClasses)}
         >
-            <SwitchPrimitive.Thumb
-                className={switchThumbVariants({ size })}
-            />
+            <SwitchPrimitive.Thumb className={switchThumbVariants({ size })} />
         </SwitchPrimitive.Root>
     );
 

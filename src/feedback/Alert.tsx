@@ -43,14 +43,7 @@ const variantStyles: Record<
     },
 };
 
-function Alert({
-    variant = 'info',
-    title,
-    icon,
-    className,
-    children,
-    ...props
-}: AlertProps) {
+function Alert({ variant = 'info', title, icon, className, children, ...props }: AlertProps) {
     const styles = variantStyles[variant];
     return (
         <div

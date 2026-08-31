@@ -51,8 +51,7 @@ describe('splitHighlightedLines', () => {
     });
 
     it('produces a self-contained <a> when the anchor fits within a single line', () => {
-        const html =
-            '<pre><code class="hljs">"<a href="/bar">cu_abc123</a>"</code></pre>';
+        const html = '<pre><code class="hljs">"<a href="/bar">cu_abc123</a>"</code></pre>';
         const lines = splitHighlightedLines(html);
         expect(lines).toEqual(['"<a href="/bar">cu_abc123</a>"']);
     });

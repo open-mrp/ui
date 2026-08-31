@@ -6,9 +6,7 @@ import * as React from 'react';
 
 import { cn } from '@/utils/cn';
 
-function Accordion({
-    ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Root>) {
+function Accordion({ ...props }: React.ComponentProps<typeof AccordionPrimitive.Root>) {
     return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
 }
 
@@ -19,7 +17,10 @@ function AccordionItem({
     return (
         <AccordionPrimitive.Item
             data-slot="accordion-item"
-            className={cn('border-b border-gray-200 dark:border-gray-700 last:border-b-0', className)}
+            className={cn(
+                'border-b border-gray-200 dark:border-gray-700 last:border-b-0',
+                className,
+            )}
             {...props}
         />
     );

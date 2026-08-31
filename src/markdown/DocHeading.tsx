@@ -109,10 +109,7 @@ export default function DocHeading({
     isOptional,
     id: idProp,
 }: DocHeadingProps) {
-    const id = useMemo(
-        () => idProp ?? createSlug(getTextContent(children)),
-        [children, idProp],
-    );
+    const id = useMemo(() => idProp ?? createSlug(getTextContent(children)), [children, idProp]);
 
     const [copied, setCopied] = useState(false);
 

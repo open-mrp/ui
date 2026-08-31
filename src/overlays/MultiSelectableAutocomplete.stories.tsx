@@ -33,7 +33,9 @@ async function fetchTeamMembers({
     const query = search?.trim().toLowerCase() ?? '';
     const filtered = TEAM_MEMBERS.filter((member) => {
         if (query === '') return true;
-        return member.name.toLowerCase().includes(query) || member.role.toLowerCase().includes(query);
+        return (
+            member.name.toLowerCase().includes(query) || member.role.toLowerCase().includes(query)
+        );
     }).slice(0, limit ?? TEAM_MEMBERS.length);
 
     return Promise.resolve({

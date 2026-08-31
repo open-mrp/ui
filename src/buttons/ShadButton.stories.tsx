@@ -366,9 +366,15 @@ export const AllSizes: Story = {
             <Button size="sm">Small</Button>
             <Button size="default">Default</Button>
             <Button size="lg">Large</Button>
-            <Button size="icon-sm"><Settings /></Button>
-            <Button size="icon"><Search /></Button>
-            <Button size="icon-lg"><Folder /></Button>
+            <Button size="icon-sm">
+                <Settings />
+            </Button>
+            <Button size="icon">
+                <Search />
+            </Button>
+            <Button size="icon-lg">
+                <Folder />
+            </Button>
         </div>
     ),
 };

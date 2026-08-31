@@ -35,8 +35,7 @@ const getBrowserStorage = (): StorageLike | null => {
         };
 
         const candidate = maybeWindow.localStorage as
-            | (StorageLike & { [key: string]: unknown })
-            | undefined;
+            (StorageLike & { [key: string]: unknown }) | undefined;
 
         if (!candidate) return null;
 

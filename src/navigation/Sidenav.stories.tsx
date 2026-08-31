@@ -86,7 +86,11 @@ export const Basic: Story = {
             {
                 title: 'Components Library',
                 links: [
-                    { href: '/buttons', children: 'Buttons & Interactive Elements', icon: <Settings className="w-4 h-4" /> },
+                    {
+                        href: '/buttons',
+                        children: 'Buttons & Interactive Elements',
+                        icon: <Settings className="w-4 h-4" />,
+                    },
                     { href: '/forms', children: 'Forms & Input Components' },
                     { href: '/cards', children: 'Cards & Container Components' },
                     { href: '/layout', children: 'Layout & Grid Systems' },
@@ -266,7 +270,11 @@ export const DeepNestingWithIcons: Story = {
                     {
                         title: 'Level1',
                         items: [
-                            { href: '/level1/overview', children: 'Overview', icon: <FileText className="w-4 h-4" /> },
+                            {
+                                href: '/level1/overview',
+                                children: 'Overview',
+                                icon: <FileText className="w-4 h-4" />,
+                            },
                             {
                                 title: 'Level2',
                                 items: [

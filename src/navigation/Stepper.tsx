@@ -34,7 +34,8 @@ function Stepper({
         return (
             <ol data-slot="stepper" className={cn('flex flex-col gap-2', className)}>
                 {steps.map((step, i) => {
-                    const state = i < activeIndex ? 'completed' : i === activeIndex ? 'active' : 'upcoming';
+                    const state =
+                        i < activeIndex ? 'completed' : i === activeIndex ? 'active' : 'upcoming';
                     const clickable = onStepClick && i <= maxReach;
                     return (
                         <li key={step.label} className="flex items-start gap-3">
@@ -72,12 +73,10 @@ function Stepper({
     }
 
     return (
-        <ol
-            data-slot="stepper"
-            className={cn('flex items-center w-full', className)}
-        >
+        <ol data-slot="stepper" className={cn('flex items-center w-full', className)}>
             {steps.map((step, i) => {
-                const state = i < activeIndex ? 'completed' : i === activeIndex ? 'active' : 'upcoming';
+                const state =
+                    i < activeIndex ? 'completed' : i === activeIndex ? 'active' : 'upcoming';
                 const clickable = onStepClick && i <= maxReach;
                 return (
                     <React.Fragment key={step.label}>
@@ -132,8 +131,7 @@ function StepIndicator({
         <span
             className={cn(
                 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors',
-                state === 'completed' &&
-                    'border-[var(--primary)] bg-[var(--primary)] text-white',
+                state === 'completed' && 'border-[var(--primary)] bg-[var(--primary)] text-white',
                 state === 'active' &&
                     'border-[var(--primary)] bg-white dark:bg-gray-900 text-[var(--primary)]',
                 state === 'upcoming' &&

@@ -39,7 +39,11 @@ function withGlobalFlags(pattern: RegExp): RegExp {
     return new RegExp(pattern.source, flags);
 }
 
-function collectMatches(text: string, pattern: LinkPattern, patternIndex: number): AnnotatedMatch[] {
+function collectMatches(
+    text: string,
+    pattern: LinkPattern,
+    patternIndex: number,
+): AnnotatedMatch[] {
     const re = withGlobalFlags(pattern.pattern);
     const out: AnnotatedMatch[] = [];
     let m: RegExpExecArray | null;

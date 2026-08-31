@@ -109,10 +109,7 @@ const nestedSection: NavSubSectionData = {
 
 export const FlatItems: Story = {
     render: () => (
-        <InteractiveWrapper
-            subSection={flatSection}
-            initialActive="/inventory/warehouses"
-        />
+        <InteractiveWrapper subSection={flatSection} initialActive="/inventory/warehouses" />
     ),
 };
 
@@ -124,9 +121,6 @@ export const Nested: Story = {
 
 export const CollapsedByDefault: Story = {
     render: () => (
-        <InteractiveWrapper
-            subSection={flatSection}
-            initialActive="/somewhere-unrelated"
-        />
+        <InteractiveWrapper subSection={flatSection} initialActive="/somewhere-unrelated" />
     ),
 };

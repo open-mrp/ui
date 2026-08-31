@@ -16,7 +16,14 @@ export interface NavItemProps {
     }) => React.ReactNode;
 }
 
-export default function NavItem({ href, children, icon, active, onClick, renderLink }: NavItemProps) {
+export default function NavItem({
+    href,
+    children,
+    icon,
+    active,
+    onClick,
+    renderLink,
+}: NavItemProps) {
     const ref = useRef<HTMLDivElement>(null);
     const hasMountedRef = useRef(false);
 

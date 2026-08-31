@@ -57,7 +57,7 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
     const [value, setValue] = useState<AddressValue>(initial);
 
     const update = (field: keyof AddressValue, v: string | boolean) =>
-        setValue(prev => ({ ...prev, [field]: v }));
+        setValue((prev) => ({ ...prev, [field]: v }));
 
     return (
         <div className="flex flex-col gap-3">
@@ -65,35 +65,35 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                 label="Address Name"
                 placeholder="Ex. Acme Inc. or Home Office"
                 value={value.name}
-                onChange={e => update('name', e.target.value)}
+                onChange={(e) => update('name', e.target.value)}
                 variant="outlined"
                 required
             />
             <Input
                 label="Address Line 1"
                 value={value.addressLine1}
-                onChange={e => update('addressLine1', e.target.value)}
+                onChange={(e) => update('addressLine1', e.target.value)}
                 variant="outlined"
                 required
             />
             <Input
                 label="Address Line 2"
                 value={value.addressLine2}
-                onChange={e => update('addressLine2', e.target.value)}
+                onChange={(e) => update('addressLine2', e.target.value)}
                 variant="outlined"
             />
             <div className="grid grid-cols-[2fr_1fr] gap-3">
                 <Input
                     label="City"
                     value={value.city}
-                    onChange={e => update('city', e.target.value)}
+                    onChange={(e) => update('city', e.target.value)}
                     variant="outlined"
                     required
                 />
                 <Input
                     label="State"
                     value={value.state}
-                    onChange={e => update('state', e.target.value)}
+                    onChange={(e) => update('state', e.target.value)}
                     variant="outlined"
                     required
                 />
@@ -102,7 +102,7 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                 <Input
                     label="Postal Code"
                     value={value.postalCode}
-                    onChange={e => update('postalCode', e.target.value)}
+                    onChange={(e) => update('postalCode', e.target.value)}
                     variant="outlined"
                     required
                 />
@@ -110,13 +110,13 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                     label="Country"
                     options={COUNTRY_OPTIONS}
                     value={value.country}
-                    onChange={v => update('country', v ?? 'US')}
+                    onChange={(v) => update('country', v ?? 'US')}
                     variant="outlined"
                 />
             </div>
             <Switch
                 checked={value.isDropShip}
-                onCheckedChange={checked => update('isDropShip', checked)}
+                onCheckedChange={(checked) => update('isDropShip', checked)}
                 label="Drop ship address"
             />
             {value.isDropShip && (
@@ -125,7 +125,7 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                         label="Phone"
                         placeholder="555-555-5555"
                         value={value.phone}
-                        onChange={e => update('phone', e.target.value)}
+                        onChange={(e) => update('phone', e.target.value)}
                         variant="outlined"
                         containerClassName="flex-1"
                     />
@@ -133,7 +133,7 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                         label="Email"
                         placeholder="contact@example.com"
                         value={value.email}
-                        onChange={e => update('email', e.target.value)}
+                        onChange={(e) => update('email', e.target.value)}
                         variant="outlined"
                         containerClassName="flex-1"
                     />
@@ -165,7 +165,9 @@ const meta = {
     decorators: [
         (Story) => (
             <div className="w-[480px] p-6 border border-gray-200 rounded-lg bg-white dark:bg-gray-900 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Edit address details</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    Edit address details
+                </h2>
                 <Story />
             </div>
         ),
@@ -202,7 +204,7 @@ export const ValidationError: Story = {
     render: () => {
         const [value, setValue] = useState(FILLED_ADDRESS);
         const update = (field: keyof AddressValue, v: string | boolean) =>
-            setValue(prev => ({ ...prev, [field]: v }));
+            setValue((prev) => ({ ...prev, [field]: v }));
 
         return (
             <div className="flex flex-col gap-3">
@@ -210,35 +212,35 @@ export const ValidationError: Story = {
                     label="Address Name"
                     placeholder="Ex. Acme Inc. or Home Office"
                     value={value.name}
-                    onChange={e => update('name', e.target.value)}
+                    onChange={(e) => update('name', e.target.value)}
                     variant="outlined"
                     required
                 />
                 <Input
                     label="Address Line 1"
                     value={value.addressLine1}
-                    onChange={e => update('addressLine1', e.target.value)}
+                    onChange={(e) => update('addressLine1', e.target.value)}
                     variant="outlined"
                     required
                 />
                 <Input
                     label="Address Line 2"
                     value={value.addressLine2}
-                    onChange={e => update('addressLine2', e.target.value)}
+                    onChange={(e) => update('addressLine2', e.target.value)}
                     variant="outlined"
                 />
                 <div className="grid grid-cols-[2fr_1fr] gap-3">
                     <Input
                         label="City"
                         value={value.city}
-                        onChange={e => update('city', e.target.value)}
+                        onChange={(e) => update('city', e.target.value)}
                         variant="outlined"
                         required
                     />
                     <Input
                         label="State"
                         value={value.state}
-                        onChange={e => update('state', e.target.value)}
+                        onChange={(e) => update('state', e.target.value)}
                         variant="outlined"
                         required
                     />
@@ -247,7 +249,7 @@ export const ValidationError: Story = {
                     <Input
                         label="Postal Code"
                         value={value.postalCode}
-                        onChange={e => update('postalCode', e.target.value)}
+                        onChange={(e) => update('postalCode', e.target.value)}
                         variant="outlined"
                         required
                     />
@@ -255,7 +257,7 @@ export const ValidationError: Story = {
                         label="Country"
                         options={COUNTRY_OPTIONS}
                         value={value.country}
-                        onChange={v => update('country', v ?? 'US')}
+                        onChange={(v) => update('country', v ?? 'US')}
                         variant="outlined"
                     />
                 </div>
@@ -277,7 +279,9 @@ export const CorrectionDiff: Story = {
     render: () => (
         <div className="flex flex-col gap-3">
             <div className="p-3 border border-blue-400 rounded bg-white dark:bg-gray-900">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">Suggested corrections</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    Suggested corrections
+                </p>
                 <div className="grid grid-cols-[1fr_auto_1fr] gap-1 items-center">
                     <span className="text-xs font-semibold text-gray-500">Your input</span>
                     <span />
@@ -285,12 +289,16 @@ export const CorrectionDiff: Story = {
 
                     <div>
                         <span className="text-xs text-gray-500">Address Line 1</span>
-                        <p className="text-sm line-through text-red-600 break-words">7869 West Main Street</p>
+                        <p className="text-sm line-through text-red-600 break-words">
+                            7869 West Main Street
+                        </p>
                     </div>
                     <span className="text-gray-400 px-1">&rarr;</span>
                     <div>
                         <span className="text-xs text-gray-500">Address Line 1</span>
-                        <p className="text-sm font-medium text-emerald-600 break-words">7869 W Main St</p>
+                        <p className="text-sm font-medium text-emerald-600 break-words">
+                            7869 W Main St
+                        </p>
                     </div>
 
                     <div>
@@ -300,14 +308,22 @@ export const CorrectionDiff: Story = {
                     <span className="text-gray-400 px-1">&rarr;</span>
                     <div>
                         <span className="text-xs text-gray-500">Postal Code</span>
-                        <p className="text-sm font-medium text-emerald-600 break-words">70360-4461</p>
+                        <p className="text-sm font-medium text-emerald-600 break-words">
+                            70360-4461
+                        </p>
                     </div>
                 </div>
             </div>
             <div className="flex gap-2 justify-end mt-2">
-                <Button variant="outlined" color="primary">Cancel</Button>
-                <Button variant="outlined" color="primary">Keep original</Button>
-                <Button variant="contained" color="primary">Accept corrections</Button>
+                <Button variant="outlined" color="primary">
+                    Cancel
+                </Button>
+                <Button variant="outlined" color="primary">
+                    Keep original
+                </Button>
+                <Button variant="contained" color="primary">
+                    Accept corrections
+                </Button>
             </div>
         </div>
     ),

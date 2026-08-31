@@ -8,75 +8,71 @@ import { cn } from '@/utils/cn';
 
 export type InputVariant = 'outlined' | 'line' | 'plain';
 
-const inputContainerVariants = cva(
-    'group relative flex items-center transition-colors',
-    {
-        variants: {
-            variant: {
-                outlined: [
-                    'rounded-md border',
-                    'focus-within:border-[var(--primary)] focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
-                ],
-                line: 'bg-transparent',
-                plain: 'bg-transparent',
-            },
-            size: {
-                sm: 'py-1 text-xs',
-                md: 'py-2 text-sm',
-                lg: 'py-2.5 text-base',
-            },
-            blur: {
-                true: 'backdrop-blur-md',
-                false: '',
-            },
-            error: {
-                true: '',
-                false: '',
-            },
-            disabled: {
-                true: 'opacity-50 cursor-default',
-                false: '',
-            },
+const inputContainerVariants = cva('group relative flex items-center transition-colors', {
+    variants: {
+        variant: {
+            outlined: [
+                'rounded-md border',
+                'focus-within:border-[var(--primary)] focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
+            ],
+            line: 'bg-transparent',
+            plain: 'bg-transparent',
         },
-        compoundVariants: [
-            // outlined + blur
-            {
-                variant: 'outlined',
-                blur: true,
-                className: 'bg-white/60 dark:bg-gray-900/60 border-white/30 dark:border-white/15',
-            },
-            // outlined + no blur + no error
-            {
-                variant: 'outlined',
-                blur: false,
-                error: false,
-                className:
-                    'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600',
-            },
-            // outlined + no blur + error
-            {
-                variant: 'outlined',
-                blur: false,
-                error: true,
-                className: 'bg-white dark:bg-gray-900',
-            },
-            // outlined + error (any blur)
-            {
-                variant: 'outlined',
-                error: true,
-                className:
-                    'border-red-500 focus-within:border-red-500 focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]',
-            },
-        ],
-        defaultVariants: {
-            variant: 'outlined',
-            size: 'md',
-            blur: false,
-            error: false,
-            disabled: false,
+        size: {
+            sm: 'py-1 text-xs',
+            md: 'py-2 text-sm',
+            lg: 'py-2.5 text-base',
+        },
+        blur: {
+            true: 'backdrop-blur-md',
+            false: '',
+        },
+        error: {
+            true: '',
+            false: '',
+        },
+        disabled: {
+            true: 'opacity-50 cursor-default',
+            false: '',
         },
     },
-);
+    compoundVariants: [
+        // outlined + blur
+        {
+            variant: 'outlined',
+            blur: true,
+            className: 'bg-white/60 dark:bg-gray-900/60 border-white/30 dark:border-white/15',
+        },
+        // outlined + no blur + no error
+        {
+            variant: 'outlined',
+            blur: false,
+            error: false,
+            className: 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600',
+        },
+        // outlined + no blur + error
+        {
+            variant: 'outlined',
+            blur: false,
+            error: true,
+            className: 'bg-white dark:bg-gray-900',
+        },
+        // outlined + error (any blur)
+        {
+            variant: 'outlined',
+            error: true,
+            className:
+                'border-red-500 focus-within:border-red-500 focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]',
+        },
+    ],
+    defaultVariants: {
+        variant: 'outlined',
+        size: 'md',
+        blur: false,
+        error: false,
+        disabled: false,
+    },
+});
 
 export type InputProps = Omit<React.ComponentProps<'input'>, 'size' | 'prefix'> & {
     ref?: React.Ref<HTMLInputElement>;
@@ -140,11 +136,12 @@ function Input({
                         error,
                         disabled,
                     }),
-                    variant !== 'plain' && {
-                        sm: 'px-2',
-                        md: 'px-3',
-                        lg: 'px-4',
-                    }[size],
+                    variant !== 'plain' &&
+                        {
+                            sm: 'px-2',
+                            md: 'px-3',
+                            lg: 'px-4',
+                        }[size],
                     containerClassName,
                 )}
             >
@@ -168,7 +165,7 @@ function Input({
                 {clearable && hasValue && !loading && (
                     <button
                         type="button"
-                        onClick={e => {
+                        onClick={(e) => {
                             e.stopPropagation();
                             onClear?.();
                             inputRef.current?.focus();
@@ -189,9 +186,7 @@ function Input({
                             error
                                 ? 'bg-red-500 group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
                                 : cn(
-                                      blur
-                                          ? 'bg-white/30'
-                                          : 'bg-gray-300 dark:bg-gray-600',
+                                      blur ? 'bg-white/30' : 'bg-gray-300 dark:bg-gray-600',
                                       'group-focus-within:!bg-[var(--primary)]',
                                   ),
                             'group-focus-within:h-[3px]',

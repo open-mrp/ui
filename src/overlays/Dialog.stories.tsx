@@ -67,8 +67,8 @@ export const Confirmation: Story = {
                 <DialogHeader>
                     <DialogTitle>Delete this warehouse?</DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. All inventory must be transferred
-                        before the warehouse can be deleted.
+                        This action cannot be undone. All inventory must be transferred before the
+                        warehouse can be deleted.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -97,11 +97,10 @@ export const LongContent: Story = {
                     <div className="flex flex-col gap-3 text-sm">
                         {Array.from({ length: 10 }).map((_, i) => (
                             <p key={i}>
-                                Section {i + 1}. Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                consequat.
+                                Section {i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing
+                                elit. Sed do eiusmod tempor incididunt ut labore et dolore magna
+                                aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                                laboris nisi ut aliquip ex ea commodo consequat.
                             </p>
                         ))}
                     </div>

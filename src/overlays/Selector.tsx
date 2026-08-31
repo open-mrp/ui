@@ -90,8 +90,8 @@ export function Selector(props: SelectorProps) {
             selectedAtOpenRef.current = multi
                 ? new Set(props.value)
                 : props.value !== null
-                    ? new Set([props.value])
-                    : new Set<string>();
+                  ? new Set([props.value])
+                  : new Set<string>();
         } else {
             selectedAtOpenRef.current = new Set();
         }
@@ -101,13 +101,13 @@ export function Selector(props: SelectorProps) {
     // Filter by search, then pin snapshot-selected options to the top.
     const filteredOptions = useMemo(() => {
         const base = search
-            ? options.filter(o => {
-                const lower = search.toLowerCase();
-                return (
-                    o.label.toLowerCase().includes(lower) ||
-                    o.description?.toLowerCase().includes(lower)
-                );
-            })
+            ? options.filter((o) => {
+                  const lower = search.toLowerCase();
+                  return (
+                      o.label.toLowerCase().includes(lower) ||
+                      o.description?.toLowerCase().includes(lower)
+                  );
+              })
             : options;
         const selectedSet = selectedAtOpenRef.current;
         if (selectedSet.size === 0) return base;
@@ -142,7 +142,7 @@ export function Selector(props: SelectorProps) {
             return null; // multi mode shows pills instead
         }
         if (props.value === null) return null;
-        const selected = options.find(o => o.value === props.value);
+        const selected = options.find((o) => o.value === props.value);
         if (!selected) return null;
         if (triggerField === 'description') {
             return selected.description ?? selected.label;
@@ -151,9 +151,7 @@ export function Selector(props: SelectorProps) {
     })();
 
     // Selected values for multi mode
-    const selectedOptions = multi
-        ? options.filter(o => props.value.includes(o.value))
-        : [];
+    const selectedOptions = multi ? options.filter((o) => props.value.includes(o.value)) : [];
 
     function handleSelect(option: SelectorOption) {
         if (option.disabled) return;
@@ -161,7 +159,7 @@ export function Selector(props: SelectorProps) {
         if (multi) {
             const currentValue = props.value;
             if (currentValue.includes(option.value)) {
-                props.onChange(currentValue.filter(v => v !== option.value));
+                props.onChange(currentValue.filter((v) => v !== option.value));
             } else {
                 props.onChange([...currentValue, option.value]);
             }
@@ -182,7 +180,7 @@ export function Selector(props: SelectorProps) {
     function handleRemovePill(value: string, e: React.MouseEvent) {
         e.stopPropagation();
         if (multi) {
-            props.onChange(props.value.filter(v => v !== value));
+            props.onChange(props.value.filter((v) => v !== value));
         }
     }
 
@@ -198,15 +196,11 @@ export function Selector(props: SelectorProps) {
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
-                setHighlightedIndex(prev =>
-                    prev < filteredOptions.length - 1 ? prev + 1 : 0,
-                );
+                setHighlightedIndex((prev) => (prev < filteredOptions.length - 1 ? prev + 1 : 0));
                 break;
             case 'ArrowUp':
                 e.preventDefault();
-                setHighlightedIndex(prev =>
-                    prev > 0 ? prev - 1 : filteredOptions.length - 1,
-                );
+                setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : filteredOptions.length - 1));
                 break;
             case 'Enter':
                 e.preventDefault();
@@ -253,11 +247,12 @@ export function Selector(props: SelectorProps) {
                         onKeyDown={handleKeyDown}
                         className={cn(
                             'flex w-full cursor-pointer items-center gap-1 text-left transition-colors',
-                            variant !== 'plain' && {
-                                sm: 'px-2',
-                                md: 'px-3',
-                                lg: 'px-4',
-                            }[size],
+                            variant !== 'plain' &&
+                                {
+                                    sm: 'px-2',
+                                    md: 'px-3',
+                                    lg: 'px-4',
+                                }[size],
                             {
                                 sm: 'min-h-[30px] py-1 text-xs',
                                 md: 'min-h-[38px] py-2 text-sm',
@@ -282,7 +277,7 @@ export function Selector(props: SelectorProps) {
                     >
                         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
                             {multi && selectedOptions.length > 0 ? (
-                                selectedOptions.map(opt => (
+                                selectedOptions.map((opt) => (
                                     <span
                                         key={opt.value}
                                         className={cn(
@@ -294,7 +289,7 @@ export function Selector(props: SelectorProps) {
                                         {opt.label}
                                         <button
                                             type="button"
-                                            onClick={e => handleRemovePill(opt.value, e)}
+                                            onClick={(e) => handleRemovePill(opt.value, e)}
                                             disabled={disabled}
                                             className="cursor-pointer rounded-full p-0.5 hover:bg-[var(--primary)]/30 dark:hover:bg-[var(--primary)]/40"
                                             aria-label={`Remove ${opt.label}`}
@@ -307,9 +302,7 @@ export function Selector(props: SelectorProps) {
                                 <span
                                     className={cn(
                                         'truncate',
-                                        blur
-                                            ? 'text-white'
-                                            : 'text-gray-900 dark:text-gray-100',
+                                        blur ? 'text-white' : 'text-gray-900 dark:text-gray-100',
                                     )}
                                 >
                                     {displayText}
@@ -318,9 +311,7 @@ export function Selector(props: SelectorProps) {
                                 <span
                                     className={cn(
                                         'truncate',
-                                        blur
-                                            ? 'text-white/40'
-                                            : 'text-gray-400 dark:text-gray-500',
+                                        blur ? 'text-white/40' : 'text-gray-400 dark:text-gray-500',
                                     )}
                                 >
                                     {placeholder}
@@ -330,7 +321,7 @@ export function Selector(props: SelectorProps) {
                         {clearable && hasValue && (
                             <button
                                 type="button"
-                                onClick={e => {
+                                onClick={(e) => {
                                     e.stopPropagation();
                                     handleClear();
                                 }}
@@ -358,14 +349,12 @@ export function Selector(props: SelectorProps) {
                                 error
                                     ? 'bg-red-500 group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
                                     : cn(
-                                        blur
-                                            ? 'bg-white/30'
-                                            : 'bg-gray-300 dark:bg-gray-600',
-                                        'group-focus-within:!bg-[var(--primary)]',
-                                    ),
+                                          blur ? 'bg-white/30' : 'bg-gray-300 dark:bg-gray-600',
+                                          'group-focus-within:!bg-[var(--primary)]',
+                                      ),
                                 'group-focus-within:h-[3px]',
                                 !error &&
-                                'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
+                                    'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
                             )}
                         />
                     </div>
@@ -375,14 +364,17 @@ export function Selector(props: SelectorProps) {
                     <PopoverPrimitive.Content
                         align="start"
                         sideOffset={4}
-                        onOpenAutoFocus={e => {
+                        onOpenAutoFocus={(e) => {
                             e.preventDefault();
                             if (searchable) {
                                 searchInputRef.current?.focus();
                             }
                         }}
                         onKeyDown={handleKeyDown}
-                        style={{ zIndex: 1400, maxHeight: 'min(240px, var(--radix-popover-content-available-height))' }}
+                        style={{
+                            zIndex: 1400,
+                            maxHeight: 'min(240px, var(--radix-popover-content-available-height))',
+                        }}
                         className={cn(
                             'min-w-[var(--radix-popover-trigger-width)] w-max max-w-[min(480px,var(--radix-popover-content-available-width))] overflow-auto rounded-md border shadow-md outline-hidden',
                             'backdrop-blur-md bg-white/60 border-white/20 dark:bg-gray-900/60 dark:border-white/10',
@@ -400,7 +392,7 @@ export function Selector(props: SelectorProps) {
                                     size="sm"
                                     placeholder={searchPlaceholder}
                                     value={search}
-                                    onChange={e => {
+                                    onChange={(e) => {
                                         setSearch(e.target.value);
                                         setHighlightedIndex(-1);
                                     }}
@@ -419,9 +411,7 @@ export function Selector(props: SelectorProps) {
                         )}
                         {filteredOptions.length === 0 ? (
                             <div className="px-3 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                                {search
-                                    ? `No results for "${search}"`
-                                    : 'No options available'}
+                                {search ? `No results for "${search}"` : 'No options available'}
                             </div>
                         ) : (
                             <ul
@@ -449,13 +439,12 @@ export function Selector(props: SelectorProps) {
                                                 'text-gray-900 dark:text-gray-100',
                                                 isHighlighted && 'bg-gray-200 dark:bg-gray-700',
                                                 selected &&
+                                                    !isHighlighted &&
+                                                    'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
                                                 !isHighlighted &&
-                                                'bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20',
-                                                !isHighlighted &&
-                                                !selected &&
-                                                'hover:bg-gray-200 dark:hover:bg-gray-700/50',
-                                                option.disabled &&
-                                                'cursor-default opacity-50',
+                                                    !selected &&
+                                                    'hover:bg-gray-200 dark:hover:bg-gray-700/50',
+                                                option.disabled && 'cursor-default opacity-50',
                                             )}
                                         >
                                             {multi && (
@@ -480,7 +469,8 @@ export function Selector(props: SelectorProps) {
                                                     )}
                                                 </div>
                                             )}
-                                            {descriptionPosition === 'inline' && option.description ? (
+                                            {descriptionPosition === 'inline' &&
+                                            option.description ? (
                                                 <div className="flex min-w-0 flex-1 items-baseline gap-2">
                                                     <div className="font-semibold leading-tight">
                                                         {option.label}

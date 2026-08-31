@@ -127,9 +127,7 @@ export default function Button({
     // reference it. This lets consumers override hover/background via `className`
     // (e.g. `hover:bg-red-500`), which inline `style` would otherwise block.
     const buttonStyle = {
-        ...(isContained
-            ? { '--ui-btn-bg': resolvedColor }
-            : { '--ui-btn-fg': resolvedColor }),
+        ...(isContained ? { '--ui-btn-bg': resolvedColor } : { '--ui-btn-fg': resolvedColor }),
         ...style,
     } as React.CSSProperties;
 

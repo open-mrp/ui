@@ -101,14 +101,8 @@ export const Controlled: Story = {
         const [checked, setChecked] = useState(false);
         return (
             <div className="flex flex-col gap-2">
-                <Switch
-                    checked={checked}
-                    onCheckedChange={setChecked}
-                    label="Controlled switch"
-                />
-                <p className="text-xs text-gray-500">
-                    State: {checked ? 'on' : 'off'}
-                </p>
+                <Switch checked={checked} onCheckedChange={setChecked} label="Controlled switch" />
+                <p className="text-xs text-gray-500">State: {checked ? 'on' : 'off'}</p>
             </div>
         );
     },

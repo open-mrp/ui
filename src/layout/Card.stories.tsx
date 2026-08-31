@@ -1,14 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import Button from '../buttons/Button';
-import {
-    Card,
-    CardBody,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from './Card';
+import { Card, CardBody, CardDescription, CardFooter, CardHeader, CardTitle } from './Card';
 
 const meta = {
     title: 'Layout/Card',
@@ -32,9 +25,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
     render: () => (
         <Card>
-            <CardBody>
-                A minimal card with only a body.
-            </CardBody>
+            <CardBody>A minimal card with only a body.</CardBody>
         </Card>
     ),
 };
@@ -76,8 +67,8 @@ export const Unstyled: Story = {
             <CardHeader>
                 <CardTitle>Frameless card</CardTitle>
                 <CardDescription>
-                    Renders without border or shadow — useful when nested inside a
-                    larger composite that owns the frame.
+                    Renders without border or shadow — useful when nested inside a larger composite
+                    that owns the frame.
                 </CardDescription>
             </CardHeader>
             <CardBody>

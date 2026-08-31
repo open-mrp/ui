@@ -117,10 +117,10 @@ export function MultiSelectableAutocomplete<T>({
     if (open !== prevOpenRef.current) {
         if (open) {
             const pinnedNow = value.map(
-                v => fetchedOptions.find(item => isOptionEqualToValue(item, v)) ?? v,
+                (v) => fetchedOptions.find((item) => isOptionEqualToValue(item, v)) ?? v,
             );
             const restNow = fetchedOptions.filter(
-                item => !value.some(v => isOptionEqualToValue(item, v)),
+                (item) => !value.some((v) => isOptionEqualToValue(item, v)),
             );
             displayOrderAtOpenRef.current = [...pinnedNow, ...restNow];
         } else {
@@ -134,22 +134,22 @@ export function MultiSelectableAutocomplete<T>({
     const displayOptions = useMemo(() => {
         const order = displayOrderAtOpenRef.current;
         if (order.length === 0) return fetchedOptions;
-        const orderedExisting = order.filter(o =>
-            fetchedOptions.some(f => isOptionEqualToValue(f, o)),
+        const orderedExisting = order.filter((o) =>
+            fetchedOptions.some((f) => isOptionEqualToValue(f, o)),
         );
         const newItems = fetchedOptions.filter(
-            f => !order.some(o => isOptionEqualToValue(f, o)),
+            (f) => !order.some((o) => isOptionEqualToValue(f, o)),
         );
         return [...orderedExisting, ...newItems];
     }, [fetchedOptions, open, isOptionEqualToValue]);
 
     function isSelected(option: T): boolean {
-        return value.some(v => isOptionEqualToValue(option, v));
+        return value.some((v) => isOptionEqualToValue(option, v));
     }
 
     function handleToggle(option: T) {
         if (isSelected(option)) {
-            onSelect(value.filter(v => !isOptionEqualToValue(option, v)));
+            onSelect(value.filter((v) => !isOptionEqualToValue(option, v)));
         } else {
             onSelect([...value, { ...option }]);
         }
@@ -185,11 +185,11 @@ export function MultiSelectableAutocomplete<T>({
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
-                setHighlightedIndex(prev => (prev < displayOptions.length - 1 ? prev + 1 : 0));
+                setHighlightedIndex((prev) => (prev < displayOptions.length - 1 ? prev + 1 : 0));
                 break;
             case 'ArrowUp':
                 e.preventDefault();
-                setHighlightedIndex(prev => (prev > 0 ? prev - 1 : displayOptions.length - 1));
+                setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : displayOptions.length - 1));
                 break;
             case 'Enter':
                 e.preventDefault();
@@ -229,10 +229,7 @@ export function MultiSelectableAutocomplete<T>({
                 <PopoverPrimitive.Anchor asChild>
                     <div
                         ref={anchorRef}
-                        className={cn(
-                            'group relative',
-                            disabled && 'opacity-50 cursor-default',
-                        )}
+                        className={cn('group relative', disabled && 'opacity-50 cursor-default')}
                     >
                         <div
                             className={cn(
@@ -241,9 +238,13 @@ export function MultiSelectableAutocomplete<T>({
                                 blur && 'backdrop-blur-md',
                                 variant === 'outlined' && [
                                     'rounded-md border',
-                                    blur ? 'bg-white/60 dark:bg-gray-900/60' : 'bg-white dark:bg-gray-900',
+                                    blur
+                                        ? 'bg-white/60 dark:bg-gray-900/60'
+                                        : 'bg-white dark:bg-gray-900',
                                     'focus-within:border-[var(--primary)] focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
-                                    blur ? 'border-white/30 dark:border-white/15' : 'dark:border-gray-700',
+                                    blur
+                                        ? 'border-white/30 dark:border-white/15'
+                                        : 'dark:border-gray-700',
                                     error
                                         ? 'border-red-500 focus-within:border-red-500 focus-within:shadow-[0_0_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
                                         : !blur && 'border-gray-300 dark:border-gray-600',
@@ -266,7 +267,7 @@ export function MultiSelectableAutocomplete<T>({
                                         {itemLabel.primary}
                                         <button
                                             type="button"
-                                            onClick={e => {
+                                            onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleRemove(index);
                                             }}
@@ -280,7 +281,16 @@ export function MultiSelectableAutocomplete<T>({
                                 );
                             })}
                             <div className="flex min-w-[80px] flex-1 items-center">
-                                {showSearchIcon && <Search className={cn('mr-1.5 h-4 w-4 shrink-0', blur ? 'text-white/50' : 'text-gray-400 dark:text-gray-500')} />}
+                                {showSearchIcon && (
+                                    <Search
+                                        className={cn(
+                                            'mr-1.5 h-4 w-4 shrink-0',
+                                            blur
+                                                ? 'text-white/50'
+                                                : 'text-gray-400 dark:text-gray-500',
+                                        )}
+                                    />
+                                )}
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -291,7 +301,7 @@ export function MultiSelectableAutocomplete<T>({
                                     disabled={disabled}
                                     placeholder={value.length === 0 ? placeholder : ''}
                                     value={query}
-                                    onChange={e => {
+                                    onChange={(e) => {
                                         setTouched(true);
                                         setQuery(e.target.value);
                                         setHighlightedIndex(-1);
@@ -310,7 +320,7 @@ export function MultiSelectableAutocomplete<T>({
                                     onClick={() => {
                                         setTouched(true);
                                         if (wasFocusedOnMouseDownRef.current) {
-                                            setOpen(prev => !prev);
+                                            setOpen((prev) => !prev);
                                         } else {
                                             setOpen(true);
                                         }
@@ -325,7 +335,9 @@ export function MultiSelectableAutocomplete<T>({
                                     )}
                                 />
                             </div>
-                            {loading && <Loader2 className="ml-1 h-4 w-4 shrink-0 animate-spin text-gray-400" />}
+                            {loading && (
+                                <Loader2 className="ml-1 h-4 w-4 shrink-0 animate-spin text-gray-400" />
+                            )}
                             {clearable && value.length > 0 && !loading && (
                                 <button
                                     type="button"
@@ -344,9 +356,15 @@ export function MultiSelectableAutocomplete<T>({
                                         'absolute inset-x-0 top-0 h-0.5 w-full transition-all',
                                         error
                                             ? 'bg-red-500 group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,theme(colors.red.500)_30%,transparent)]'
-                                            : cn(blur ? 'bg-white/30' : 'bg-gray-300 dark:bg-gray-600', 'group-focus-within:!bg-[var(--primary)]'),
+                                            : cn(
+                                                  blur
+                                                      ? 'bg-white/30'
+                                                      : 'bg-gray-300 dark:bg-gray-600',
+                                                  'group-focus-within:!bg-[var(--primary)]',
+                                              ),
                                         'group-focus-within:h-[3px]',
-                                        !error && 'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
+                                        !error &&
+                                            'group-focus-within:shadow-[0_2px_10px_2px_color-mix(in_srgb,var(--primary)_30%,transparent)]',
                                     )}
                                 />
                             </div>
@@ -358,13 +376,16 @@ export function MultiSelectableAutocomplete<T>({
                     <PopoverPrimitive.Content
                         align="start"
                         sideOffset={4}
-                        onOpenAutoFocus={e => e.preventDefault()}
-                        onInteractOutside={e => {
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onInteractOutside={(e) => {
                             if (anchorRef.current?.contains(e.target as Node)) {
                                 e.preventDefault();
                             }
                         }}
-                        style={{ zIndex: 1400, maxHeight: 'min(240px, var(--radix-popover-content-available-height))' }}
+                        style={{
+                            zIndex: 1400,
+                            maxHeight: 'min(240px, var(--radix-popover-content-available-height))',
+                        }}
                         className={cn(
                             // pointer-events-auto: a modal Radix Dialog sets `pointer-events: none` on
                             // <body>; since this Popover portals to <body> (outside the dialog's layer),
@@ -387,7 +408,12 @@ export function MultiSelectableAutocomplete<T>({
                                       : `No results for "${query}"`}
                             </div>
                         ) : (
-                            <ul ref={listRef} role="listbox" aria-multiselectable="true" className="py-1">
+                            <ul
+                                ref={listRef}
+                                role="listbox"
+                                aria-multiselectable="true"
+                                className="py-1"
+                            >
                                 {displayOptions.map((option, index) => {
                                     const optionLabel = getOptionLabel(option);
                                     const selected = isSelected(option);
@@ -399,13 +425,14 @@ export function MultiSelectableAutocomplete<T>({
                                             role="option"
                                             aria-selected={selected}
                                             data-highlighted={isHighlighted || undefined}
-                                            onMouseDown={e => e.preventDefault()}
+                                            onMouseDown={(e) => e.preventDefault()}
                                             onClick={() => handleToggle(option)}
                                             className={cn(
                                                 'flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors',
                                                 'text-gray-900 dark:text-gray-100',
                                                 isHighlighted && 'bg-gray-100 dark:bg-gray-700',
-                                                !isHighlighted && 'hover:bg-gray-50 dark:hover:bg-gray-700/50',
+                                                !isHighlighted &&
+                                                    'hover:bg-gray-50 dark:hover:bg-gray-700/50',
                                             )}
                                         >
                                             <div
@@ -450,7 +477,9 @@ export function MultiSelectableAutocomplete<T>({
                 <p
                     className={cn(
                         'mt-1 text-xs',
-                        error ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400',
+                        error
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-gray-500 dark:text-gray-400',
                     )}
                 >
                     {helperText}

@@ -33,8 +33,8 @@ export const Default: Story = {
                 token when prompted.
             </DocChecklistItem>
             <DocChecklistItem id="create">
-                <strong>Create a warehouse.</strong> Add your first inventory location from
-                the dashboard.
+                <strong>Create a warehouse.</strong> Add your first inventory location from the
+                dashboard.
             </DocChecklistItem>
             <DocChecklistItem id="sku">
                 <strong>Add your first SKU.</strong> Import from CSV or create one manually.
