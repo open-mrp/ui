@@ -1,5 +1,11 @@
 # @openmrp/ui
 
+## 2.0.3
+
+### Patch Changes
+
+- be53909: fix: update deps
+
 ## 2.0.2
 
 ### Patch Changes
