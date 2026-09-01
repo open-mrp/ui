@@ -1,5 +1,11 @@
 # @openmrp/ui
 
+## 2.0.4
+
+### Patch Changes
+
+- 5a84362: Fix Selector nested-button hydration error when clearable
+
 ## 2.0.3
 
 ### Patch Changes
