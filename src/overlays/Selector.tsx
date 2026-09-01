@@ -78,7 +78,7 @@ export function Selector(props: SelectorProps) {
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
-    const triggerRef = useRef<HTMLButtonElement>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
     const selectedAtOpenRef = useRef<Set<string>>(new Set());
     const prevOpenRef = useRef(false);
 
@@ -237,13 +237,13 @@ export function Selector(props: SelectorProps) {
             )}
             <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
                 <PopoverPrimitive.Trigger asChild disabled={disabled}>
-                    <button
+                    <div
                         ref={triggerRef}
-                        type="button"
                         role="combobox"
+                        tabIndex={disabled ? -1 : 0}
                         aria-expanded={open}
                         aria-haspopup="listbox"
-                        disabled={disabled}
+                        aria-disabled={disabled || undefined}
                         onKeyDown={handleKeyDown}
                         className={cn(
                             'flex w-full cursor-pointer items-center gap-1 text-left transition-colors',
@@ -271,7 +271,7 @@ export function Selector(props: SelectorProps) {
                             ],
                             variant === 'line' && 'bg-transparent',
                             variant === 'plain' && 'bg-transparent',
-                            disabled && 'opacity-50 cursor-default',
+                            disabled && 'opacity-50 cursor-default pointer-events-none',
                             triggerClassName,
                         )}
                     >
@@ -289,6 +289,7 @@ export function Selector(props: SelectorProps) {
                                         {opt.label}
                                         <button
                                             type="button"
+                                            onPointerDown={(e) => e.stopPropagation()}
                                             onClick={(e) => handleRemovePill(opt.value, e)}
                                             disabled={disabled}
                                             className="cursor-pointer rounded-full p-0.5 hover:bg-[var(--primary)]/30 dark:hover:bg-[var(--primary)]/40"
@@ -321,10 +322,12 @@ export function Selector(props: SelectorProps) {
                         {clearable && hasValue && (
                             <button
                                 type="button"
+                                onPointerDown={(e) => e.stopPropagation()}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleClear();
                                 }}
+                                disabled={disabled}
                                 className="shrink-0 cursor-pointer rounded-sm p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                 aria-label="Clear selection"
                             >
@@ -338,7 +341,7 @@ export function Selector(props: SelectorProps) {
                                 open && 'rotate-180',
                             )}
                         />
-                    </button>
+                    </div>
                 </PopoverPrimitive.Trigger>
 
                 {variant === 'line' && (
