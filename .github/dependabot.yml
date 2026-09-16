@@ -14,6 +14,10 @@ updates:
       directory: '/'
       schedule:
           interval: 'weekly'
+      ignore:
+          # changesets/action v2 requires @changesets/cli v3; bump both together.
+          - dependency-name: 'changesets/action'
+            update-types: ['version-update:semver-major']
       groups:
           actions:
               patterns: ['*']
