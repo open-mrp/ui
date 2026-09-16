@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "declaration": false,
+        "emitDeclarationOnly": false,
+        "noEmit": true,
+        "isolatedModules": true,
+        "types": ["jest", "@testing-library/jest-dom"]
+    },
+    "include": ["src/**/*.ts", "src/**/*.tsx"],
+    "exclude": ["**/*.stories.ts", "**/*.stories.tsx"]
+}

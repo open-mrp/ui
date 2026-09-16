@@ -1,7 +1,7 @@
 export default {
     testEnvironment: 'jsdom',
     transform: {
-        '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
+        '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
     },
     moduleNameMapper: {
         '.(css|less|scss)$': 'identity-obj-proxy',
