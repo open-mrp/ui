@@ -1,5 +1,11 @@
 # @openmrp/ui
 
+## 2.0.5
+
+### Patch Changes
+
+- 5b651f7: chore: update dependencies
+
 ## 2.0.4
 
 ### Patch Changes
