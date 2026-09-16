@@ -50,7 +50,7 @@
         "@babel/preset-typescript": "^8.0.1",
         "@babel/preset-react": "^8.0.1",
         "@babel/register": "^8.0.5",
-        "@changesets/cli": "^2.31.1",
+        "@changesets/cli": "^3.0.2",
         "@storybook/addon-docs": "^10.6.0",
         "@storybook/addon-onboarding": "^10.6.0",
         "@storybook/addon-themes": "^10.6.0",
