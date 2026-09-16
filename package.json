@@ -83,7 +83,7 @@
         "tsc-alias": "^1.9.2",
         "tslib": "^2.8.1",
         "tsup": "^8.5.1",
-        "typescript": "^5.9.3",
+        "typescript": "^7.0.2",
         "vite-plugin-glsl": "^1.6.1",
         "yalc": "^1.0.0-pre.53"
     },
@@ -105,8 +105,8 @@
         "@tanstack/react-virtual": "^3.14.10",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "copy-to-clipboard": "^3.3.3",
         "lucide-react": "^1.39.0",
+        "copy-to-clipboard": "^4.0.2",
         "rehype-highlight": "^7.0.2",
         "rehype-parse": "^9.0.1",
         "rehype-stringify": "^10.0.1",
