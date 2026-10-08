@@ -1,7 +1,7 @@
 // Color management utilities using functional programming
-import { ColorConfiguration, colorConfigurations } from '../colorConfigurations';
+import { type ColorConfiguration, colorConfigurations } from '../colorConfigurations';
 import { colorShader as colorShaderSource } from './shaders';
-import { BaseFBO, ColorProgram, HSLAColor, RGBColor } from './types';
+import type { BaseFBO, ColorProgram, HSLAColor, RGBColor } from './types';
 
 // Internal state for color management
 let currentScheme: ColorConfiguration = 'default';

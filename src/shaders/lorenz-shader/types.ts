@@ -1,4 +1,4 @@
-import { ColorConfiguration } from '../colorConfigurations';
+import type { ColorConfiguration } from '../colorConfigurations';
 
 export interface LorenzParams {
     sigma: number;

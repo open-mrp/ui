@@ -5,7 +5,7 @@ import {
     advectionShader as advectionShaderSource,
     splatShader as splatShaderSource,
 } from './shaders';
-import { BaseFBO, DoubleFBO, RGBColor, SplatConfig, SplatProgram } from './types';
+import type { BaseFBO, DoubleFBO, RGBColor, SplatConfig, SplatProgram } from './types';
 
 // Performance optimization: Cache for aspect ratio calculations
 let cachedAspectRatio: number = 1.0;

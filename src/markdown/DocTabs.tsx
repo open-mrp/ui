@@ -1,8 +1,8 @@
 'use client';
 
 import { cn } from '@/utils/cn';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
-import { DocTabProps } from './DocTab';
+import React, { type ReactNode, useEffect, useMemo, useState } from 'react';
+import type { DocTabProps } from './DocTab';
 
 export interface DocTabsProps {
     children: ReactNode;

@@ -3,7 +3,7 @@
 import { useDarkMode } from '@/hooks/useDarkMode';
 import MoonIcon from '@/icons/MoonIcon';
 import SunIcon from '@/icons/SunIcon';
-import Button, { ButtonProps } from './Button';
+import Button, { type ButtonProps } from './Button';
 
 export interface DarkModeButtonProps extends ButtonProps {
     variant?: 'icon' | 'outlined';

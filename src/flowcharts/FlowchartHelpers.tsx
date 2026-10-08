@@ -1,4 +1,4 @@
-import { Edge, MarkerType, Node } from '@xyflow/react';
+import { type Edge, MarkerType, type Node } from '@xyflow/react';
 import React from 'react';
 
 const strokeWidth = 1.8;

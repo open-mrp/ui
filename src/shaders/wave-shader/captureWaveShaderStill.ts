@@ -1,7 +1,7 @@
-import { colorConfigurations, ColorConfiguration } from '../colorConfigurations';
+import { colorConfigurations, type ColorConfiguration } from '../colorConfigurations';
 import fragmentShaderSource from './shaders/main.glsl';
 import vertexShaderSource from './shaders/vertex.glsl';
-import { DEFAULT_BACKGROUND_COLOR, RGBColor } from './types';
+import { DEFAULT_BACKGROUND_COLOR, type RGBColor } from './types';
 import { WaveShaderRenderer } from './WaveShaderRenderer';
 
 export interface CaptureWaveShaderStillOptions {

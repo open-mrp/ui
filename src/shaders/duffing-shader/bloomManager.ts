@@ -6,7 +6,7 @@ import {
     bloomFinalShader as bloomFinalShaderSource,
     bloomPrefilterShader as bloomPrefilterShaderSource,
 } from './shaders';
-import { BaseFBO, BloomConfig, BloomPrograms } from './types';
+import type { BaseFBO, BloomConfig, BloomPrograms } from './types';
 
 // Internal state - only tracking framebuffers and cached values
 let bloomFramebuffers: BaseFBO[] = [];

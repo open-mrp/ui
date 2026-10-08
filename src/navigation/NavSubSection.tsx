@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { NavLink, NavSubSectionData } from './types';
+import type { NavLink, NavSubSectionData } from './types';
 
 export interface NavSubSectionProps {
     subSection: NavSubSectionData;

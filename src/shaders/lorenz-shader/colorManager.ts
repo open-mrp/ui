@@ -1,5 +1,5 @@
 // Color management utilities using functional programming
-import { ColorConfiguration, colorConfigurations } from '../colorConfigurations';
+import { type ColorConfiguration, colorConfigurations } from '../colorConfigurations';
 import COLOR_SHADER from './shaders/colorShader.glsl';
 
 /**

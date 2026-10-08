@@ -3,7 +3,7 @@
 import { cn } from '@/utils/cn';
 import { PanelLeftClose } from 'lucide-react';
 import { useSidenavState } from '../hooks/useSidenavStore';
-import { NavLink, NavSubSectionData } from './types';
+import type { NavLink, NavSubSectionData } from './types';
 
 export interface NavSection {
     title: string;

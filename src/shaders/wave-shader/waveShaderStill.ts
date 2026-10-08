@@ -1,4 +1,4 @@
-import { RGBColor, WaveShaderFallbackImage } from './types';
+import type { RGBColor, WaveShaderFallbackImage } from './types';
 
 /**
  * Pre-rendered still frames of the default WaveShader, shown as a fallback when WebGL

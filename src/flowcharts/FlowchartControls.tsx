@@ -2,7 +2,7 @@ import { Button } from '@/buttons';
 import FitViewIcon from '@/icons/FitViewIcon';
 import ZoomInIcon from '@/icons/ZoomInIcon';
 import ZoomOutIcon from '@/icons/ZoomOutIcon';
-import { ReactFlowInstance } from '@xyflow/react';
+import type { ReactFlowInstance } from '@xyflow/react';
 
 export interface FlowchartControlsProps {
     reactFlowInstance: ReactFlowInstance | null;
