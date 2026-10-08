@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/utils/cn';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export interface DocTabProps {
     label: string;

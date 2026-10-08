@@ -1,4 +1,4 @@
-import { ColorConfiguration } from '../colorConfigurations';
+import type { ColorConfiguration } from '../colorConfigurations';
 
 /**
  * RGB color represented as a tuple of three numbers (0-255).

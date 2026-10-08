@@ -1,5 +1,5 @@
 import { calculateShaderCanvasDimensions } from '../utils/calculateShaderCanvasDimensions';
-import { DisplayParams, LorenzParams, LorenzProps } from './types';
+import type { DisplayParams, LorenzParams, LorenzProps } from './types';
 
 /**
  * Creates default Lorenz parameters with optional overrides

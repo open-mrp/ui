@@ -6,7 +6,7 @@ import { colorConfigurations } from '../colorConfigurations';
 import { calculateShaderCanvasDimensions } from '../utils/calculateShaderCanvasDimensions';
 import { FluidRenderer } from './FluidRenderer';
 import { getShaders } from './shaders';
-import { Config, DuffingShaderProps, FragmentShader } from './types';
+import type { Config, DuffingShaderProps, FragmentShader } from './types';
 
 const DEFAULT_CONFIG: Config = {
     SIM_RESOLUTION: 512,

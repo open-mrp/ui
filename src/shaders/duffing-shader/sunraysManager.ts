@@ -7,7 +7,7 @@ import {
     sunraysMaskShader as sunraysMaskShaderSource,
     sunraysShader as sunraysShaderSource,
 } from './shaders';
-import { BaseFBO, SunraysConfig, SunraysPrograms } from './types';
+import type { BaseFBO, SunraysConfig, SunraysPrograms } from './types';
 
 // Internal state - only tracking framebuffers
 let sunraysFramebuffers: {

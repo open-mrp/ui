@@ -8,7 +8,7 @@ import {
     pressureShader as pressureShaderSource,
     vorticityShader as vorticityShaderSource,
 } from './shaders';
-import { BaseFBO, DoubleFBO, PhysicsConfig, PhysicsPrograms } from './types';
+import type { BaseFBO, DoubleFBO, PhysicsConfig, PhysicsPrograms } from './types';
 
 /**
  * Initialize physics shaders

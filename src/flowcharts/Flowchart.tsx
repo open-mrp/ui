@@ -4,11 +4,11 @@ import { cn } from '@/utils/cn';
 import {
     Background,
     BackgroundVariant,
-    Edge,
-    Node,
-    NodeProps,
+    type Edge,
+    type Node,
+    type NodeProps,
     ReactFlow,
-    ReactFlowInstance,
+    type ReactFlowInstance,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import React, { useCallback, useState } from 'react';

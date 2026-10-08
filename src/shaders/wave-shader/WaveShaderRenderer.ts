@@ -1,5 +1,5 @@
 import { gradientTextureCache } from './GradientTextureCache';
-import { DEFAULT_BACKGROUND_COLOR, RGBColor } from './types';
+import { DEFAULT_BACKGROUND_COLOR, type RGBColor } from './types';
 
 const N_TIME_VALUES = 2;
 

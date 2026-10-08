@@ -1,6 +1,6 @@
 'use strict';
-import { ColorConfiguration } from '../colorConfigurations';
-import { FragmentShader } from './types';
+import type { ColorConfiguration } from '../colorConfigurations';
+import type { FragmentShader } from './types';
 
 // Import managers for their functionality
 import {
@@ -30,7 +30,7 @@ import {
     initSunraysFramebuffers,
     initSunraysShaders,
 } from './sunraysManager';
-import {
+import type {
     AdvectionProgram,
     BaseFBO,
     BloomPrograms,

@@ -1,4 +1,4 @@
-import { DisplayParams, LorenzParams, LorenzSolution, LorenzWebGLProgram } from './types';
+import type { DisplayParams, LorenzParams, LorenzSolution, LorenzWebGLProgram } from './types';
 
 // Import shaders as strings (will be handled by build process)
 import projectVert from './shaders/project.vert.glsl';
@@ -6,7 +6,7 @@ import tailFrag from './shaders/tail.frag.glsl';
 import tailVert from './shaders/tail.vert.glsl';
 
 // Import color management utilities
-import { RGBColor, generateColor, getRandomColor, setColorScheme } from './colorManager';
+import { type RGBColor, generateColor, getRandomColor, setColorScheme } from './colorManager';
 
 export class Lorenz {
     public gl: WebGLRenderingContext;

@@ -3,7 +3,7 @@ import { colorConfigurations } from '../colorConfigurations';
 import { calculateShaderCanvasDimensions } from '../utils/calculateShaderCanvasDimensions';
 import { HSLAtoRGB } from './colorManager';
 import { Lorenz } from './Lorenz';
-import { LorenzProps } from './types';
+import type { LorenzProps } from './types';
 
 export function LorenzShader({
     width = 800,

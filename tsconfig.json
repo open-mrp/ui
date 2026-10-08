@@ -10,6 +10,7 @@
         "moduleResolution": "bundler",
         "strict": true,
         "esModuleInterop": true,
+        "verbatimModuleSyntax": true,
         "skipLibCheck": true,
         "paths": {
             "@/*": ["./src/*"]
