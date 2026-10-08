@@ -1,5 +1,11 @@
 # @openmrp/ui
 
+## 2.0.6
+
+### Patch Changes
+
+- 96f093a: Import types with `import type` so the published ESM/CJS output no longer imports type-only names as runtime values, which strict bundlers (Rolldown/Vite) reject as missing exports. `verbatimModuleSyntax` is now enabled to keep it that way.
+
 ## 2.0.5
 
 ### Patch Changes
