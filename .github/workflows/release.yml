@@ -38,13 +38,13 @@ jobs:
             # This action uses the changesets created in PRs to create a new version and publish
             - name: Create Release Pull Request or Publish
               id: changesets
-              uses: changesets/action@v1
+              uses: changesets/action@v2
               with:
                   # This expects you to have a script called release which does a build for your packages and calls changeset publish
-                  publish: bun run release
-                  version: bunx changeset version
-                  commit: 'chore: version packages'
-                  title: 'chore: version packages'
+                  publish-script: bun run release
+                  version-script: bunx changeset version
+                  commit-message: 'chore: version packages'
+                  pr-title: 'chore: version packages'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
