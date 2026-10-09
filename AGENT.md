@@ -39,6 +39,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Formatting:** 4-space indentation, single quotes, semicolons, trailing commas, 100-char line width (Prettier)
 - **Path alias:** `@/*` maps to `src/*` (configured in tsconfig, jest, babel)
-- **Exports pattern:** Each component file default-exports the component and named-exports its props type. Category barrel files re-export both.
+- **Exports pattern:** Component files use named exports for the component and its props type. Category barrel files re-export them (`export * from './Component'`). A few older components still default-export.
+- **Theme tokens:** `src/styles/tokens.css` defines the palette (`--palette-*`, light in `:root`, dark in `.dark`), elevation shadows (`shadow-elevation-N`), easing (`ease-standard`, `ease-decelerate`, `ease-accelerate`, `ease-sharp`), animations and `screen-*` breakpoints. Components use the semantic utilities (`bg-paper`, `text-fg`, `text-fg-secondary`, `border-divider`, `bg-primary-main`, …) rather than raw grays.
 - **Versioning:** Changesets for semantic versioning. CI auto-publishes on push to main.
 - **React version:** 19 (peer dependency)

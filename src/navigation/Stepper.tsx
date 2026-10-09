@@ -1,146 +1,245 @@
-'use client';
-
-import { Check } from 'lucide-react';
-import * as React from 'react';
-
+import {
+    Children,
+    cloneElement,
+    createContext,
+    forwardRef,
+    isValidElement,
+    useContext,
+    type ComponentPropsWithoutRef,
+    type ReactElement,
+    type ReactNode,
+} from 'react';
 import { cn } from '@/utils/cn';
+import { InternalCheckCircleIcon, InternalWarningIcon } from '@/icons/internal-icons';
 
-export type StepperStep = {
-    label: string;
-    description?: string;
-};
-
-export type StepperProps = {
-    steps: StepperStep[];
-    activeIndex: number;
-    /** Zero-based index of the furthest step the user can jump to. Defaults to activeIndex. */
-    maxReachableIndex?: number;
-    orientation?: 'horizontal' | 'vertical';
-    onStepClick?: (index: number) => void;
-    className?: string;
-};
-
-function Stepper({
-    steps,
-    activeIndex,
-    maxReachableIndex,
-    orientation = 'horizontal',
-    onStepClick,
-    className,
-}: StepperProps) {
-    const maxReach = maxReachableIndex ?? activeIndex;
-
-    if (orientation === 'vertical') {
-        return (
-            <ol data-slot="stepper" className={cn('flex flex-col gap-2', className)}>
-                {steps.map((step, i) => {
-                    const state =
-                        i < activeIndex ? 'completed' : i === activeIndex ? 'active' : 'upcoming';
-                    const clickable = onStepClick && i <= maxReach;
-                    return (
-                        <li key={step.label} className="flex items-start gap-3">
-                            <StepIndicator state={state} index={i} />
-                            <button
-                                type="button"
-                                disabled={!clickable}
-                                onClick={() => clickable && onStepClick(i)}
-                                className={cn(
-                                    'flex flex-col items-start text-left pt-0.5',
-                                    clickable && 'cursor-pointer',
-                                )}
-                            >
-                                <span
-                                    className={cn(
-                                        'text-sm font-medium',
-                                        state === 'active'
-                                            ? 'text-gray-900 dark:text-gray-100'
-                                            : 'text-gray-500 dark:text-gray-400',
-                                    )}
-                                >
-                                    {step.label}
-                                </span>
-                                {step.description && (
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                                        {step.description}
-                                    </span>
-                                )}
-                            </button>
-                        </li>
-                    );
-                })}
-            </ol>
-        );
-    }
-
-    return (
-        <ol data-slot="stepper" className={cn('flex items-center w-full', className)}>
-            {steps.map((step, i) => {
-                const state =
-                    i < activeIndex ? 'completed' : i === activeIndex ? 'active' : 'upcoming';
-                const clickable = onStepClick && i <= maxReach;
-                return (
-                    <React.Fragment key={step.label}>
-                        <li className="flex items-center gap-2 min-w-0">
-                            <button
-                                type="button"
-                                disabled={!clickable}
-                                onClick={() => clickable && onStepClick(i)}
-                                className={cn(
-                                    'flex items-center gap-2 min-w-0',
-                                    clickable && 'cursor-pointer',
-                                )}
-                            >
-                                <StepIndicator state={state} index={i} />
-                                <span
-                                    className={cn(
-                                        'text-sm font-medium truncate hidden sm:inline',
-                                        state === 'active'
-                                            ? 'text-gray-900 dark:text-gray-100'
-                                            : 'text-gray-500 dark:text-gray-400',
-                                    )}
-                                >
-                                    {step.label}
-                                </span>
-                            </button>
-                        </li>
-                        {i < steps.length - 1 && (
-                            <div
-                                className={cn(
-                                    'mx-2 sm:mx-3 h-px flex-1 transition-colors',
-                                    i < activeIndex
-                                        ? 'bg-[var(--primary)]'
-                                        : 'bg-gray-300 dark:bg-gray-600',
-                                )}
-                            />
-                        )}
-                    </React.Fragment>
-                );
-            })}
-        </ol>
-    );
+interface StepperContextValue {
+    activeStep: number;
+    alternativeLabel: boolean;
+    orientation: 'horizontal' | 'vertical';
+    nonLinear: boolean;
 }
 
-function StepIndicator({
-    state,
-    index,
-}: {
-    state: 'completed' | 'active' | 'upcoming';
+const StepperContext = createContext<StepperContextValue>({
+    activeStep: 0,
+    alternativeLabel: false,
+    orientation: 'horizontal',
+    nonLinear: false,
+});
+
+interface StepContextValue {
     index: number;
-}) {
+    active: boolean;
+    completed: boolean;
+    disabled: boolean;
+    last: boolean;
+}
+
+const StepContext = createContext<StepContextValue>({
+    index: 0,
+    active: false,
+    completed: false,
+    disabled: false,
+    last: false,
+});
+
+export interface StepperProps extends ComponentPropsWithoutRef<'ol'> {
+    activeStep?: number;
+    alternativeLabel?: boolean;
+    orientation?: 'horizontal' | 'vertical';
+    nonLinear?: boolean;
+    connector?: ReactElement | null;
+}
+
+export function StepConnector({ className }: { className?: string }) {
+    const { alternativeLabel, orientation } = useContext(StepperContext);
+    const vertical = orientation === 'vertical';
     return (
-        <span
+        <div
+            aria-hidden
             className={cn(
-                'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors',
-                state === 'completed' && 'border-[var(--primary)] bg-[var(--primary)] text-white',
-                state === 'active' &&
-                    'border-[var(--primary)] bg-white dark:bg-gray-900 text-[var(--primary)]',
-                state === 'upcoming' &&
-                    'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500',
+                'flex-[1_1_auto]',
+                alternativeLabel && 'absolute top-3 right-[calc(50%+20px)] left-[calc(-50%+20px)]',
+                vertical && 'ml-3',
+                className
             )}
         >
-            {state === 'completed' ? <Check className="h-4 w-4" /> : index + 1}
-        </span>
+            <span
+                className={cn(
+                    'block border-grey-400 dark:border-grey-600',
+                    vertical ? 'min-h-6 border-l border-solid' : 'border-t border-solid'
+                )}
+            />
+        </div>
     );
 }
 
-export { Stepper };
+export const Stepper = forwardRef<HTMLOListElement, StepperProps>(function Stepper(
+    {
+        activeStep = 0,
+        alternativeLabel = false,
+        orientation = 'horizontal',
+        nonLinear = false,
+        connector = <StepConnector />,
+        className,
+        children,
+        ...other
+    },
+    ref
+) {
+    const steps = Children.toArray(children).filter(isValidElement) as ReactElement<StepProps>[];
+    return (
+        <StepperContext.Provider value={{ activeStep, alternativeLabel, orientation, nonLinear }}>
+            <ol
+                ref={ref}
+                className={cn(
+                    'm-0 flex list-none p-0',
+                    orientation === 'horizontal' ? 'flex-row items-center' : 'flex-col',
+                    alternativeLabel && 'items-start',
+                    className
+                )}
+                {...other}
+            >
+                {steps.map((step, index) =>
+                    cloneElement(step, {
+                        key: step.key ?? index,
+                        index,
+                        last: index + 1 === steps.length,
+                        connector: index > 0 ? connector : null,
+                    })
+                )}
+            </ol>
+        </StepperContext.Provider>
+    );
+});
+
+export interface StepProps extends ComponentPropsWithoutRef<'li'> {
+    index?: number;
+    active?: boolean;
+    completed?: boolean;
+    disabled?: boolean;
+    last?: boolean;
+    connector?: ReactNode;
+}
+
+export const Step = forwardRef<HTMLLIElement, StepProps>(function Step(
+    {
+        index = 0,
+        active: activeProp,
+        completed: completedProp,
+        disabled: disabledProp,
+        last = false,
+        connector,
+        className,
+        children,
+        ...other
+    },
+    ref
+) {
+    const { activeStep, alternativeLabel, orientation, nonLinear } = useContext(StepperContext);
+    const active = activeProp ?? activeStep === index;
+    const completed = completedProp ?? (!nonLinear && activeStep > index);
+    const disabled = disabledProp ?? (!nonLinear && activeStep < index);
+    const horizontal = orientation === 'horizontal';
+    return (
+        <StepContext.Provider value={{ index, active, completed, disabled, last }}>
+            <li
+                ref={ref}
+                className={cn(
+                    horizontal &&
+                        !alternativeLabel &&
+                        'flex flex-[1_1_auto] items-center px-2 first:flex-none',
+                    alternativeLabel && 'relative flex-1',
+                    className
+                )}
+                {...other}
+            >
+                {connector}
+                {children}
+            </li>
+        </StepContext.Provider>
+    );
+});
+
+export function StepIcon({
+    active,
+    completed,
+    error,
+    icon,
+}: {
+    active: boolean;
+    completed: boolean;
+    error?: boolean;
+    icon: ReactNode;
+}) {
+    const base = 'block h-6 w-6 text-fg-disabled transition-[color] duration-150 ease-standard';
+    if (error) return <InternalWarningIcon className={cn(base, 'text-error-main')} />;
+    if (completed) return <InternalCheckCircleIcon className={cn(base, 'text-primary-main')} />;
+    return (
+        <svg
+            className={cn(base, 'fill-current', active && 'text-primary-main')}
+            viewBox="0 0 24 24"
+            aria-hidden
+            focusable="false"
+        >
+            <circle cx="12" cy="12" r="12" />
+            <text
+                x="12"
+                y="12"
+                textAnchor="middle"
+                dominantBaseline="central"
+                className="fill-primary-contrast font-plex-sans text-[0.75rem]"
+            >
+                {icon}
+            </text>
+        </svg>
+    );
+}
+
+export interface StepLabelProps extends ComponentPropsWithoutRef<'span'> {
+    error?: boolean;
+    optional?: ReactNode;
+    icon?: ReactNode;
+}
+
+export const StepLabel = forwardRef<HTMLSpanElement, StepLabelProps>(function StepLabel(
+    { error = false, optional, icon, className, children, ...other },
+    ref
+) {
+    const { alternativeLabel, orientation } = useContext(StepperContext);
+    const { index, active, completed, disabled } = useContext(StepContext);
+    return (
+        <span
+            ref={ref}
+            className={cn(
+                'flex items-center',
+                alternativeLabel && 'flex-col',
+                orientation === 'vertical' && 'py-2 text-left',
+                disabled && 'cursor-default',
+                className
+            )}
+            {...other}
+        >
+            <span className={cn('flex shrink-0', alternativeLabel ? 'pr-0' : 'pr-2')}>
+                <StepIcon
+                    active={active}
+                    completed={completed}
+                    error={error}
+                    icon={icon ?? index + 1}
+                />
+            </span>
+            <span className={cn('w-full text-fg-secondary', alternativeLabel && 'text-center')}>
+                <span
+                    className={cn(
+                        'block font-plex-sans text-[0.875rem] leading-[1.57] transition-[color] duration-150 ease-standard',
+                        (active || completed) && 'font-medium text-fg',
+                        error && 'text-error-main',
+                        alternativeLabel && 'mt-4'
+                    )}
+                >
+                    {children}
+                </span>
+                {optional}
+            </span>
+        </span>
+    );
+});

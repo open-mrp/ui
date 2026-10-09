@@ -1,4 +1,4 @@
-import { Button } from '@/buttons';
+import { GlassButton } from '@/buttons/GlassButton';
 import FitViewIcon from '@/icons/FitViewIcon';
 import ZoomInIcon from '@/icons/ZoomInIcon';
 import ZoomOutIcon from '@/icons/ZoomOutIcon';
@@ -18,36 +18,36 @@ export default function FlowchartControls({ reactFlowInstance }: FlowchartContro
                 WebkitBackdropFilter: 'blur(10px)', // For Safari support
             }}
         >
-            <Button
+            <GlassButton
                 variant="icon"
                 color="gray"
                 onClick={() => reactFlowInstance?.fitView()}
                 title="Fit View"
             >
                 <FitViewIcon size={16} />
-            </Button>
+            </GlassButton>
             <div
                 className="w-px h-6"
                 style={{
                     backgroundColor: 'var(--border-color)',
                 }}
             />
-            <Button
+            <GlassButton
                 variant="icon"
                 color="gray"
                 onClick={() => reactFlowInstance?.zoomOut({ duration: 200 })}
                 title="Zoom Out"
             >
                 <ZoomOutIcon size={16} />
-            </Button>
-            <Button
+            </GlassButton>
+            <GlassButton
                 variant="icon"
                 color="gray"
                 onClick={() => reactFlowInstance?.zoomIn({ duration: 200 })}
                 title="Zoom In"
             >
                 <ZoomInIcon size={16} />
-            </Button>
+            </GlassButton>
         </div>
     );
 }

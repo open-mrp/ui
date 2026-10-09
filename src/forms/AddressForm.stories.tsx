@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import Button from '@/buttons/Button';
+import { Button } from '@/buttons/Button';
 import { Selector, type SelectorOption } from '@/overlays/Selector';
 
-import { Input } from './Input';
-import { Switch } from './Switch';
+import { FormControlLabel, Switch } from './SelectionControls';
+import { TextField } from './TextField';
 
 const COUNTRY_OPTIONS: SelectorOption[] = [
     { value: 'US', label: 'United States' },
@@ -61,7 +61,7 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
 
     return (
         <div className="flex flex-col gap-3">
-            <Input
+            <TextField
                 label="Address Name"
                 placeholder="Ex. Acme Inc. or Home Office"
                 value={value.name}
@@ -69,28 +69,28 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                 variant="outlined"
                 required
             />
-            <Input
+            <TextField
                 label="Address Line 1"
                 value={value.addressLine1}
                 onChange={(e) => update('addressLine1', e.target.value)}
                 variant="outlined"
                 required
             />
-            <Input
+            <TextField
                 label="Address Line 2"
                 value={value.addressLine2}
                 onChange={(e) => update('addressLine2', e.target.value)}
                 variant="outlined"
             />
             <div className="grid grid-cols-[2fr_1fr] gap-3">
-                <Input
+                <TextField
                     label="City"
                     value={value.city}
                     onChange={(e) => update('city', e.target.value)}
                     variant="outlined"
                     required
                 />
-                <Input
+                <TextField
                     label="State"
                     value={value.state}
                     onChange={(e) => update('state', e.target.value)}
@@ -99,7 +99,7 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                 />
             </div>
             <div className="grid grid-cols-[1fr_2fr] gap-3">
-                <Input
+                <TextField
                     label="Postal Code"
                     value={value.postalCode}
                     onChange={(e) => update('postalCode', e.target.value)}
@@ -114,33 +114,37 @@ function AddressFormDemo({ initial = EMPTY_ADDRESS }: { initial?: AddressValue }
                     variant="outlined"
                 />
             </div>
-            <Switch
-                checked={value.isDropShip}
-                onCheckedChange={(checked) => update('isDropShip', checked)}
+            <FormControlLabel
                 label="Drop ship address"
+                control={
+                    <Switch
+                        checked={value.isDropShip}
+                        onChange={(_, checked) => update('isDropShip', checked)}
+                    />
+                }
             />
             {value.isDropShip && (
                 <div className="flex gap-3">
-                    <Input
+                    <TextField
                         label="Phone"
                         placeholder="555-555-5555"
                         value={value.phone}
                         onChange={(e) => update('phone', e.target.value)}
                         variant="outlined"
-                        containerClassName="flex-1"
+                        className="flex-1"
                     />
-                    <Input
+                    <TextField
                         label="Email"
                         placeholder="contact@example.com"
                         value={value.email}
                         onChange={(e) => update('email', e.target.value)}
                         variant="outlined"
-                        containerClassName="flex-1"
+                        className="flex-1"
                     />
                 </div>
             )}
             <div className="flex gap-2 justify-end mt-4">
-                <Button variant="text" color="#D14343">
+                <Button variant="text" color="error">
                     Delete
                 </Button>
                 <div className="flex-1" />
@@ -208,7 +212,7 @@ export const ValidationError: Story = {
 
         return (
             <div className="flex flex-col gap-3">
-                <Input
+                <TextField
                     label="Address Name"
                     placeholder="Ex. Acme Inc. or Home Office"
                     value={value.name}
@@ -216,28 +220,28 @@ export const ValidationError: Story = {
                     variant="outlined"
                     required
                 />
-                <Input
+                <TextField
                     label="Address Line 1"
                     value={value.addressLine1}
                     onChange={(e) => update('addressLine1', e.target.value)}
                     variant="outlined"
                     required
                 />
-                <Input
+                <TextField
                     label="Address Line 2"
                     value={value.addressLine2}
                     onChange={(e) => update('addressLine2', e.target.value)}
                     variant="outlined"
                 />
                 <div className="grid grid-cols-[2fr_1fr] gap-3">
-                    <Input
+                    <TextField
                         label="City"
                         value={value.city}
                         onChange={(e) => update('city', e.target.value)}
                         variant="outlined"
                         required
                     />
-                    <Input
+                    <TextField
                         label="State"
                         value={value.state}
                         onChange={(e) => update('state', e.target.value)}
@@ -246,7 +250,7 @@ export const ValidationError: Story = {
                     />
                 </div>
                 <div className="grid grid-cols-[1fr_2fr] gap-3">
-                    <Input
+                    <TextField
                         label="Postal Code"
                         value={value.postalCode}
                         onChange={(e) => update('postalCode', e.target.value)}
@@ -266,7 +270,7 @@ export const ValidationError: Story = {
                     <Button variant="outlined" color="primary">
                         Cancel
                     </Button>
-                    <Button variant="contained" color="#FFB020">
+                    <Button variant="contained" color="warning">
                         Save anyway
                     </Button>
                 </div>

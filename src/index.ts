@@ -13,3 +13,6 @@ export * from './overlays';
 export * from './shaders';
 export * from './signifiers';
 export * from './tables';
+export * from './theme';
+export * from './typography';
+export * from './utils';

@@ -1,15 +1,5 @@
-// Base table components
-export {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableContainer,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from './TableComponents';
+export * from './Table';
+export * from './TablePagination';
 
 // Sortable table head
 export {
@@ -36,8 +26,6 @@ export {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-    TablePagination,
     type ItemsPerPageSelectorProps,
     type PaginationControlsProps,
-    type TablePaginationProps,
 } from './Pagination';

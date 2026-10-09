@@ -3,9 +3,9 @@
 import { useDarkMode } from '@/hooks/useDarkMode';
 import MoonIcon from '@/icons/MoonIcon';
 import SunIcon from '@/icons/SunIcon';
-import Button, { type ButtonProps } from './Button';
+import { GlassButton, type GlassButtonProps } from './GlassButton';
 
-export interface DarkModeButtonProps extends ButtonProps {
+export interface DarkModeButtonProps extends GlassButtonProps {
     variant?: 'icon' | 'outlined';
     className?: string;
 }
@@ -19,7 +19,7 @@ export default function DarkModeButton({
 
     if (variant === 'icon') {
         return (
-            <Button
+            <GlassButton
                 className={className}
                 variant="icon"
                 onClick={toggleDarkMode}
@@ -27,13 +27,13 @@ export default function DarkModeButton({
                 {...props}
             >
                 {isDark ? <SunIcon /> : <MoonIcon />}
-            </Button>
+            </GlassButton>
         );
     }
 
     return (
-        <Button className={className} variant="outlined" onClick={toggleDarkMode} {...props}>
+        <GlassButton className={className} variant="outlined" onClick={toggleDarkMode} {...props}>
             {isDark ? 'Light Mode' : 'Dark Mode'}
-        </Button>
+        </GlassButton>
     );
 }

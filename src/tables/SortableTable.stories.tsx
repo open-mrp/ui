@@ -8,7 +8,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableHeader,
+    TableHead,
     TableRow,
     type SortDirection,
 } from './index';
@@ -96,7 +96,7 @@ export const SortableTable: Story = {
                 </div>
 
                 <Table>
-                    <TableHeader>
+                    <TableHead>
                         <TableRow>
                             <SortableTableHead
                                 sortKey="id"
@@ -164,7 +164,7 @@ export const SortableTable: Story = {
                                 Salary
                             </SortableTableHead>
                         </TableRow>
-                    </TableHeader>
+                    </TableHead>
                     <TableBody>
                         {sortedData.map((row) => (
                             <TableRow key={row.id}>
@@ -270,7 +270,7 @@ export const CustomStyledSortable: Story = {
 
                 <TableContainer className="bg-indigo-50/30 dark:bg-indigo-950/50 border-2 border-indigo-300 dark:border-indigo-600 shadow-xl rounded-xl">
                     <Table>
-                        <TableHeader className="bg-indigo-100 dark:bg-indigo-900/40">
+                        <TableHead className="bg-indigo-100 dark:bg-indigo-900/40">
                             <TableRow className="border-indigo-200 dark:border-indigo-700">
                                 <SortableTableHead
                                     sortKey="id"
@@ -318,7 +318,7 @@ export const CustomStyledSortable: Story = {
                                     Status
                                 </SortableTableHead>
                             </TableRow>
-                        </TableHeader>
+                        </TableHead>
                         <TableBody className="bg-indigo-50/20 dark:bg-indigo-950/30">
                             {currentData.map((row, index) => (
                                 <TableRow

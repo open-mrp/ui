@@ -1,157 +1,232 @@
-import type { ComponentSize } from '@/types/ComponentSize';
-import { cva } from 'class-variance-authority';
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
+import { forwardRef, useId, type ReactNode } from 'react';
+import { ButtonBase, type ButtonBaseProps } from './ButtonBase';
+import { CircularProgress } from '@/feedback/CircularProgress';
+import { cn } from '@/utils/cn';
+import type { PaletteColorName, Size } from '@/theme/types';
 
-export type ButtonVariant = 'contained' | 'outlined' | 'text' | 'icon';
+export type ButtonVariant = 'text' | 'outlined' | 'contained';
+export type ButtonColor = PaletteColorName | 'inherit';
 
-// Base styles
-const BASE_STYLES =
-    'ui-button inline-flex items-center justify-center rounded-md text-sm font-semibold transition-all duration-250 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2';
-
-const buttonVariants = cva(BASE_STYLES, {
-    variants: {
-        variant: {
-            contained: 'bg-[var(--ui-btn-bg)] hover:brightness-95',
-            outlined:
-                'border border-[var(--ui-btn-fg)] text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
-            text: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
-            icon: 'p-2 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
-        },
-        size: {
-            sm: 'px-4 py-2 text-xs',
-            md: 'px-4 py-2',
-            lg: 'px-6 py-2 text-base',
-        },
-        disabled: {
-            true: 'opacity-50 cursor-auto pointer-events-none',
-            false: 'hover:cursor-pointer',
-        },
-        blur: {
-            true: 'backdrop-blur-md',
-            false: '',
-        },
-    },
-    compoundVariants: [
-        {
-            variant: 'contained',
-            disabled: true,
-            class: '!bg-gray-700/50 !text-gray-600 !hover:bg-gray-700/50',
-        },
-        {
-            variant: 'outlined',
-            disabled: true,
-            class: '!border-gray-700/50 !text-gray-600 !hover:bg-transparent !hover:border-gray-700/50',
-        },
-        {
-            variant: 'text',
-            disabled: true,
-            class: '!text-gray-600 !hover:bg-transparent',
-        },
-        {
-            variant: 'icon',
-            disabled: true,
-            class: '!text-gray-600 !hover:bg-transparent',
-        },
-        {
-            variant: 'contained',
-            blur: true,
-            disabled: false,
-            class: 'bg-[var(--ui-btn-fg)]/10 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/15 dark:bg-[var(--ui-btn-fg)]/5 dark:hover:bg-[var(--ui-btn-fg)]/10',
-        },
-        {
-            variant: 'outlined',
-            blur: true,
-            disabled: false,
-            class: 'border-[var(--ui-btn-fg)]/20 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/10 hover:border-[var(--ui-btn-fg)]/30 dark:hover:bg-[var(--ui-btn-fg)]/5',
-        },
-        {
-            variant: 'text',
-            blur: true,
-            disabled: false,
-            class: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
-        },
-        {
-            variant: 'icon',
-            blur: true,
-            disabled: false,
-            class: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
-        },
-    ],
-    defaultVariants: {
-        variant: 'contained',
-        size: 'md',
-        disabled: false,
-        blur: false,
-    },
-});
-
-export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
-    children?: React.ReactNode;
+export interface ButtonProps extends Omit<ButtonBaseProps, 'color'> {
     variant?: ButtonVariant;
-    size?: ComponentSize;
-    color?: string;
-    disabled?: boolean;
-    blur?: boolean;
+    color?: ButtonColor;
+    size?: Size;
+    startIcon?: ReactNode;
+    endIcon?: ReactNode;
+    fullWidth?: boolean;
+    disableElevation?: boolean;
+    loading?: boolean | null;
+    loadingPosition?: 'start' | 'end' | 'center';
+    loadingIndicator?: ReactNode;
 }
 
-// Colors that should use dark text for contrast
-const LIGHT_COLORS = new Set(['white', '#ffffff', '#fff', '#fafafa', '#f5f5f5']);
-// Colors that should use light text for contrast
-const DARK_COLORS = new Set(['primary', 'secondary', 'gray', 'black', '#000000', '#000']);
+const containedColors: Record<ButtonColor, string> = {
+    primary: 'bg-primary-main text-primary-contrast hover:bg-primary-dark',
+    secondary: 'bg-secondary-main text-secondary-contrast hover:bg-secondary-dark',
+    error: 'bg-error-main text-error-contrast hover:bg-error-dark',
+    warning: 'bg-warning-main text-warning-contrast hover:bg-warning-dark',
+    info: 'bg-info-main text-info-contrast hover:bg-info-dark',
+    success: 'bg-success-main text-success-contrast hover:bg-success-dark',
+    inherit: 'bg-button-inherit text-inherit hover:bg-button-inherit-hover',
+};
 
-export default function Button({
-    children,
-    variant = 'contained',
-    size = 'md',
-    color = variant === 'icon' ? 'gray' : 'white',
-    disabled = false,
-    blur = false,
-    className,
-    style,
-    ...props
-}: ButtonProps) {
-    const baseClasses = buttonVariants({ variant, size, disabled, blur });
+const outlinedColors: Record<ButtonColor, string> = {
+    primary:
+        'text-primary-main border-primary-main/50 hover:border-primary-main hover:bg-primary-main/4',
+    secondary:
+        'text-secondary-main border-secondary-main/50 hover:border-secondary-main hover:bg-secondary-main/4',
+    error: 'text-error-main border-error-main/50 hover:border-error-main hover:bg-error-main/4',
+    warning:
+        'text-warning-main border-warning-main/50 hover:border-warning-main hover:bg-warning-main/4',
+    info: 'text-info-main border-info-main/50 hover:border-info-main hover:bg-info-main/4',
+    success:
+        'text-success-main border-success-main/50 hover:border-success-main hover:bg-success-main/4',
+    inherit: 'text-inherit border-current hover:bg-fg/4',
+};
 
-    // Determine the CSS color value. Use standard theme vars if a simple key is provided.
-    const resolvedColor = ['primary', 'secondary', 'gray', 'black', 'white'].includes(color)
-        ? `var(--color-${color})`
-        : color;
+const textColors: Record<ButtonColor, string> = {
+    primary: 'text-primary-main hover:bg-primary-main/4',
+    secondary: 'text-secondary-main hover:bg-secondary-main/4',
+    error: 'text-error-main hover:bg-error-main/4',
+    warning: 'text-warning-main hover:bg-warning-main/4',
+    info: 'text-info-main hover:bg-info-main/4',
+    success: 'text-success-main hover:bg-success-main/4',
+    inherit: 'text-inherit hover:bg-fg/4',
+};
 
-    // For contained variant, determine text color based on background contrast
-    const isContained = variant === 'contained' && !blur;
-    const isLightBackground = LIGHT_COLORS.has(color);
-    const isDarkBackground = DARK_COLORS.has(color);
+const sizeClasses: Record<Size, string> = {
+    small: 'px-3 py-1.5 text-[0.8125rem]',
+    medium: 'px-4 py-2',
+    large: 'px-6 py-2.5 text-[0.9375rem]',
+};
 
-    // Expose the resolved color as a CSS custom property so variant classes can
-    // reference it. This lets consumers override hover/background via `className`
-    // (e.g. `hover:bg-red-500`), which inline `style` would otherwise block.
-    const buttonStyle = {
-        ...(isContained ? { '--ui-btn-bg': resolvedColor } : { '--ui-btn-fg': resolvedColor }),
-        ...style,
-    } as React.CSSProperties;
+const iconSizeClasses: Record<Size, string> = {
+    small: '[&>*:nth-of-type(1)]:text-[16px]',
+    medium: '[&>*:nth-of-type(1)]:text-[18px]',
+    large: '[&>*:nth-of-type(1)]:text-[20px]',
+};
 
-    // Determine text color class for contained variant
-    let textColorClass = '';
-    if (isContained) {
-        if (isLightBackground) {
-            textColorClass = 'text-gray-900';
-        } else if (isDarkBackground) {
-            textColorClass = 'text-white';
-        } else {
-            // For custom colors, default to white text (most colored backgrounds need light text)
-            textColorClass = 'text-white';
-        }
-    }
+const loadingOffsetClasses = {
+    start: { text: 'left-[6px]', small: 'left-[8px]', default: 'left-[12px]' },
+    end: { text: 'right-[6px]', small: 'right-[8px]', default: 'right-[12px]' },
+};
 
-    return (
-        <button
-            disabled={disabled}
-            className={twMerge(baseClasses, textColorClass, className)}
-            style={buttonStyle}
-            {...props}
-        >
-            {children}
-        </button>
+function loadingIndicatorPosition(
+    position: 'start' | 'end' | 'center',
+    variant: ButtonVariant,
+    size: Size,
+    fullWidth: boolean
+): string {
+    if (position === 'center') return 'left-1/2 -translate-x-1/2 text-action-disabled';
+    if (fullWidth) return position === 'start' ? 'relative left-[-10px]' : 'relative right-[-10px]';
+    const offset = variant === 'text' ? 'text' : size === 'small' ? 'small' : 'default';
+    return loadingOffsetClasses[position][offset];
+}
+
+const indicatorOffsets: Record<string, string> = {
+    'left-[6px]': 'left-[6px]',
+    'left-[8px]': 'left-[8px]',
+    'left-[12px]': 'left-[12px]',
+    'right-[6px]': 'right-[6px]',
+    'right-[8px]': 'right-[8px]',
+    'right-[12px]': 'right-[12px]',
+};
+
+export function buttonClasses({
+    variant = 'text',
+    color = 'primary',
+    size = 'medium',
+    fullWidth = false,
+    disableElevation = true,
+    loading = false,
+    loadingPosition = 'center',
+}: Pick<
+    ButtonProps,
+    'variant' | 'color' | 'size' | 'fullWidth' | 'disableElevation' | 'loading' | 'loadingPosition'
+>): string {
+    return cn(
+        'font-plex-sans text-[0.875rem] font-semibold leading-5 normal-case min-w-16 rounded-lg transition-[background-color,box-shadow,border-color,color] duration-250 ease-standard hover:no-underline',
+        variant === 'contained' && containedColors[color],
+        variant === 'contained' &&
+            'data-disabled:text-action-disabled data-disabled:bg-action-disabled-bg data-disabled:shadow-none',
+        variant === 'contained' &&
+            !disableElevation &&
+            'shadow-elevation-2 hover:shadow-elevation-4 active:shadow-elevation-8 focus-visible:shadow-elevation-6',
+        variant === 'outlined' && 'border border-solid',
+        variant === 'outlined' && outlinedColors[color],
+        variant === 'outlined' && 'data-disabled:border-action-disabled-bg',
+        variant === 'text' && textColors[color],
+        'data-disabled:text-action-disabled',
+        sizeClasses[size],
+        fullWidth && 'w-full',
+        loading &&
+            loadingPosition === 'center' &&
+            'transition-[background-color,box-shadow,border-color] text-transparent!'
     );
 }
+
+export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
+    {
+        variant = 'text',
+        color = 'primary',
+        size = 'medium',
+        startIcon,
+        endIcon,
+        fullWidth = false,
+        disableElevation = true,
+        loading = null,
+        loadingPosition = 'center',
+        loadingIndicator,
+        disabled,
+        id: idProp,
+        className,
+        children,
+        ...other
+    },
+    ref
+) {
+    const generatedId = useId();
+    const loadingId = idProp ?? generatedId;
+    const isLoading = loading === true;
+    const hideStart = isLoading && loadingPosition === 'start';
+    const hideEnd = isLoading && loadingPosition === 'end';
+    const indicatorPosition = loadingIndicatorPosition(loadingPosition, variant, size, fullWidth);
+    const loader =
+        typeof loading === 'boolean' ? (
+            <span className="contents">
+                {isLoading ? (
+                    <span
+                        className={cn(
+                            'absolute flex visible',
+                            indicatorOffsets[indicatorPosition] ?? indicatorPosition
+                        )}
+                    >
+                        {loadingIndicator ?? (
+                            <CircularProgress
+                                aria-labelledby={loadingId}
+                                color="inherit"
+                                size={16}
+                            />
+                        )}
+                    </span>
+                ) : null}
+            </span>
+        ) : null;
+    const start =
+        startIcon || hideStart ? (
+            <span
+                data-slot="button-start-icon"
+                className={cn(
+                    '[display:inherit] items-center mr-2 -ml-1 zero-width-before',
+                    size === 'small' && '-ml-0.5',
+                    hideStart && 'opacity-0 transition-opacity duration-250 ease-standard',
+                    hideStart && fullWidth && '-mr-2',
+                    iconSizeClasses[size]
+                )}
+            >
+                {startIcon || <span className="inline-block h-[1em] w-[1em]" />}
+            </span>
+        ) : null;
+    const end =
+        endIcon || hideEnd ? (
+            <span
+                data-slot="button-end-icon"
+                className={cn(
+                    '[display:inherit] -mr-1 ml-2',
+                    size === 'small' && '-mr-0.5',
+                    hideEnd && 'opacity-0 transition-opacity duration-250 ease-standard',
+                    hideEnd && fullWidth && '-ml-2',
+                    iconSizeClasses[size]
+                )}
+            >
+                {endIcon || <span className="inline-block h-[1em] w-[1em]" />}
+            </span>
+        ) : null;
+    return (
+        <ButtonBase
+            ref={ref}
+            data-slot="button"
+            id={isLoading ? loadingId : idProp}
+            disabled={disabled || isLoading}
+            className={cn(
+                buttonClasses({
+                    variant,
+                    color,
+                    size,
+                    fullWidth,
+                    disableElevation,
+                    loading: isLoading,
+                    loadingPosition,
+                }),
+                className
+            )}
+            {...other}
+        >
+            {start}
+            {loadingPosition !== 'end' && loader}
+            {children}
+            {loadingPosition === 'end' && loader}
+            {end}
+        </ButtonBase>
+    );
+});

@@ -16,7 +16,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableHeader,
+    TableHead,
     TableRow,
     ToggleableTableHead,
     type SortDirection,
@@ -218,7 +218,7 @@ export const ToggleableTable: Story = {
 
                 <TableContainer>
                     <Table>
-                        <TableHeader>
+                        <TableHead>
                             <TableRow>
                                 {visibleColumns.map((columnId) => {
                                     const config = columnConfig.find((col) => col.id === columnId);
@@ -249,7 +249,7 @@ export const ToggleableTable: Story = {
                                     );
                                 })}
                             </TableRow>
-                        </TableHeader>
+                        </TableHead>
                         <TableBody>
                             {currentData.map((employee) => (
                                 <TableRow key={employee.id}>
@@ -473,7 +473,7 @@ export const CustomStyledAdvancedTable: Story = {
 
                 <TableContainer className="bg-teal-50/30 dark:bg-teal-950/50 border-2 border-teal-300 dark:border-teal-600 shadow-xl rounded-xl">
                     <Table>
-                        <TableHeader className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-t-xl">
+                        <TableHead className="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-t-xl">
                             <TableRow className="border-teal-600">
                                 {visibleColumns.map((columnId) => {
                                     const config = columnConfig.find((col) => col.id === columnId);
@@ -500,7 +500,7 @@ export const CustomStyledAdvancedTable: Story = {
                                     );
                                 })}
                             </TableRow>
-                        </TableHeader>
+                        </TableHead>
                         <TableBody className="bg-teal-50/20 dark:bg-teal-950/30">
                             {currentData.map((employee, index) => (
                                 <TableRow
