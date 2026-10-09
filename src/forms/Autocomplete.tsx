@@ -1,3 +1,5 @@
+'use client';
+
 import { autoUpdate, flip, size as sizeMiddleware, useFloating } from '@floating-ui/react-dom';
 import {
     useEffect,

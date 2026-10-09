@@ -1,3 +1,5 @@
+'use client';
+
 import {
     arrow as arrowMiddleware,
     autoUpdate,

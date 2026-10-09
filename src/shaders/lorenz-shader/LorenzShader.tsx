@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef, useState } from 'react';
 import { colorConfigurations } from '../colorConfigurations';
 import { calculateShaderCanvasDimensions } from '../utils/calculateShaderCanvasDimensions';

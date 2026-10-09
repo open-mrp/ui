@@ -1,3 +1,5 @@
+'use client';
+
 import { forwardRef, useId, type ReactNode } from 'react';
 import { ButtonBase, type ButtonBaseProps } from './ButtonBase';
 import { CircularProgress } from '@/feedback/CircularProgress';
