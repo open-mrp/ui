@@ -1,5 +1,11 @@
 # @openmrp/ui
 
+## 3.0.1
+
+### Patch Changes
+
+- 27564de: Add `'use client'` to components that use React context or hooks, so importing `@openmrp/ui` from a React Server Component no longer crashes with `createContext is not a function`.
+
 ## 3.0.0
 
 ### Major Changes
