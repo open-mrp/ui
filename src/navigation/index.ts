@@ -1,5 +1,6 @@
 export { default as BlurSearchBar, type BlurSearchBarProps } from './BlurSearchBar';
-export { default as Breadcrumbs, type Breadcrumb, type BreadcrumbsProps } from './Breadcrumbs';
+export * from './Breadcrumbs';
+export * from './Link';
 export { default as Footer, type FooterProps } from './Footer';
 export { default as Navbar, type NavbarProps } from './NavBar';
 export { default as NavItem, type NavItemProps } from './NavItem';
@@ -7,7 +8,6 @@ export { default as NavSubSection, type NavSubSectionProps } from './NavSubSecti
 export { ProgressBar } from './ProgressBar';
 export type { ProgressBarProps } from './ProgressBar';
 export { default as Sidenav, type NavSection, type SidenavProps } from './Sidenav';
-export { Stepper } from './Stepper';
-export type { StepperProps, StepperStep } from './Stepper';
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs';
+export * from './Stepper';
+export * from './Tabs';
 export { type NavLink, type NavSubSectionData } from './types';

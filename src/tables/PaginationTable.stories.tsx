@@ -15,7 +15,6 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TableHeader,
     TableRow,
 } from './index';
 import { generateSampleData } from './TableStories.utils';
@@ -357,18 +356,18 @@ export const PaginatedTable: Story = {
                 </div>
 
                 <Table>
-                    <TableHeader>
+                    <TableHead>
                         <TableRow>
-                            <TableHead className="w-[100px]">ID</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Department</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Join Date</TableHead>
-                            <TableHead className="text-right">Salary</TableHead>
+                            <TableCell className="w-[100px]">ID</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Department</TableCell>
+                            <TableCell>Role</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Join Date</TableCell>
+                            <TableCell className="text-right">Salary</TableCell>
                         </TableRow>
-                    </TableHeader>
+                    </TableHead>
                     <TableBody>
                         {currentData.map((employee) => (
                             <TableRow key={employee.id}>
@@ -456,18 +455,18 @@ export const LargePaginatedTable: Story = {
                 </div>
 
                 <Table>
-                    <TableHeader>
+                    <TableHead>
                         <TableRow>
-                            <TableHead className="w-[80px]">ID</TableHead>
-                            <TableHead className="min-w-[200px]">Name</TableHead>
-                            <TableHead className="min-w-[240px]">Email</TableHead>
-                            <TableHead className="min-w-[180px]">Department</TableHead>
-                            <TableHead className="min-w-[160px]">Role</TableHead>
-                            <TableHead className="min-w-[140px]">Status</TableHead>
-                            <TableHead className="min-w-[140px]">Join Date</TableHead>
-                            <TableHead className="text-right min-w-[140px]">Salary</TableHead>
+                            <TableCell className="w-[80px]">ID</TableCell>
+                            <TableCell className="min-w-[200px]">Name</TableCell>
+                            <TableCell className="min-w-[240px]">Email</TableCell>
+                            <TableCell className="min-w-[180px]">Department</TableCell>
+                            <TableCell className="min-w-[160px]">Role</TableCell>
+                            <TableCell className="min-w-[140px]">Status</TableCell>
+                            <TableCell className="min-w-[140px]">Join Date</TableCell>
+                            <TableCell className="text-right min-w-[140px]">Salary</TableCell>
                         </TableRow>
-                    </TableHeader>
+                    </TableHead>
                     <TableBody>
                         {currentData.map((employee) => (
                             <TableRow key={employee.id}>
@@ -552,18 +551,18 @@ export const TableWithItemsPerPageSelector: Story = {
                 </div>
 
                 <Table>
-                    <TableHeader>
+                    <TableHead>
                         <TableRow>
-                            <TableHead className="w-[80px]">ID</TableHead>
-                            <TableHead className="min-w-[200px]">Name</TableHead>
-                            <TableHead className="min-w-[240px]">Email</TableHead>
-                            <TableHead className="min-w-[180px]">Department</TableHead>
-                            <TableHead className="min-w-[160px]">Role</TableHead>
-                            <TableHead className="min-w-[140px]">Status</TableHead>
-                            <TableHead className="min-w-[140px]">Join Date</TableHead>
-                            <TableHead className="text-right min-w-[140px]">Salary</TableHead>
+                            <TableCell className="w-[80px]">ID</TableCell>
+                            <TableCell className="min-w-[200px]">Name</TableCell>
+                            <TableCell className="min-w-[240px]">Email</TableCell>
+                            <TableCell className="min-w-[180px]">Department</TableCell>
+                            <TableCell className="min-w-[160px]">Role</TableCell>
+                            <TableCell className="min-w-[140px]">Status</TableCell>
+                            <TableCell className="min-w-[140px]">Join Date</TableCell>
+                            <TableCell className="text-right min-w-[140px]">Salary</TableCell>
                         </TableRow>
-                    </TableHeader>
+                    </TableHead>
                     <TableBody>
                         {currentData.map((employee) => (
                             <TableRow key={employee.id}>
@@ -647,25 +646,25 @@ export const CustomStyledPaginatedTable: Story = {
 
                 <TableContainer className="bg-amber-50/30 dark:bg-amber-950/50 border-2 border-amber-300 dark:border-amber-600 shadow-xl rounded-xl">
                     <Table>
-                        <TableHeader className="bg-amber-100 dark:bg-amber-900/40">
+                        <TableHead className="bg-amber-100 dark:bg-amber-900/40">
                             <TableRow className="border-amber-200 dark:border-amber-700">
-                                <TableHead className="w-[100px] text-amber-900 dark:text-amber-100">
+                                <TableCell className="w-[100px] text-amber-900 dark:text-amber-100">
                                     ID
-                                </TableHead>
-                                <TableHead className="text-amber-900 dark:text-amber-100">
+                                </TableCell>
+                                <TableCell className="text-amber-900 dark:text-amber-100">
                                     Name
-                                </TableHead>
-                                <TableHead className="text-amber-900 dark:text-amber-100">
+                                </TableCell>
+                                <TableCell className="text-amber-900 dark:text-amber-100">
                                     Email
-                                </TableHead>
-                                <TableHead className="text-amber-900 dark:text-amber-100">
+                                </TableCell>
+                                <TableCell className="text-amber-900 dark:text-amber-100">
                                     Department
-                                </TableHead>
-                                <TableHead className="text-amber-900 dark:text-amber-100">
+                                </TableCell>
+                                <TableCell className="text-amber-900 dark:text-amber-100">
                                     Status
-                                </TableHead>
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
+                        </TableHead>
                         <TableBody className="bg-amber-50/20 dark:bg-amber-950/30">
                             {currentData.map((employee, index) => (
                                 <TableRow

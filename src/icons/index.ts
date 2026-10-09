@@ -18,7 +18,8 @@ import SunIcon from './SunIcon';
 import ZoomInIcon from './ZoomInIcon';
 import ZoomOutIcon from './ZoomOutIcon';
 
-// Individual icon exports
+export * from './SvgIcon';
+
 export { default as ArrowRightIcon } from './ArrowRightIcon';
 export { default as OpenMRPLogo } from './OpenMRPLogo';
 export { default as CheckIcon } from './CheckIcon';

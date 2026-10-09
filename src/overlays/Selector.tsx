@@ -4,7 +4,6 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Input } from '@/forms/Input';
 import { cn } from '@/utils/cn';
 
 export type SelectorVariant = 'outlined' | 'line' | 'plain';
@@ -389,27 +388,27 @@ export function Selector(props: SelectorProps) {
                     >
                         {searchable && (
                             <div className="border-b border-gray-200 p-2 dark:border-gray-700">
-                                <Input
-                                    ref={searchInputRef}
-                                    variant="plain"
-                                    size="sm"
-                                    placeholder={searchPlaceholder}
-                                    value={search}
-                                    onChange={(e) => {
-                                        setSearch(e.target.value);
-                                        setHighlightedIndex(-1);
-                                    }}
-                                    prefix={
-                                        <Search
-                                            className={cn(
-                                                'h-4 w-4',
-                                                blur
-                                                    ? 'text-white/50'
-                                                    : 'text-gray-400 dark:text-gray-500',
-                                            )}
-                                        />
-                                    }
-                                />
+                                <label className="flex items-center gap-2 rounded-md border border-solid border-input-border px-2 py-1.5 text-sm focus-within:border-primary-main">
+                                    <Search
+                                        className={cn(
+                                            'h-4 w-4 shrink-0',
+                                            blur
+                                                ? 'text-white/50'
+                                                : 'text-gray-400 dark:text-gray-500',
+                                        )}
+                                    />
+                                    <input
+                                        ref={searchInputRef}
+                                        placeholder={searchPlaceholder}
+                                        aria-label={searchPlaceholder}
+                                        value={search}
+                                        onChange={(e) => {
+                                            setSearch(e.target.value);
+                                            setHighlightedIndex(-1);
+                                        }}
+                                        className="w-full min-w-0 border-0 bg-transparent p-0 text-sm text-fg outline-0 placeholder:text-fg-secondary"
+                                    />
+                                </label>
                             </div>
                         )}
                         {filteredOptions.length === 0 ? (

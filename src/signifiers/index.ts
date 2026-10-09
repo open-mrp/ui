@@ -1,1 +1,3 @@
-export { default as Chip, type ChipProps } from './Chip';
+export * from './Avatar';
+export * from './Badge';
+export * from './Chip';

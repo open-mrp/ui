@@ -4,7 +4,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react';
 import * as React from 'react';
 
-import Button, { type ButtonProps } from '@/buttons/Button';
+import { GlassButton, type GlassButtonProps } from '@/buttons/GlassButton';
 import { cn } from '@/utils/cn';
 
 function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
@@ -32,7 +32,7 @@ function DropdownMenuButton({
     blur = false,
     className,
     ...props
-}: ButtonProps & Omit<React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>, 'color'>) {
+}: GlassButtonProps & Omit<React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>, 'color'>) {
     return (
         <DropdownMenuPrimitive.Trigger
             data-slot="dropdown-menu-button"
@@ -40,7 +40,7 @@ function DropdownMenuButton({
             disabled={disabled}
             {...props}
         >
-            <Button
+            <GlassButton
                 variant={variant}
                 size={size}
                 color={color}
@@ -52,7 +52,7 @@ function DropdownMenuButton({
                 )}
             >
                 {children}
-            </Button>
+            </GlassButton>
         </DropdownMenuPrimitive.Trigger>
     );
 }
