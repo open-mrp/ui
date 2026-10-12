@@ -19,6 +19,7 @@ import { cn } from '@/utils/cn';
 import { IconButton } from '@/buttons/IconButton';
 import { InternalArrowDropDownIcon, InternalCloseIcon } from '@/icons/internal-icons';
 import { Portal } from '@/overlays/Modal';
+import { overlayProps } from '@/overlays/overlay';
 import { useForkRef } from '@/hooks/use-fork-ref';
 
 export type AutocompleteChangeReason =
@@ -628,6 +629,7 @@ export function Autocomplete<
                     <div
                         ref={setFloating}
                         role="presentation"
+                        {...overlayProps}
                         className="z-[1300]"
                         style={floatingStyles}
                     >

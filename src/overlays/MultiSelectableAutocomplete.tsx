@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { cn } from '@/utils/cn';
 import type { ListResponse } from './autocomplete-types';
+import { overlayProps } from './overlay';
 
 export type MultiSelectableAutocompleteVariant = 'outlined' | 'line' | 'plain';
 
@@ -374,6 +375,7 @@ export function MultiSelectableAutocomplete<T>({
 
                 <PopoverPrimitive.Portal>
                     <PopoverPrimitive.Content
+                        {...overlayProps}
                         align="start"
                         sideOffset={4}
                         onOpenAutoFocus={(e) => e.preventDefault()}

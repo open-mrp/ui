@@ -5,6 +5,7 @@ import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { cn } from '@/utils/cn';
+import { overlayProps } from './overlay';
 
 export type SelectorVariant = 'outlined' | 'line' | 'plain';
 
@@ -364,6 +365,7 @@ export function Selector(props: SelectorProps) {
 
                 <PopoverPrimitive.Portal>
                     <PopoverPrimitive.Content
+                        {...overlayProps}
                         align="start"
                         sideOffset={4}
                         onOpenAutoFocus={(e) => {

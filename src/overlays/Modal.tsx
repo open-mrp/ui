@@ -13,6 +13,7 @@ import {
     type SyntheticEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { isInsideOverlay, overlayProps } from './overlay';
 import { cn } from '@/utils/cn';
 import type { BivariantCallback } from '@/theme/types';
 import { useForkRef } from '@/hooks/use-fork-ref';
@@ -195,12 +196,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
             if (!content || !root || !isTopModal(id)) return;
             const target = event.target as Element | null;
             if (target && root.contains(target)) return;
-            if (
-                target?.closest?.(
-                    '[data-modal-content], [role=dialog], [role=tooltip]'
-                )
-            )
-                return;
+            if (isInsideOverlay(target) || target?.closest?.('[role=dialog]')) return;
             const tabbable = getTabbable(content);
             (tabbable[0] ?? content).focus({ preventScroll: true });
         };
@@ -246,6 +242,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
             <div
                 ref={handleRef}
                 role="presentation"
+                {...overlayProps}
                 className={cn('fixed inset-0 z-[1300]', hiddenWhenClosed && 'invisible', className)}
                 onKeyDown={handleKeyDown}
                 {...other}

@@ -6,6 +6,7 @@ import * as React from 'react';
 
 import { GlassButton, type GlassButtonProps } from '@/buttons/GlassButton';
 import { cn } from '@/utils/cn';
+import { overlayProps } from './overlay';
 
 function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
     return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -66,6 +67,7 @@ function DropdownMenuContent({
         <DropdownMenuPrimitive.Portal>
             <DropdownMenuPrimitive.Content
                 data-slot="dropdown-menu-content"
+                {...overlayProps}
                 sideOffset={sideOffset}
                 className={cn(
                     'relative z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md',
@@ -274,6 +276,7 @@ function DropdownMenuSubContent({
     return (
         <DropdownMenuPrimitive.SubContent
             data-slot="dropdown-menu-sub-content"
+            {...overlayProps}
             className={cn(
                 'z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg',
                 'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',

@@ -12,6 +12,7 @@ import {
 import { forwardRef, useLayoutEffect, type ComponentPropsWithoutRef, type ReactNode } from 'react';
 import { cn } from '@/utils/cn';
 import { Portal } from './Modal';
+import { overlayProps } from './overlay';
 import { useForkRef } from '@/hooks/use-fork-ref';
 import { usePresence } from '@/hooks/use-presence';
 
@@ -95,6 +96,7 @@ export const Popper = forwardRef<HTMLDivElement, PopperProps>(function Popper(
             <div
                 ref={attachFloating}
                 role="tooltip"
+                {...overlayProps}
                 data-popper-placement={resolvedPlacement}
                 className={cn(!visible && 'hidden', className)}
                 style={{ ...floatingStyles, ...style }}

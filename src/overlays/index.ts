@@ -47,6 +47,7 @@ export * from './Dialog';
 export * from './Drawer';
 export * from './Menu';
 export * from './Modal';
+export * from './overlay';
 export * from './Popover';
 export * from './Popper';
 export * from './Tooltip';

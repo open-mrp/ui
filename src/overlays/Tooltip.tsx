@@ -27,6 +27,7 @@ import {
 import { cn } from '@/utils/cn';
 import { TimerBag } from '@/utils/timers';
 import { Portal } from './Modal';
+import { overlayProps } from './overlay';
 import { useForkRef } from '@/hooks/use-fork-ref';
 import { usePresence } from '@/hooks/use-presence';
 
@@ -244,6 +245,7 @@ export function Tooltip({
                         ref={setFloating}
                         id={id}
                         role="tooltip"
+                        {...overlayProps}
                         data-popper-placement={resolvedPlacement}
                         className={cn(
                             'z-[1500]',

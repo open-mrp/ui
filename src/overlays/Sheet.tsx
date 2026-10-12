@@ -5,6 +5,7 @@ import * as SheetPrimitive from '@radix-ui/react-dialog';
 import * as React from 'react';
 
 import { cn } from '@/utils/cn';
+import { overlayProps } from './overlay';
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
     return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -51,6 +52,7 @@ function SheetContent({
             <SheetOverlay />
             <SheetPrimitive.Content
                 data-slot="sheet-content"
+                {...overlayProps}
                 className={cn(
                     'fixed z-50 flex flex-col shadow-lg transition ease-in-out',
                     'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
