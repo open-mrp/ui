@@ -1,5 +1,11 @@
 # @openmrp/ui
 
+## 3.1.0
+
+### Minor Changes
+
+- 0dc51c6: feat: add overlay utilities for consistent client handling
+
 ## 3.0.1
 
 ### Patch Changes
