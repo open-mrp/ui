@@ -36,6 +36,7 @@ export interface AnchoredPanelProps extends ComponentPropsWithoutRef<'div'> {
     align?: AnchoredPanelAlign;
     sideOffset?: number;
     alignOffset?: number;
+    collisionPadding?: number;
     modal?: boolean;
     onDismiss?: (event: Event | SyntheticEvent, reason: DismissReason | 'backdropClick') => void;
     returnFocus?: boolean;
@@ -49,6 +50,7 @@ export const AnchoredPanel = forwardRef<HTMLDivElement, AnchoredPanelProps>(func
         align = 'center',
         sideOffset = 0,
         alignOffset = 0,
+        collisionPadding = 0,
         modal = false,
         onDismiss,
         returnFocus = true,
@@ -69,9 +71,10 @@ export const AnchoredPanel = forwardRef<HTMLDivElement, AnchoredPanelProps>(func
         elements: { reference: anchor },
         middleware: [
             offsetMiddleware({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
-            flip(),
-            shift(),
+            flip({ padding: collisionPadding }),
+            shift({ padding: collisionPadding }),
             size({
+                padding: collisionPadding,
                 apply({ availableWidth, availableHeight, rects, elements }) {
                     const target = elements.floating.style;
                     target.setProperty('--anchor-width', `${rects.reference.width}px`);

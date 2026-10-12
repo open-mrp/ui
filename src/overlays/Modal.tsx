@@ -5,6 +5,7 @@ import {
     forwardRef,
     useEffect,
     useId,
+    useInsertionEffect,
     useLayoutEffect,
     useRef,
     useState,
@@ -156,6 +157,15 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
     const handleRef = useForkRef(rootRef, ref, setRootElement);
     const { mounted, state } = usePresence(open, exitDuration);
 
+    const opener = useRef<HTMLElement | null>(null);
+    useInsertionEffect(() => {
+        if (open) opener.current = document.activeElement as HTMLElement | null;
+    }, [open]);
+
+    const pendingRestore = useRef<{ target: HTMLElement | null; cancelled: boolean } | null>(
+        null
+    );
+
     useLayoutEffect(() => {
         if (!open) return;
         const root = rootRef.current;
@@ -163,7 +173,12 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
         modalStack.push(id);
         if (!disableScrollLock) lockScroll();
         const hidden = hideSiblings(root);
-        const previouslyFocused = document.activeElement as HTMLElement | null;
+        const pending = pendingRestore.current;
+        pendingRestore.current = null;
+        if (pending) pending.cancelled = true;
+        const previouslyFocused = pending
+            ? pending.target
+            : (opener.current ?? (document.activeElement as HTMLElement | null));
         if (!disableAutoFocus) {
             const content = contentRef.current;
             const target = initialFocusRef?.current ?? content;
@@ -176,16 +191,14 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
             if (index !== -1) modalStack.splice(index, 1);
             if (!disableScrollLock) unlockScroll();
             hidden.forEach(element => element.removeAttribute('aria-hidden'));
-            if (
-                !disableRestoreFocus &&
-                previouslyFocused &&
-                typeof previouslyFocused.focus === 'function'
-            ) {
-                queueMicrotask(() => {
-                    if (previouslyFocused.isConnected)
-                        previouslyFocused.focus({ preventScroll: true });
-                });
-            }
+            const restore = { target: previouslyFocused, cancelled: false };
+            pendingRestore.current = restore;
+            queueMicrotask(() => {
+                if (pendingRestore.current === restore) pendingRestore.current = null;
+                if (restore.cancelled || disableRestoreFocus) return;
+                if (previouslyFocused?.isConnected && typeof previouslyFocused.focus === 'function')
+                    previouslyFocused.focus({ preventScroll: true });
+            });
         };
     }, [open, id, disableScrollLock, disableAutoFocus, disableRestoreFocus, initialFocusRef]);
 

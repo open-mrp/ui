@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { StrictMode, useState } from 'react';
 import { Button } from '../buttons/Button';
 import { Autocomplete } from '../forms/Autocomplete';
 import { TextField } from '../forms/TextField';
@@ -354,4 +354,37 @@ function MultiAutocompleteDemo() {
 export const MultiAutocompleteStory: Story = {
     name: 'MultiSelectableAutocomplete',
     render: () => <MultiAutocompleteDemo />,
+};
+
+function StrictDialogDemo() {
+    const [open, setOpen] = useState(false);
+    return (
+        <div className="flex flex-col items-start gap-4">
+            <Button data-testid="open" onClick={() => setOpen(true)}>
+                Open dialog
+            </Button>
+            {open && (
+                <Dialog open onClose={() => setOpen(false)}>
+                    <DialogTitle>Mounted on open</DialogTitle>
+                    <DialogContent>
+                        <input data-testid="dialog-input" className="border px-2 py-1" autoFocus />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button data-testid="cancel" onClick={() => setOpen(false)}>
+                            Cancel
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+        </div>
+    );
+}
+
+export const StrictDialogStory: Story = {
+    name: 'Dialog mounted on open in StrictMode',
+    render: () => (
+        <StrictMode>
+            <StrictDialogDemo />
+        </StrictMode>
+    ),
 };
