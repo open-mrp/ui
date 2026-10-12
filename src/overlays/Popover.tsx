@@ -4,6 +4,7 @@ import {
     forwardRef,
     useCallback,
     useEffect,
+    useEffectEvent,
     useLayoutEffect,
     useRef,
     useState,
@@ -200,11 +201,13 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
         };
     }, [open, computePosition]);
 
+    const handleEntered = useEffectEvent(() => onEntered?.());
+
     useEffect(() => {
-        if (!open || !onEntered) return;
-        const timer = setTimeout(onEntered, duration);
+        if (!open) return;
+        const timer = setTimeout(handleEntered, duration);
         return () => clearTimeout(timer);
-    }, [open, onEntered, duration]);
+    }, [open, duration]);
 
     const animate = transitionDuration !== 0;
 

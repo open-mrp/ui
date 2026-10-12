@@ -5,6 +5,7 @@ import {
     forwardRef,
     useContext,
     useId,
+    useMemo,
     useRef,
     type ComponentPropsWithoutRef,
     type ReactNode,
@@ -72,6 +73,8 @@ export const Dialog = forwardRef<HTMLDivElement, DialogProps>(function Dialog(
 ) {
     const titleId = useId();
     const paperRef = useRef<HTMLDivElement | null>(null);
+    const labelledBy = ariaLabelledBy ?? titleId;
+    const context = useMemo(() => ({ titleId: labelledBy }), [labelledBy]);
     return (
         <Modal
             ref={ref}
@@ -95,14 +98,14 @@ export const Dialog = forwardRef<HTMLDivElement, DialogProps>(function Dialog(
             )}
             {...other}
         >
-            <DialogContext.Provider value={{ titleId: ariaLabelledBy ?? titleId }}>
+            <DialogContext.Provider value={context}>
                 <div
                     ref={paperRef}
                     role="dialog"
                     tabIndex={-1}
                     data-slot="dialog-paper"
                     aria-modal="true"
-                    aria-labelledby={ariaLabelledBy ?? titleId}
+                    aria-labelledby={labelledBy}
                     aria-describedby={ariaDescribedBy}
                     {...paperProps}
                     className={cn(

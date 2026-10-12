@@ -2,9 +2,10 @@
 
 import {
     forwardRef,
-    useCallback,
     useEffect,
+    useEffectEvent,
     useRef,
+    useState,
     type ComponentPropsWithoutRef,
     type ReactNode,
 } from 'react';
@@ -54,47 +55,41 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
     },
     ref
 ) {
-    const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const rootRef = useRef<HTMLDivElement | null>(null);
     const handleRef = useForkRef(rootRef, ref);
-    const onCloseRef = useRef(onClose);
-    useEffect(() => {
-        onCloseRef.current = onClose;
-    });
-
-    const start = useCallback(
-        (duration: number | null) => {
-            clearTimeout(timer.current);
-            if (!open || duration == null || !onCloseRef.current) return;
-            timer.current = setTimeout(() => {
-                onCloseRef.current?.(null, 'timeout');
-            }, duration);
-        },
-        [open]
+    const [timer, setTimer] = useState({ running: true, factor: 1 });
+    const [previousOpen, setPreviousOpen] = useState(open);
+    if (previousOpen !== open) {
+        setPreviousOpen(open);
+        setTimer({ running: true, factor: 1 });
+    }
+    const handleClose = useEffectEvent(
+        (event: Event | null, reason: SnackbarCloseReason) => onClose?.(event, reason)
     );
 
     useEffect(() => {
-        start(autoHideDuration);
-        return () => clearTimeout(timer.current);
-    }, [start, autoHideDuration]);
+        if (!open || !timer.running || autoHideDuration == null) return;
+        const id = setTimeout(() => handleClose(null, 'timeout'), autoHideDuration * timer.factor);
+        return () => clearTimeout(id);
+    }, [open, timer, autoHideDuration]);
 
     useEffect(() => {
         if (!open) return;
         const handleKey = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && !event.defaultPrevented)
-                onCloseRef.current?.(event, 'escapeKeyDown');
+                handleClose(event, 'escapeKeyDown');
         };
         const handlePointer = (event: MouseEvent) => {
             if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-                onCloseRef.current?.(event, 'clickaway');
+                handleClose(event, 'clickaway');
             }
         };
         const frame = requestAnimationFrame(() => {
             document.addEventListener('click', handlePointer);
         });
         document.addEventListener('keydown', handleKey);
-        const pause = () => clearTimeout(timer.current);
-        const resume = () => start(autoHideDuration == null ? null : autoHideDuration * 0.5);
+        const pause = () => setTimer({ running: false, factor: 1 });
+        const resume = () => setTimer({ running: true, factor: 0.5 });
         if (!disableWindowBlurListener) {
             window.addEventListener('blur', pause);
             window.addEventListener('focus', resume);
@@ -106,7 +101,7 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
             window.removeEventListener('blur', pause);
             window.removeEventListener('focus', resume);
         };
-    }, [open, start, autoHideDuration, disableWindowBlurListener]);
+    }, [open, disableWindowBlurListener]);
 
     if (!open) return null;
 
@@ -121,11 +116,11 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
                 className
             )}
             onMouseEnter={event => {
-                clearTimeout(timer.current);
+                setTimer({ running: false, factor: 1 });
                 onMouseEnter?.(event);
             }}
             onMouseLeave={event => {
-                start(autoHideDuration);
+                setTimer({ running: true, factor: 1 });
                 onMouseLeave?.(event);
             }}
             {...other}

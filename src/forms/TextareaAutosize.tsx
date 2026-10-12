@@ -60,7 +60,7 @@ export const TextareaAutosize = forwardRef<HTMLTextAreaElement, TextareaAutosize
 
         useLayoutEffect(() => {
             syncHeight();
-        });
+        }, [value, syncHeight]);
 
         useEffect(() => {
             const handleResize = debounce(syncHeight);
@@ -92,7 +92,7 @@ export const TextareaAutosize = forwardRef<HTMLTextAreaElement, TextareaAutosize
                     ref={handleRef}
                     value={value}
                     onChange={event => {
-                        syncHeight();
+                        if (value === undefined) syncHeight();
                         onChange?.(event);
                     }}
                     rows={minRows}

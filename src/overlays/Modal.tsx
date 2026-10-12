@@ -1,11 +1,13 @@
 'use client';
 
 import {
+    createContext,
     forwardRef,
     useEffect,
     useId,
     useLayoutEffect,
     useRef,
+    useState,
     type ComponentPropsWithoutRef,
     type KeyboardEvent as ReactKeyboardEvent,
     type MouseEvent as ReactMouseEvent,
@@ -87,6 +89,8 @@ function getTabbable(root: HTMLElement): HTMLElement[] {
     );
 }
 
+export const ModalRootContext = createContext<HTMLElement | null>(null);
+
 export interface PortalProps {
     children: ReactNode;
     disablePortal?: boolean;
@@ -148,12 +152,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
     const id = useId();
     const rootRef = useRef<HTMLDivElement | null>(null);
     const contentRef = useRef<HTMLDivElement | null>(null);
-    const handleRef = useForkRef(rootRef, ref);
+    const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
+    const handleRef = useForkRef(rootRef, ref, setRootElement);
     const { mounted, state } = usePresence(open, exitDuration);
-    const onCloseRef = useRef(onClose);
-    useEffect(() => {
-        onCloseRef.current = onClose;
-    });
 
     useLayoutEffect(() => {
         if (!open) return;
@@ -227,7 +228,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
         if (event.key !== 'Escape' || event.nativeEvent.isComposing || !isTopModal(id)) return;
         if (!disableEscapeKeyDown) {
             event.stopPropagation();
-            onCloseRef.current?.(event, 'escapeKeyDown');
+            onClose?.(event, 'escapeKeyDown');
         }
     };
 
@@ -247,56 +248,58 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
                 onKeyDown={handleKeyDown}
                 {...other}
             >
-                {hideBackdrop ? null : (
+                <ModalRootContext.Provider value={rootElement}>
+                    {hideBackdrop ? null : (
+                        <div
+                            aria-hidden="true"
+                            className={cn(
+                                'fixed inset-0 -z-10 flex items-center justify-center bg-transparent [-webkit-tap-highlight-color:transparent]',
+                                state === 'open'
+                                    ? 'animate-fade-in'
+                                    : 'animate-fade-out opacity-0',
+                                backdropClassName
+                            )}
+                            onMouseDown={event => {
+                                backdropDown.current = event.target;
+                            }}
+                            onClick={event => {
+                                if (backdropDown.current !== event.currentTarget) return;
+                                backdropDown.current = null;
+                                onBackdropClick?.(event);
+                                onClose?.(event, 'backdropClick');
+                            }}
+                        />
+                    )}
                     <div
-                        aria-hidden="true"
-                        className={cn(
-                            'fixed inset-0 -z-10 flex items-center justify-center bg-transparent [-webkit-tap-highlight-color:transparent]',
-                            state === 'open'
-                                ? 'animate-fade-in'
-                                : 'animate-fade-out opacity-0',
-                            backdropClassName
-                        )}
-                        onMouseDown={event => {
-                            backdropDown.current = event.target;
-                        }}
-                        onClick={event => {
-                            if (backdropDown.current !== event.currentTarget) return;
-                            backdropDown.current = null;
-                            onBackdropClick?.(event);
-                            onCloseRef.current?.(event, 'backdropClick');
-                        }}
-                    />
-                )}
-                <div
-                    ref={contentRef}
-                    tabIndex={-1}
-                    className={cn('outline-0', contentClassName)}
-                    data-modal-content=""
-                    onMouseDown={
-                        contentIsBackdrop
-                            ? event => {
-                                  backdropDown.current = event.target;
-                              }
-                            : undefined
-                    }
-                    onClick={
-                        contentIsBackdrop
-                            ? event => {
-                                  if (
-                                      backdropDown.current !== event.currentTarget ||
-                                      event.target !== event.currentTarget
-                                  )
-                                      return;
-                                  backdropDown.current = null;
-                                  onBackdropClick?.(event);
-                                  onCloseRef.current?.(event, 'backdropClick');
-                              }
-                            : undefined
-                    }
-                >
-                    {typeof children === 'function' ? children(state) : children}
-                </div>
+                        ref={contentRef}
+                        tabIndex={-1}
+                        className={cn('outline-0', contentClassName)}
+                        data-modal-content=""
+                        onMouseDown={
+                            contentIsBackdrop
+                                ? event => {
+                                      backdropDown.current = event.target;
+                                  }
+                                : undefined
+                        }
+                        onClick={
+                            contentIsBackdrop
+                                ? event => {
+                                      if (
+                                          backdropDown.current !== event.currentTarget ||
+                                          event.target !== event.currentTarget
+                                      )
+                                          return;
+                                      backdropDown.current = null;
+                                      onBackdropClick?.(event);
+                                      onClose?.(event, 'backdropClick');
+                                  }
+                                : undefined
+                        }
+                    >
+                        {typeof children === 'function' ? children(state) : children}
+                    </div>
+                </ModalRootContext.Provider>
             </div>
         </Portal>
     );

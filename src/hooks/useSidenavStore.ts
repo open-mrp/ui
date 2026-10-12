@@ -1,44 +1,60 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { useSyncExternalStore } from 'react';
 
-interface SidenavState {
-    isCollapsed: boolean;
-    setCollapsed: (collapsed: boolean) => void;
-    toggleCollapsed: () => void;
+const STORAGE_KEY = 'openmrp-sidenav-state';
+
+const listeners = new Set<() => void>();
+let collapsed: boolean | null = null;
+
+function readCollapsed(): boolean {
+    try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw)?.state?.isCollapsed === true : false;
+    } catch {
+        return false;
+    }
 }
 
-export const useSidenavStore = create<SidenavState>()(
-    persist(
-        (set) => ({
-            isCollapsed: false,
-            setCollapsed: (collapsed: boolean) => set({ isCollapsed: collapsed }),
-            toggleCollapsed: () => set((state) => ({ isCollapsed: !state.isCollapsed })),
-        }),
-        {
-            name: 'openmrp-sidenav-state',
-        },
-    ),
-);
+function getCollapsed(): boolean {
+    if (collapsed === null) collapsed = readCollapsed();
+    return collapsed;
+}
 
-/**
- * Hook to safely use sidenav state with SSR.
- * Returns the hydrated state only after the client has mounted.
- */
+function persist(value: boolean): void {
+    try {
+        window.localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ state: { isCollapsed: value }, version: 0 }),
+        );
+    } catch {
+        return;
+    }
+}
+
+function setCollapsed(next: boolean): void {
+    collapsed = next;
+    persist(next);
+    listeners.forEach((listener) => listener());
+}
+
+function toggleCollapsed(): void {
+    setCollapsed(!getCollapsed());
+}
+
+function subscribe(listener: () => void): () => void {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+}
+
+const noopSubscribe = () => () => {};
+
 export function useSidenavState() {
-    const store = useSidenavStore();
-    const [isHydrated, setIsHydrated] = useState(false);
-
-    useEffect(() => {
-        setIsHydrated(true);
-    }, []);
-
-    return {
-        ...store,
-        // During SSR and initial hydration, always return false to avoid mismatch
-        isCollapsed: isHydrated ? store.isCollapsed : false,
-        isHydrated,
-    };
+    const isCollapsed = useSyncExternalStore(subscribe, getCollapsed, () => false);
+    const isHydrated = useSyncExternalStore(
+        noopSubscribe,
+        () => true,
+        () => false,
+    );
+    return { isCollapsed, setCollapsed, toggleCollapsed, isHydrated };
 }

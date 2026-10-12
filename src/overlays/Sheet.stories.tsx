@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as React from 'react';
-import { Button } from '../buttons/ShadButton';
+import { Button } from '../buttons/Button';
 import {
     Sheet,
     SheetBody,
@@ -28,7 +28,7 @@ export const Default: Story = {
     render: () => (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="outline">Open Sheet</Button>
+                <Button variant="outlined">Open Sheet</Button>
             </SheetTrigger>
             <SheetContent>
                 <SheetHeader>
@@ -52,7 +52,7 @@ export const Default: Story = {
                     </div>
                 </SheetBody>
                 <SheetFooter>
-                    <Button variant="outline">Cancel</Button>
+                    <Button variant="outlined">Cancel</Button>
                     <Button>Save</Button>
                 </SheetFooter>
             </SheetContent>
@@ -64,7 +64,7 @@ export const LeftSide: Story = {
     render: () => (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="outline">Open Left Sheet</Button>
+                <Button variant="outlined">Open Left Sheet</Button>
             </SheetTrigger>
             <SheetContent side="left">
                 <SheetHeader>
@@ -73,13 +73,13 @@ export const LeftSide: Story = {
                 </SheetHeader>
                 <SheetBody>
                     <div className="space-y-2">
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button variant="text" className="w-full justify-start">
                             Home
                         </Button>
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button variant="text" className="w-full justify-start">
                             About
                         </Button>
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button variant="text" className="w-full justify-start">
                             Contact
                         </Button>
                     </div>
@@ -93,7 +93,7 @@ export const TopSide: Story = {
     render: () => (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="outline">Open Top Sheet</Button>
+                <Button variant="outlined">Open Top Sheet</Button>
             </SheetTrigger>
             <SheetContent side="top">
                 <SheetHeader>
@@ -102,11 +102,11 @@ export const TopSide: Story = {
                 </SheetHeader>
                 <SheetBody>
                     <div className="flex gap-2">
-                        <Button size="sm">New Document</Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="small">New Document</Button>
+                        <Button size="small" variant="outlined">
                             Import
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="small" variant="outlined">
                             Export
                         </Button>
                     </div>
@@ -120,7 +120,7 @@ export const BottomSide: Story = {
     render: () => (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="outline">Open Bottom Sheet</Button>
+                <Button variant="outlined">Open Bottom Sheet</Button>
             </SheetTrigger>
             <SheetContent side="bottom">
                 <SheetHeader>
@@ -129,13 +129,13 @@ export const BottomSide: Story = {
                 </SheetHeader>
                 <SheetBody>
                     <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="small" variant="outlined">
                             Copy Link
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="small" variant="outlined">
                             Email
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="small" variant="outlined">
                             Social Media
                         </Button>
                     </div>
