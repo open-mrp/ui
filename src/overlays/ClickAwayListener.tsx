@@ -4,6 +4,7 @@ import {
     cloneElement,
     isValidElement,
     useEffect,
+    useEffectEvent,
     useRef,
     type ReactElement,
     type Ref,
@@ -35,10 +36,7 @@ export function ClickAwayListener({
 }: ClickAwayListenerProps) {
     const nodeRef = useRef<Element | null>(null);
     const activated = useRef(false);
-    const callbackRef = useRef(onClickAway);
-    useEffect(() => {
-        callbackRef.current = onClickAway;
-    });
+    const handleClickAway = useEffectEvent((event: MouseEvent | TouchEvent) => onClickAway(event));
     const childRef = isValidElement(children) ? children.props.ref : undefined;
     const handleRef = useForkRef<Element>(nodeRef, childRef);
 
@@ -58,7 +56,7 @@ export function ClickAwayListener({
             const path = event.composedPath();
             if (path.includes(nodeRef.current)) return;
             if (event.target instanceof Node && !event.target.isConnected) return;
-            callbackRef.current(event);
+            handleClickAway(event);
         };
         const mouseName = mouseEvent ? mouseEventNames[mouseEvent] : null;
         const touchName = touchEvent ? touchEventNames[touchEvent] : null;

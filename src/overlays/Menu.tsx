@@ -6,6 +6,7 @@ import {
     useContext,
     useEffect,
     useLayoutEffect,
+    useMemo,
     useRef,
     useState,
     type ComponentPropsWithoutRef,
@@ -84,6 +85,10 @@ export const MenuList = forwardRef<HTMLUListElement, MenuListProps>(function Men
     const typeahead = useRef({ keys: [] as string[], last: 0 });
     const [activeItem, setActiveItem] = useState<HTMLElement | null>(null);
     const roving = variant === 'selectedMenu';
+    const context = useMemo(
+        () => ({ dense, role: itemRole, activeItem, roving }),
+        [dense, itemRole, activeItem, roving]
+    );
 
     useLayoutEffect(() => {
         const list = listRef.current;
@@ -205,7 +210,7 @@ export const MenuList = forwardRef<HTMLUListElement, MenuListProps>(function Men
     };
 
     return (
-        <MenuListContext.Provider value={{ dense, role: itemRole, activeItem, roving }}>
+        <MenuListContext.Provider value={context}>
             <Component
                 ref={handleRef}
                 role={role}
@@ -325,6 +330,7 @@ export const MenuItem = forwardRef<HTMLLIElement, MenuItemProps>(function MenuIt
 ) {
     const context = useContext(MenuListContext);
     const dense = denseProp ?? context.dense;
+    const listContext = useMemo(() => ({ dense }), [dense]);
     const itemRef = useRef<HTMLLIElement | null>(null);
     const handleRef = useForkRef(itemRef, ref);
     useEffect(() => {
@@ -335,7 +341,7 @@ export const MenuItem = forwardRef<HTMLLIElement, MenuItemProps>(function MenuIt
     const isActive = context.activeItem !== null && itemRef.current === context.activeItem;
     const resolvedTabIndex = disabled ? -1 : (tabIndex ?? (context.roving && isActive ? 0 : -1));
     return (
-        <ListContext.Provider value={{ dense }}>
+        <ListContext.Provider value={listContext}>
             <Component
                 ref={handleRef}
                 role={role}

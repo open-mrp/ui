@@ -15,7 +15,6 @@ import {
     isValidElement,
     useEffect,
     useId,
-    useLayoutEffect,
     useState,
     type FocusEvent,
     type MouseEvent,
@@ -154,7 +153,7 @@ export function Tooltip({
 
     useEffect(() => () => timers.clearAll(), [timers]);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (!open) return;
         hysteresisOpen = true;
         clearTimeout(hysteresisTimer);

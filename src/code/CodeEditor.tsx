@@ -1,7 +1,6 @@
 'use client';
 
 import { useVirtualizer } from '@tanstack/react-virtual';
-import copy from 'copy-to-clipboard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { escapeHtml, highlightCode } from '../utils/highlight';
 import CodeCopyButton from './CodeCopyButton';
@@ -326,7 +325,7 @@ export default function CodeEditor({
 
     const handleCopy = () => {
         const text = copyCode || codeRef.current?.textContent || '';
-        copy(text);
+        void navigator.clipboard?.writeText(text).catch(() => {});
         setCopied(true);
         if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
         copiedTimeoutRef.current = setTimeout(() => setCopied(false), 1000);

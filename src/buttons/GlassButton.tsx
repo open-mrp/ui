@@ -1,5 +1,4 @@
 import type { ComponentSize } from '@/types/ComponentSize';
-import { cva } from 'class-variance-authority';
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -9,82 +8,59 @@ export type GlassButtonVariant = 'contained' | 'outlined' | 'text' | 'icon';
 const BASE_STYLES =
     'ui-button inline-flex items-center justify-center rounded-md text-sm font-semibold transition-all duration-250 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2';
 
-const glassButtonVariants = cva(BASE_STYLES, {
-    variants: {
-        variant: {
-            contained: 'bg-[var(--ui-btn-bg)] hover:brightness-95',
-            outlined:
-                'border border-[var(--ui-btn-fg)] text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
-            text: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
-            icon: 'p-2 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
-        },
-        size: {
-            sm: 'px-4 py-2 text-xs',
-            md: 'px-4 py-2',
-            lg: 'px-6 py-2 text-base',
-        },
-        disabled: {
-            true: 'opacity-50 cursor-auto pointer-events-none',
-            false: 'hover:cursor-pointer',
-        },
-        blur: {
-            true: 'backdrop-blur-md',
-            false: '',
-        },
-    },
-    compoundVariants: [
-        {
-            variant: 'contained',
-            disabled: true,
-            class: '!bg-gray-700/50 !text-gray-600 !hover:bg-gray-700/50',
-        },
-        {
-            variant: 'outlined',
-            disabled: true,
-            class: '!border-gray-700/50 !text-gray-600 !hover:bg-transparent !hover:border-gray-700/50',
-        },
-        {
-            variant: 'text',
-            disabled: true,
-            class: '!text-gray-600 !hover:bg-transparent',
-        },
-        {
-            variant: 'icon',
-            disabled: true,
-            class: '!text-gray-600 !hover:bg-transparent',
-        },
-        {
-            variant: 'contained',
-            blur: true,
-            disabled: false,
-            class: 'bg-[var(--ui-btn-fg)]/10 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/15 dark:bg-[var(--ui-btn-fg)]/5 dark:hover:bg-[var(--ui-btn-fg)]/10',
-        },
-        {
-            variant: 'outlined',
-            blur: true,
-            disabled: false,
-            class: 'border-[var(--ui-btn-fg)]/20 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/10 hover:border-[var(--ui-btn-fg)]/30 dark:hover:bg-[var(--ui-btn-fg)]/5',
-        },
-        {
-            variant: 'text',
-            blur: true,
-            disabled: false,
-            class: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
-        },
-        {
-            variant: 'icon',
-            blur: true,
-            disabled: false,
-            class: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
-        },
-    ],
-    defaultVariants: {
-        variant: 'contained',
-        size: 'md',
-        disabled: false,
-        blur: false,
-    },
-});
+const VARIANT_STYLES: Record<GlassButtonVariant, string> = {
+    contained: 'bg-[var(--ui-btn-bg)] hover:brightness-95',
+    outlined:
+        'border border-[var(--ui-btn-fg)] text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
+    text: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
+    icon: 'p-2 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/5',
+};
+
+const SIZE_STYLES: Record<ComponentSize, string> = {
+    sm: 'px-4 py-2 text-xs',
+    md: 'px-4 py-2',
+    lg: 'px-6 py-2 text-base',
+};
+
+const DISABLED_STYLES: Record<GlassButtonVariant, string> = {
+    contained: '!bg-gray-700/50 !text-gray-600 !hover:bg-gray-700/50',
+    outlined: '!border-gray-700/50 !text-gray-600 !hover:bg-transparent !hover:border-gray-700/50',
+    text: '!text-gray-600 !hover:bg-transparent',
+    icon: '!text-gray-600 !hover:bg-transparent',
+};
+
+const BLUR_STYLES: Record<GlassButtonVariant, string> = {
+    contained:
+        'bg-[var(--ui-btn-fg)]/10 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/15 dark:bg-[var(--ui-btn-fg)]/5 dark:hover:bg-[var(--ui-btn-fg)]/10',
+    outlined:
+        'border-[var(--ui-btn-fg)]/20 text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/10 hover:border-[var(--ui-btn-fg)]/30 dark:hover:bg-[var(--ui-btn-fg)]/5',
+    text: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
+    icon: 'text-[var(--ui-btn-fg)] hover:bg-[var(--ui-btn-fg)]/20 dark:hover:bg-[var(--ui-btn-fg)]/15',
+};
+
+function glassButtonVariants({
+    variant = 'contained',
+    size = 'md',
+    disabled = false,
+    blur = false,
+}: {
+    variant?: GlassButtonVariant;
+    size?: ComponentSize;
+    disabled?: boolean;
+    blur?: boolean;
+}): string {
+    return [
+        BASE_STYLES,
+        VARIANT_STYLES[variant],
+        SIZE_STYLES[size],
+        disabled ? 'opacity-50 cursor-auto pointer-events-none' : 'hover:cursor-pointer',
+        blur ? 'backdrop-blur-md' : '',
+        disabled ? DISABLED_STYLES[variant] : '',
+        blur && !disabled ? BLUR_STYLES[variant] : '',
+    ]
+        .filter(Boolean)
+        .join(' ');
+}
 
 export interface GlassButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
     children?: React.ReactNode;

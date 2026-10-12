@@ -4,6 +4,7 @@ import {
     createContext,
     forwardRef,
     useContext,
+    useMemo,
     type ComponentPropsWithoutRef,
     type ElementType,
 } from 'react';
@@ -35,8 +36,12 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
     ref
 ) {
     const Component = component ?? 'table';
+    const context = useMemo(
+        () => ({ size, padding, stickyHeader }),
+        [size, padding, stickyHeader]
+    );
     return (
-        <TableContext.Provider value={{ size, padding, stickyHeader }}>
+        <TableContext.Provider value={context}>
             <Component
                 ref={ref}
                 className={cn(

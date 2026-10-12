@@ -231,7 +231,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
 
     useLayoutEffect(() => {
         updateIndicator();
-    });
+    }, [updateIndicator, children, variant, centered]);
 
     useEffect(() => {
         const list = listRef.current;

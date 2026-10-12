@@ -1,7 +1,15 @@
-import rehypeHighlight from 'rehype-highlight';
-import rehypeParse from 'rehype-parse';
-import rehypeStringify from 'rehype-stringify';
-import { unified } from 'unified';
+import hljs from 'highlight.js/lib/common';
+import arduino from 'highlight.js/lib/languages/arduino';
+
+if (!hljs.getLanguage('arduino')) hljs.registerLanguage('arduino', arduino);
+
+const ENTITIES: Record<string, string> = {
+    '&amp;': '&#x26;',
+    '&lt;': '&#x3C;',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#x27;': "'",
+};
 
 /** Escape HTML entities so raw code can't be parsed as markup. */
 export function escapeHtml(code: string): string {
@@ -13,15 +21,15 @@ export function escapeHtml(code: string): string {
         .replace(/'/g, '&#39;');
 }
 
+function encodeText(code: string): string {
+    return code.replace(/&/g, '&#x26;').replace(/</g, '&#x3C;');
+}
+
 export async function highlightCode(code: string, language: string): Promise<string> {
-    // Escape HTML entities in the code block to avoid accidental HTML parsing
-    const escaped = escapeHtml(code);
-
-    const result = await unified()
-        .use(rehypeParse, { fragment: true })
-        .use(rehypeHighlight)
-        .use(rehypeStringify)
-        .process(`<pre><code class="language-${language}">${escaped}</code></pre>`);
-
-    return result.toString();
+    const body = hljs.getLanguage(language)
+        ? hljs
+              .highlight(code, { language, ignoreIllegals: true })
+              .value.replace(/&(?:amp|lt|gt|quot|#x27);/g, (entity) => ENTITIES[entity] ?? entity)
+        : encodeText(code);
+    return `<pre><code class="hljs language-${language}">${body}</code></pre>`;
 }

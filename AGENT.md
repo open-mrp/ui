@@ -25,11 +25,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Component organization:** Components live in `src/` grouped by category (buttons, navigation, overlays, tables, etc.). Each category has a barrel `index.ts` that re-exports all public components. The top-level `src/index.ts` re-exports everything.
 
-**Styling:** Tailwind CSS v4 with CVA (Class Variance Authority) for variant-based component styling. The `cn()` utility in `src/utils/cn.ts` combines `clsx` + `tailwind-merge`. Theme variables are defined in `src/styles/theme.css` as CSS custom properties with dark mode support via `.dark` class.
+**Styling:** Tailwind CSS v4 (a peer dependency: consumers compile the `@theme`/`@source` directives in `dist/styles.css`). Variant styles are plain lookup maps. The `cn()` utility in `src/utils/cn.ts` combines `clsx` + `tailwind-merge`. Theme variables are defined in `src/styles/theme.css` as CSS custom properties with dark mode support via `.dark` class.
 
-**Accessible primitives:** Radix UI provides the base for overlays (Popover, Tooltip, Select, DropdownMenu, Sheet, Dialog).
+**Overlays:** All overlays are built in-house. `Modal` owns the modal layer (portal, focus trap, scroll lock, `aria-hidden` siblings, Escape/backdrop close) and backs `Dialog`, `Drawer`, `Sheet`, `Popover`, `Menu` and `DropdownMenu`. `AnchoredPanel` positions floating panels with `@floating-ui/react-dom` (exposing `--anchor-width`, `--available-height` and `--available-width`) and is non-modal by default, dismissing via `useDismissableLayer` (Escape, outside pointer, outside focus, respecting nested layers); panels opened inside a `Modal` portal into that modal's root. `Slot` in `src/utils/slot.tsx` implements `asChild`. Mark anything rendered outside a modal's DOM with `overlayProps` so focus enforcement treats it as inside.
 
-**State management:** Zustand for global state (sidebar collapse in `useSidenavStore`, dark mode). Hooks in `src/hooks/` handle SSR-safe hydration patterns.
+**State management:** Small module-level stores read through `useSyncExternalStore` (sidebar collapse in `useSidenavStore`, persisted to localStorage). Hooks in `src/hooks/` handle SSR-safe hydration patterns.
 
 **Shaders:** `src/shaders/` contains WebGL visualizations (Duffing, Lorenz, Wave) with custom physics/bloom/color managers using raw GLSL files.
 

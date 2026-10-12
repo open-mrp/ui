@@ -9,7 +9,7 @@ import {
     useFloating,
     type Placement,
 } from '@floating-ui/react-dom';
-import { forwardRef, useLayoutEffect, type ComponentPropsWithoutRef, type ReactNode } from 'react';
+import { forwardRef, type ComponentPropsWithoutRef, type ReactNode } from 'react';
 import { cn } from '@/utils/cn';
 import { Portal } from './Modal';
 import { overlayProps } from './overlay';
@@ -65,14 +65,16 @@ export const Popper = forwardRef<HTMLDivElement, PopperProps>(function Popper(
     ref
 ) {
     const { mounted } = usePresence(open, transition ? 250 : 0);
+    const resolvedAnchor = typeof anchorEl === 'function' ? anchorEl() : anchorEl;
     const {
-        refs: { setReference, setFloating },
+        refs: { setFloating },
         floatingStyles,
         placement: resolvedPlacement,
     } = useFloating({
         placement,
         strategy: 'absolute',
         open: mounted,
+        elements: { reference: resolvedAnchor ?? null },
         middleware: [
             offsetMiddleware(offset),
             ...(allowFlip ? [flip()] : []),
@@ -81,10 +83,6 @@ export const Popper = forwardRef<HTMLDivElement, PopperProps>(function Popper(
         whileElementsMounted: autoUpdate,
     });
     const attachFloating = useForkRef(setFloating, ref);
-    const resolvedAnchor = typeof anchorEl === 'function' ? anchorEl() : anchorEl;
-    useLayoutEffect(() => {
-        setReference(resolvedAnchor ?? null);
-    }, [setReference, resolvedAnchor]);
     const visible = transition ? mounted : open;
     if (!visible && !keepMounted) return null;
     const content =

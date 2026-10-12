@@ -4,7 +4,7 @@ export default {
         '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
     },
     moduleNameMapper: {
-        '.(css|less|scss)$': 'identity-obj-proxy',
+        '\\.(css|less|scss)$': 'identity-obj-proxy',
         '\\.glsl$': 'jest-transform-stub',
         '^@/(.*)$': '<rootDir>/src/$1',
     },

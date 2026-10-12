@@ -1,6 +1,7 @@
 'use client';
 
 import { autoUpdate, flip, size as sizeMiddleware, useFloating } from '@floating-ui/react-dom';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import {
     useEffect,
     useId,
@@ -26,6 +27,8 @@ export type AutocompleteChangeReason =
     'createOption' | 'selectOption' | 'removeOption' | 'clear' | 'blur';
 export type AutocompleteInputChangeReason =
     'input' | 'reset' | 'clear' | 'blur' | 'selectOption' | 'removeOption';
+
+const VIRTUALIZE_THRESHOLD = 100;
 
 export interface FilterOptionsState<T> {
     inputValue: string;
@@ -264,6 +267,17 @@ export function Autocomplete<
         inputValue: filterInput,
         getOptionLabel: getOptionLabel as (option: T) => string,
     });
+    const virtual = filtered.length > VIRTUALIZE_THRESHOLD;
+    const virtualizer = useVirtualizer({
+        count: filtered.length,
+        enabled: open && virtual,
+        getScrollElement: () => listboxRef.current,
+        estimateSize: () => 48,
+        overscan: 8,
+        paddingStart: 8,
+        scrollPaddingStart: 8,
+        scrollPaddingEnd: 8,
+    });
 
     const openPopup = (event: SyntheticEvent) => {
         if (open || disabled) return;
@@ -378,6 +392,10 @@ export function Autocomplete<
             return;
         }
         if (highlight.reason === 'mouse') return;
+        if (virtual) {
+            virtualizer.scrollToIndex(highlighted, { align: 'auto' });
+            return;
+        }
         const option = listbox.querySelector<HTMLElement>(
             `[data-option-index="${highlighted}"]`
         );
@@ -389,7 +407,7 @@ export function Autocomplete<
         } else if (option.offsetTop < listbox.scrollTop) {
             listbox.scrollTop = option.offsetTop;
         }
-    }, [open, highlighted, highlight.reason]);
+    }, [open, highlighted, highlight.reason, virtual, virtualizer]);
 
     const moveHighlight = (diff: number | 'start' | 'end', direction: 'next' | 'previous') => {
         if (!open) return;
@@ -613,6 +631,8 @@ export function Autocomplete<
     };
 
     const showPopup = open && (filtered.length > 0 || loading || !freeSolo);
+    const virtualItems = virtual ? virtualizer.getVirtualItems() : [];
+    const rendered = virtual ? virtualItems.map(item => item.index) : filtered.map((_, index) => index);
 
     return (
         <>
@@ -657,7 +677,15 @@ export function Autocomplete<
                                         listboxClassName
                                     )}
                                 >
-                                    {filtered.map((option, index) => {
+                                    {virtual ? (
+                                        <li
+                                            aria-hidden
+                                            className="m-0 p-0"
+                                            style={{ height: (virtualItems[0]?.start ?? 8) - 8 }}
+                                        />
+                                    ) : null}
+                                    {rendered.map(index => {
+                                        const option = filtered[index] as T;
                                         const selected = isSelected(option);
                                         const optionDisabled = getOptionDisabled?.(option) ?? false;
                                         const optionProps = {
@@ -666,6 +694,14 @@ export function Autocomplete<
                                             role: 'option',
                                             tabIndex: -1,
                                             'data-option-index': index,
+                                            ...(virtual
+                                                ? {
+                                                      'data-index': index,
+                                                      ref: virtualizer.measureElement,
+                                                      'aria-setsize': filtered.length,
+                                                      'aria-posinset': index + 1,
+                                                  }
+                                                : null),
                                             'aria-selected': selected,
                                             'aria-disabled': optionDisabled,
                                             onMouseMove: () =>
@@ -704,6 +740,19 @@ export function Autocomplete<
                                             </li>
                                         );
                                     })}
+                                    {virtual ? (
+                                        <li
+                                            aria-hidden
+                                            className="m-0 p-0"
+                                            style={{
+                                                height: Math.max(
+                                                    virtualizer.getTotalSize() -
+                                                        (virtualItems.at(-1)?.end ?? 0),
+                                                    0
+                                                ),
+                                            }}
+                                        />
+                                    ) : null}
                                 </ul>
                             ) : null}
                         </div>

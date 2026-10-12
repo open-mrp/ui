@@ -7,6 +7,7 @@ import {
     forwardRef,
     isValidElement,
     useContext,
+    useMemo,
     type ComponentPropsWithoutRef,
     type ReactElement,
     type ReactNode,
@@ -89,8 +90,12 @@ export const Stepper = forwardRef<HTMLOListElement, StepperProps>(function Stepp
     ref
 ) {
     const steps = Children.toArray(children).filter(isValidElement) as ReactElement<StepProps>[];
+    const context = useMemo(
+        () => ({ activeStep, alternativeLabel, orientation, nonLinear }),
+        [activeStep, alternativeLabel, orientation, nonLinear]
+    );
     return (
-        <StepperContext.Provider value={{ activeStep, alternativeLabel, orientation, nonLinear }}>
+        <StepperContext.Provider value={context}>
             <ol
                 ref={ref}
                 className={cn(
@@ -142,8 +147,12 @@ export const Step = forwardRef<HTMLLIElement, StepProps>(function Step(
     const completed = completedProp ?? (!nonLinear && activeStep > index);
     const disabled = disabledProp ?? (!nonLinear && activeStep < index);
     const horizontal = orientation === 'horizontal';
+    const context = useMemo(
+        () => ({ index, active, completed, disabled, last }),
+        [index, active, completed, disabled, last]
+    );
     return (
-        <StepContext.Provider value={{ index, active, completed, disabled, last }}>
+        <StepContext.Provider value={context}>
             <li
                 ref={ref}
                 className={cn(

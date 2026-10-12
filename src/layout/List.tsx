@@ -5,6 +5,7 @@ import {
     forwardRef,
     isValidElement,
     useContext,
+    useMemo,
     type ComponentPropsWithoutRef,
     type ElementType,
     type ReactNode,
@@ -36,9 +37,10 @@ export const List = forwardRef<HTMLUListElement, ListProps>(function List(
 ) {
     const parent = useContext(ListContext);
     const dense = denseProp ?? parent.dense;
+    const context = useMemo(() => ({ dense }), [dense]);
     const Component = component ?? 'ul';
     return (
-        <ListContext.Provider value={{ dense }}>
+        <ListContext.Provider value={context}>
             <Component
                 ref={ref}
                 className={cn(
@@ -83,9 +85,10 @@ export const ListItem = forwardRef<HTMLLIElement, ListItemProps>(function ListIt
 ) {
     const parent = useContext(ListContext);
     const dense = denseProp ?? parent.dense;
+    const context = useMemo(() => ({ dense }), [dense]);
     const Component = component ?? 'li';
     return (
-        <ListContext.Provider value={{ dense }}>
+        <ListContext.Provider value={context}>
             <Component
                 ref={ref}
                 className={cn(
@@ -134,8 +137,9 @@ export const ListItemButton = forwardRef<HTMLElement, ListItemButtonProps>(funct
 ) {
     const parent = useContext(ListContext);
     const dense = denseProp ?? parent.dense;
+    const context = useMemo(() => ({ dense }), [dense]);
     return (
-        <ListContext.Provider value={{ dense }}>
+        <ListContext.Provider value={context}>
             <ButtonBase
                 ref={ref}
                 component={component ?? 'div'}
