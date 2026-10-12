@@ -42,8 +42,10 @@ export {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from './DropdownMenu';
+export * from './AnchoredPanel';
 export * from './ClickAwayListener';
 export * from './Dialog';
+export * from './dismissable-layer';
 export * from './Drawer';
 export * from './Menu';
 export * from './Modal';
