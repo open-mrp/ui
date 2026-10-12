@@ -1,7 +1,7 @@
 {
     "name": "@openmrp/ui",
     "description": "A collection of react components and other user interface utilities for OpenMRP.",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "author": "Augno, Inc.",
     "type": "module",
     "main": "dist/cjs/index.js",
